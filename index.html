@@ -2,378 +2,949 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
-    <title>CineSync - Assista com Amigos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siga a Receita - Deluxe Chef!</title>
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Font Awesome (Ícones) CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Font Inter (Estilo Google) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        /* Estilo base com a fonte Inter */
         body {
             font-family: 'Inter', sans-serif;
-            overflow: hidden;
+            /* Fundo gradiente vibrante e vivo */
+            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            overflow: hidden; /* Prevenir scroll */
         }
-        #app-container {
-            background: linear-gradient(135deg, #1e3a8a, #312e81, #4c1d95);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+
+        /* Container principal do jogo */
+        #game-container {
+            /* Efeito de vidro fosco (glassmorphism) */
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
         }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+
+        /* Botões principais (Menu e Ação) */
+        .btn-main {
+            transition: all 0.2s ease;
+            transform: scale(1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        .sidebar {
-            transition: transform 0.3s ease-in-out;
+        .btn-main:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
-        .sidebar-left-hidden {
-            transform: translateX(-100%);
+        .btn-main:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .sidebar-right-hidden {
-            transform: translateX(100%);
+
+        /* Estilo dos botões de ingrediente */
+        .ingredient-btn {
+            transition: all 0.15s ease;
+            background: #fff;
+            color: #333;
+            border: 2px solid #ddd;
         }
-        /* Custom scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+        .ingredient-btn:hover {
+            border-color: #a78bfa; /* Roxo */
+            transform: translateY(-2px);
+        }
+        .ingredient-btn:active {
+            transform: scale(0.92);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            background-color: #a78bfa; /* Roxo */
+            color: white;
+            border-color: #a78bfa;
+        }
         
-        #video-player-container {
-            background: #000;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        /* (NOVO) Estilo para o card de "Subir de Ranque" no mercado */
+        .rank-up-card {
+            border: 3px solid #f59e0b; /* Amarelo/Ouro */
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+            transform: scale(1.02);
+            background-color: #fffbeb; /* Fundo amarelo claro */
         }
-        /* Hide default video controls */
-        video::-webkit-media-controls { display: none !important; }
-        video::-webkit-media-controls-enclosure { display: none !important; }
-        video::-webkit-media-controls-panel { display: none !important; }
+        .rank-up-card:hover {
+            background-color: #fffbeb;
+        }
+
+        /* Animações */
+        @keyframes pop-in {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop-in { animation: pop-in 0.3s ease-out forwards; }
         
-        /* Custom progress bar */
-        #progress-bar { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; background: rgba(255, 255, 255, 0.3); border-radius: 5px; outline: none; transition: height 0.2s; cursor: pointer;}
-        #progress-bar:hover { height: 8px; }
-        #progress-bar::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: #3b82f6; border-radius: 50%; cursor: pointer; transform: scale(0); transition: transform 0.2s; }
-        #video-controls:hover #progress-bar::-webkit-slider-thumb, #progress-bar:active::-webkit-slider-thumb { transform: scale(1); }
-        #video-controls.host-controls #progress-bar { cursor: pointer; }
-        #video-controls.guest-controls #progress-bar { cursor: not-allowed; }
+        @keyframes slide-in-bottom {
+            0% { transform: translateY(100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-in-bottom { animation: slide-in-bottom 0.5s ease-out forwards; }
+
+        @keyframes countdown {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        .timer-bar-inner-animate { animation: countdown 10s linear forwards; }
+        
+        /* Balão de fala melhorado */
+        .speech-bubble {
+            position: relative;
+            background: #f3f4f6; /* Cinza claro */
+            border-radius: .4em;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 15%;
+            width: 0; height: 0;
+            border: 20px solid transparent;
+            border-top-color: #f3f4f6; /* Cor igual ao balão */
+            border-bottom: 0;
+            margin-left: -10px;
+            margin-bottom: -20px;
+        }
+        
+        /* Classes de feedback */
+        .message-success { color: #10b981; /* Verde */ transform: scale(1); opacity: 1; }
+        .message-error { color: #ef4444; /* Vermelho */ transform: scale(1); opacity: 1; }
+        #message-box {
+            transition: all 0.3s ease;
+            transform: scale(0.8);
+            opacity: 0;
+            height: 2.5rem; /* Altura fixa */
+        }
+        
+        /* Combo (Streak) */
+        @keyframes pulse-orange {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.9; }
+        }
+        .animate-pulse-orange { animation: pulse-orange 0.3s ease-out; }
+
+        /* Evitar seleção de texto */
+        .no-select {
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+/Edge */
+            user-select: none; /* Padrão */
+        }
+
+        /* Estilo para as "telas" */
+        .screen {
+            display: none; /* Oculto por padrão */
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            animation: pop-in 0.4s ease-out;
+        }
+        .screen.active {
+            display: flex; /* Visível quando ativo */
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-white overflow-hidden">
+<body class="flex items-center justify-center h-screen no-select">
 
-    <div id="app-container" class="w-full h-screen">
-        <!-- Tela de Login/Entrada -->
-        <div id="login-screen" class="flex flex-col items-center justify-center w-full h-full p-4">
-            <!-- ... (conteúdo da tela de login inalterado) ... -->
-            <div class="bg-black bg-opacity-40 p-8 rounded-2xl shadow-2xl w-full max-w-md text-center backdrop-blur-sm border border-white/10">
-                <div class="flex items-center justify-center mb-6">
-                    <i data-lucide="clapperboard" class="w-10 h-10 text-blue-400 mr-3"></i>
-                    <h1 class="text-4xl font-bold">CineSync</h1>
-                </div>
-                <p class="text-slate-300 mb-8">Crie uma sala ou entre em uma para assistir com seus amigos.</p>
-                <div class="space-y-4">
-                    <input type="text" id="username-input" placeholder="Digite seu nome" class="w-full bg-slate-800/50 border-2 border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                    <button id="create-room-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg flex items-center justify-center transition-transform hover:scale-105">
-                        <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
-                        Criar Nova Sala
-                    </button>
-                    <div class="flex items-center">
-                        <hr class="flex-grow border-slate-600">
-                        <span class="px-4 text-slate-400">OU</span>
-                        <hr class="flex-grow border-slate-600">
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="room-id-input" placeholder="Cole o código da sala" class="w-full bg-slate-800/50 border-2 border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                        <button id="join-room-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg flex items-center justify-center transition-transform hover:scale-105">
-                            <i data-lucide="arrow-right-to-line" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                </div>
-                 <p id="error-message" class="text-red-400 mt-4 h-5"></p>
+    <!-- Container Principal do App (Mobile-First) -->
+    <div id="game-container" class="w-full max-w-md h-full md:h-[95vh] md:max-h-[800px] bg-white shadow-xl rounded-2xl flex flex-col overflow-hidden relative">
+
+        <!-- ====================================================== -->
+        <!-- 1. TELA DE MENU (MODIFICADA COM RANQUE)                -->
+        <!-- ====================================================== -->
+        <div id="menu-screen" class="screen active p-8 flex-col items-center justify-center text-center">
+            
+            <!-- (NOVO) Display de Ranque -->
+            <div id="rank-display" class="text-center mb-6 w-full">
+                <div id="rank-icon" class="text-8xl mb-2">🧼</div>
+                <h2 id="rank-name" class="text-3xl font-bold text-gray-700">Lava-pratos</h2>
+            </div>
+
+            <!-- (NOVO) Meta para Próximo Ranque -->
+            <div id="rank-goal" class="bg-gray-100 p-4 rounded-xl mb-6 text-center w-full shadow-inner">
+                <h4 class="text-lg font-bold text-purple-600">Próximo Nível</h4>
+                <p id="rank-goal-text" class="text-gray-600">Compre a receita "Salada" no Mercado!</p>
+            </div>
+
+            <button id="play-button" class="btn-main w-full bg-green-500 text-white font-bold px-12 py-5 rounded-xl text-3xl shadow-lg mb-6">
+                <i class="fas fa-play mr-3"></i> Próximo Pedido
+            </button>
+            <button id="market-button" class="btn-main w-full bg-blue-500 text-white font-bold px-12 py-5 rounded-xl text-3xl shadow-lg">
+                <i class="fas fa-store mr-3"></i> Mercado
+            </button>
+            <div class="mt-auto text-gray-500 text-sm">
+                Chef Deluxe v2.0
             </div>
         </div>
 
-        <!-- Tela Principal do App -->
-        <main id="main-app" class="hidden w-full h-screen flex flex-col">
-            <!-- Header -->
-            <header class="bg-black bg-opacity-30 p-2 shadow-lg flex items-center justify-between z-20 flex-shrink-0">
-                <!-- ... (conteúdo do header inalterado) ... -->
-                 <div class="flex items-center gap-4">
-                     <button id="toggle-participants-btn" class="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <i data-lucide="users" class="w-6 h-6"></i>
-                    </button>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="clapperboard" class="w-7 h-7 text-blue-400"></i>
-                        <h1 class="text-xl font-bold hidden sm:block">CineSync</h1>
+        <!-- ====================================================== -->
+        <!-- 2. TELA DE JOGO (MODIFICADA)                           -->
+        <!-- ====================================================== -->
+        <div id="game-screen" class="screen">
+            <!-- Header (Dinheiro e Pausa) -->
+            <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex justify-between items-center z-10">
+                <button id="pause-button" class="text-gray-500 hover:text-purple-600 transition-colors duration-200 text-3xl w-10 h-10 flex items-center justify-center">
+                    <i class="fas fa-pause"></i>
+                </button>
+                
+                <div class="flex items-center space-x-3">
+                    <div id="streak-display" class="text-orange-500 font-bold text-xl transition-transform duration-300" title="Combo de Acertos"></div>
+                    <div id="money-display-game" class="bg-green-500 text-white font-bold px-5 py-2 rounded-full text-lg shadow-md transition-all duration-300">
+                        $50
                     </div>
-                </div>
-                <div id="room-info" class="flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-lg border border-slate-600">
-                    <span class="text-slate-300 hidden md:inline">SALA:</span>
-                    <span id="room-id-display" class="font-mono text-lg text-blue-300"></span>
-                    <button id="copy-room-id-btn" class="p-1 rounded-md hover:bg-white/10 transition-colors">
-                        <i data-lucide="copy" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                <div class="flex items-center gap-4">
-                    <button id="app-fullscreen-btn" class="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <i id="app-fullscreen-icon" data-lucide="maximize" class="w-6 h-6"></i>
-                    </button>
-                    <button id="toggle-chat-btn" class="p-2 rounded-full hover:bg-white/10 transition-colors">
-                        <i data-lucide="message-square" class="w-6 h-6"></i>
-                    </button>
                 </div>
             </header>
 
-            <!-- Conteúdo Principal (Vídeo e Sidebars) -->
-            <div class="flex-grow flex relative overflow-hidden">
-                <!-- Sidebar de Participantes (Esquerda) -->
-                <aside id="participants-sidebar" class="sidebar sidebar-left-hidden absolute md:relative top-0 left-0 h-full w-64 md:w-72 bg-slate-900/80 backdrop-blur-md border-r border-slate-700/50 flex-shrink-0 z-30 flex flex-col">
-                    <!-- ... (conteúdo da sidebar de participantes inalterado) ... -->
-                    <div class="flex items-center justify-between p-4 border-b border-slate-700">
-                        <h2 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="users" class="w-5 h-5"></i>Participantes</h2>
-                        <button id="close-participants-btn" class="md:hidden p-1 rounded-full hover:bg-white/10">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                    <ul id="participants-list" class="flex-grow p-2 space-y-2 overflow-y-auto custom-scrollbar"></ul>
-                </aside>
-
-                <!-- Área do Vídeo e Controles -->
-                <div class="flex-grow flex flex-col p-2 sm:p-4 gap-4 overflow-y-auto custom-scrollbar">
-                    <div id="video-player-container" class="w-full aspect-video flex-shrink-0 flex items-center justify-center relative group bg-black rounded-lg">
-                        <video id="video-player" class="w-full h-full rounded-lg" playsinline></video>
-                        <div id="video-placeholder-new" class="absolute inset-0 flex flex-col items-center justify-center text-center text-slate-400 pointer-events-none">
-                            <i data-lucide="video" class="w-16 h-16 mx-auto mb-4"></i>
-                            <h3 class="text-xl font-semibold">O vídeo aparecerá aqui</h3>
-                            <p>Cole um link de vídeo (.mp4) abaixo para começar.</p>
-                        </div>
-                        <div id="video-controls" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-6 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-300 flex flex-col gap-2">
-                           <input type="range" id="progress-bar" value="0" step="0.1" class="w-full">
-                           <div class="flex items-center justify-between text-sm">
-                               <div class="flex items-center gap-3">
-                                   <button id="play-pause-btn" class="p-2">
-                                       <i id="play-pause-icon" data-lucide="play" class="w-6 h-6"></i>
-                                   </button>
-                                   <div id="time-display" class="font-mono w-28">00:00 / 00:00</div>
-                               </div>
-                               <button id="video-fullscreen-btn" class="p-2">
-                                   <i data-lucide="maximize" class="w-6 h-6"></i>
-                               </button>
-                           </div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row gap-2 flex-shrink-0">
-                        <input type="text" id="video-url-input" placeholder="Cole o link de um vídeo .mp4 aqui" class="flex-grow bg-slate-800/50 border-2 border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                        <button id="load-video-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg flex items-center justify-center gap-2 transition-transform hover:scale-105">
-                            <i data-lucide="play" class="w-5 h-5"></i> Carregar
-                        </button>
+            <!-- Área do Jogo -->
+            <main class="flex-1 flex flex-col p-4 overflow-hidden relative text-gray-800">
+                <!-- Cliente e Pedido -->
+                <div id="order-area" class="flex flex-col items-center mb-4">
+                    <div id="npc-display" class="text-8xl transition-transform duration-300"></div>
+                    <div id="order-display" class="speech-bubble text-gray-900 font-bold text-center mt-4 w-52 transition-transform duration-200">
+                        <span id="dish-emoji" class="text-6xl block"></span>
+                        <span id="dish-name" class="block mt-2 text-lg"></span>
                     </div>
                 </div>
 
-                <!-- Sidebar de Chat (Direita) -->
-                <aside id="chat-sidebar" class="sidebar sidebar-right-hidden absolute md:relative top-0 right-0 h-full w-72 md:w-80 bg-slate-900/80 backdrop-blur-md border-l border-slate-700/50 flex-shrink-0 z-30 flex flex-col">
-                    <!-- ... (conteúdo da sidebar de chat inalterado) ... -->
-                    <div class="flex items-center justify-between p-4 border-b border-slate-700">
-                        <h2 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="message-square" class="w-5 h-5"></i>Chat da Sala</h2>
-                         <button id="close-chat-btn" class="md:hidden p-1 rounded-full hover:bg-white/10">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                    <div id="chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto custom-scrollbar"></div>
-                    <form id="chat-form" class="p-2 border-t border-slate-700 flex gap-2">
-                        <input type="text" id="chat-input" placeholder="Digite uma mensagem..." autocomplete="off" class="flex-grow bg-slate-800/50 border-2 border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-lg shadow-lg flex items-center justify-center transition-transform hover:scale-105 aspect-square">
-                            <i data-lucide="send" class="w-6 h-6"></i>
-                        </button>
-                    </form>
-                </aside>
+                <!-- Receita -->
+                <div id="recipe-list" class="text-center text-2xl h-10 mb-2 flex justify-center items-center space-x-2">
+                    <!-- Receita: 🍞 🧈 🧀 🍞 -->
+                </div>
+                
+                <!-- Barra de Tempo -->
+                <div class="w-full bg-gray-200 rounded-full h-5 mb-2 overflow-hidden shadow-inner border border-gray-300">
+                    <div id="timer-bar-inner" class="h-full rounded-full bg-gradient-to-r from-red-500 to-orange-400 transition-all duration-300"></div>
+                </div>
+                <div id="timer-text" class="text-center font-bold text-lg mb-2 text-gray-700">Tempo: 12s</div>
+
+                <!-- Prato do Jogador -->
+                <div class="bg-gray-100 border border-gray-300 rounded-lg p-3 min-h-[7rem] mb-4 shadow-inner flex flex-wrap justify-center items-center gap-2" id="player-plate">
+                    <!-- Ingredientes selecionados -->
+                </div>
+
+                <!-- Mensagem de Feedback -->
+                <div id="message-box" class="text-center text-2xl font-bold">
+                    <!-- Mensagens de "Perfeito!" ou "Errado!" -->
+                </div>
+            </main>
+
+            <!-- Bandeja de Ingredientes -->
+            <footer class="bg-gray-100 p-4 shadow-inner border-t-2 border-gray-200">
+                <div id="ingredient-bin" class="grid grid-cols-5 gap-2 justify-items-center">
+                    <!-- Botões de ingredientes serão injetados aqui -->
+                </div>
+            </footer>
+        </div>
+
+        <!-- ====================================================== -->
+        <!-- 3. TELA DE MERCADO (MODIFICADA)                        -->
+        <!-- ====================================================== -->
+        <div id="market-screen" class="screen">
+            <!-- Header do Mercado -->
+            <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 w-full">
+                <button id="menu-button-market" class="text-gray-500 hover:text-purple-600 transition-colors duration-200 text-3xl w-10 h-10 flex items-center justify-center">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 class="text-2xl font-bold text-purple-600">Mercado</h2>
+                <div id="money-display-market" class="bg-green-500 text-white font-bold px-5 py-2 rounded-full text-lg shadow-md transition-all duration-300">
+                    $50
+                </div>
+            </header>
+
+            <!-- Lista de Itens do Mercado -->
+            <main class="flex-1 p-4 overflow-y-auto w-full space-y-3">
+                <div id="market-items-grid" class="space-y-3">
+                    <!-- Cards de receitas serão injetados aqui -->
+                </div>
+            </main>
+        </div>
+
+        <!-- ====================================================== -->
+        <!-- MODAIS (SOBREPOSIÇÃO)                                  -->
+        <!-- ====================================================== -->
+
+        <!-- Tela de Pausa (MODAL) -->
+        <div id="pause-screen" class="hidden absolute inset-0 bg-black/70 z-40 flex flex-col items-center justify-center p-8 text-center backdrop-blur-sm">
+            <i class="fas fa-pause-circle text-8xl text-white mb-6"></i>
+            <h2 class="text-5xl font-bold mb-10 text-white">Pausado</h2>
+            <button id="resume-button" class="btn-main w-full max-w-xs bg-green-500 text-white font-bold px-12 py-4 rounded-xl text-2xl shadow-lg mb-4">
+                Continuar
+            </button>
+            <button id="menu-button-pause" class="btn-main w-full max-w-xs bg-red-500 text-white font-bold px-12 py-4 rounded-xl text-2xl shadow-lg">
+                Voltar ao Menu
+            </button>
+        </div>
+
+        <!-- Mensagem de Feedback do Mercado (MODAL) -->
+        <div id="market-message-modal" class="hidden absolute inset-0 bg-black/70 z-50 flex flex-col items-center justify-center p-8 backdrop-blur-sm">
+            <div class="bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
+                <i id="market-message-icon" class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
+                <h3 id="market-message-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
+                <p id="market-message-text" class="text-gray-600 mb-6"></p>
+                <button id="market-message-close" class="btn-main w-full bg-purple-500 text-white font-bold py-3 rounded-lg text-lg">
+                    OK
+                </button>
             </div>
-        </main>
+        </div>
+
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script>
+        // --- 1. DEFINIÇÃO DE DADOS DO JOGO ---
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'cinesync-default';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const NPCS = ["👩‍💼", "🧑‍💻", "👨‍🎨", "👩‍🚀", "🧑‍🚒", "👮‍♀️", "👷‍♂️", "👩‍⚕️", "🧑‍🎤", "👨‍🌾"];
         
-        const ROOMS_COLLECTION_PATH = `artifacts/${appId}/public/data/cinesync_rooms`;
-
-        // --- Referências do DOM ---
-        const loginScreen = document.getElementById('login-screen');
-        const mainApp = document.getElementById('main-app');
-        const usernameInput = document.getElementById('username-input');
-        const createRoomBtn = document.getElementById('create-room-btn');
-        const joinRoomBtn = document.getElementById('join-room-btn');
-        const roomIdInput = document.getElementById('room-id-input');
-        const errorMessage = document.getElementById('error-message');
-        const participantsSidebar = document.getElementById('participants-sidebar');
-        const chatSidebar = document.getElementById('chat-sidebar');
-        const toggleParticipantsBtn = document.getElementById('toggle-participants-btn');
-        const closeParticipantsBtn = document.getElementById('close-participants-btn');
-        const toggleChatBtn = document.getElementById('toggle-chat-btn');
-        const closeChatBtn = document.getElementById('close-chat-btn');
-        const roomIdDisplay = document.getElementById('room-id-display');
-        const copyRoomIdBtn = document.getElementById('copy-room-id-btn');
-        const participantsList = document.getElementById('participants-list');
-        const videoUrlInput = document.getElementById('video-url-input');
-        const loadVideoBtn = document.getElementById('load-video-btn');
-        const chatMessages = document.getElementById('chat-messages');
-        const chatForm = document.getElementById('chat-form');
-        const chatInput = document.getElementById('chat-input');
+        // (MAIS INGREDIENTES)
+        const ALL_INGREDIENTS = [
+            "🍞", "🥬", "🥩", "🧀", "🍅", "🥒", "🧅", "🌶️", "🌮", "🍙", 
+            "🐟", "🥑", "🥚", "🥓", "🍄", "🌭", "🍗", "🌽", "🦐", "🍕",
+            "🧈", "🍆", "🥔", "🌿", "🍜", "🍓", "🍍",
+            "🥛", "🍯", "🧇", "🥞", "🥦", "🥕", "🫐", "🍚", "🥟", "🍋"
+        ];
         
-        // --- Referências do Player Customizado ---
-        const videoPlayerContainer = document.getElementById('video-player-container');
-        const videoPlayer = document.getElementById('video-player');
-        const videoPlaceholder = document.getElementById('video-placeholder-new');
-        const videoControls = document.getElementById('video-controls');
-        const playPauseBtn = document.getElementById('play-pause-btn');
-        const playPauseIcon = document.getElementById('play-pause-icon');
-        const progressBar = document.getElementById('progress-bar');
-        const timeDisplay = document.getElementById('time-display');
-        const videoFullscreenBtn = document.getElementById('video-fullscreen-btn');
+        // (MAIS RECEITAS + Estrutura de Ranque)
+        const ALL_RECIPES = [
+            // name: Nome do prato
+            // emoji: Emoji do prato
+            // price: Preço no mercado
+            // baseRecipe: A receita mínima obrigatória
+            // optionalIngredients: Ingredientes que podem ser adicionados se o jogador os tiver desbloqueado
+            
+            // Tier 1
+            { name: "Misto Quente", emoji: "🥪", price: 0, baseRecipe: ["🍞", "🧈", "🧀", "🍞"], optionalIngredients: ["🍅"] }, // Inicial
+            { name: "Limonada", emoji: "🍋", price: 60, baseRecipe: ["🍋", "🍯"], optionalIngredients: ["🌿"] },
+            { name: "Salada", emoji: "🥗", price: 100, baseRecipe: ["🥬", "🍅", "🥒"], optionalIngredients: ["🧅", "🥑", "🌽", "🥚"] }, // Rank Up
+            
+            // Tier 2
+            { name: "Vitamina", emoji: "🥑", price: 120, baseRecipe: ["🥑", "🥛", "🍯"], optionalIngredients: ["🍓"] },
+            { name: "Sushi", emoji: "🍣", price: 150, baseRecipe: ["🍙", "🐟", "🥒"], optionalIngredients: ["🥑"] },
+            { name: "Hambúrguer", emoji: "🍔", price: 200, baseRecipe: ["🍞", "🥩", "🥬", "🍞"], optionalIngredients: ["🧀", "🍅", "🥓", "🧅"] }, // Rank Up
+            
+            // Tier 3
+            { name: "Panquecas", emoji: "🥞", price: 220, baseRecipe: ["🥞", "🧈", "🍯"], optionalIngredients: ["🍓", "🫐"] },
+            { name: "Cachorro-Quente", emoji: "🌭", price: 250, baseRecipe: ["🌭", "🥓"], optionalIngredients: ["🧅", "🥒", "🌶️"] },
+            { name: "Waffles", emoji: "🧇", price: 280, baseRecipe: ["🧇", "🧈", "🍓"], optionalIngredients: ["🫐", "🍯"] },
+            { name: "Omelete", emoji: "🍳", price: 300, baseRecipe: ["🥚", "🥚", "🧈"], optionalIngredients: ["🧀", "🍄", "🌿", "🍅"] },
+            { name: "Taco", emoji: "🌮", price: 350, baseRecipe: ["🌮", "🥩", "🥬"], optionalIngredients: ["🍅", "🧀", "🌶️"] }, // Rank Up
+
+            // Tier 4
+            { name: "Frango c/ Legumes", emoji: "🍗", price: 320, baseRecipe: ["🍗", "🥦", "🥕"], optionalIngredients: ["🌿"] },
+            { name: "Sanduíche de Atum", emoji: "🥪", price: 380, baseRecipe: ["🍞", "🐟", "🥬"], optionalIngredients: ["🍅", "🧅"] },
+            { name: "Kebab", emoji: "🥙", price: 400, baseRecipe: ["🍞", "🍗", "🥬"], optionalIngredients: ["🍅", "🧅"] },
+            { name: "Onigiri", emoji: "🍙", price: 450, baseRecipe: ["🍙", "🍚", "🐟"], optionalIngredients: ["🌿"] },
+            { name: "Pizza Slice", emoji: "🍕", price: 500, baseRecipe: ["🍕", "🍅", "🧀"], optionalIngredients: ["🌶️", "🥓", "🍄"] }, // Rank Up
+
+            // Tier 5
+            { name: "Ensopado", emoji: "🍲", price: 550, baseRecipe: ["🥔", "🥕", "🧅"], optionalIngredients: ["🥦", "🥩"] },
+            { name: "Ratatouille", emoji: "🍲", price: 600, baseRecipe: ["🍅", "🍆", "🥒"], optionalIngredients: ["🧅", "🌿"] },
+            { name: "Guioza", emoji: "🥟", price: 650, baseRecipe: ["🥟", "🥩", "🥬"], optionalIngredients: ["🧅"] },
+            { name: "Temaki", emoji: "🍣", price: 750, baseRecipe: ["🍙", "🍚", "🐟", "🥑"], optionalIngredients: ["🥒"] },
+            { name: "Ramen", emoji: "🍜", price: 800, baseRecipe: ["🍜", "🥩", "🥚"], optionalIngredients: ["🌿", "🌽"] }, // Rank Up
+
+            // Tier 6
+            { name: "Salada de Frutas", emoji: "🍓", price: 800, baseRecipe: ["🍓", "🍍"], optionalIngredients: ["🥑", "🫐", "🍯"] },
+            { name: "Camarão", emoji: "🦐", price: 850, baseRecipe: ["🦐", "🧈", "🌿"], optionalIngredients: ["🍋"] },
+            { name: "Salmão Grelhado", emoji: "🐟", price: 1000, baseRecipe: ["🐟", "🍋", "🌿"], optionalIngredients: ["🥔"] } // Rank Up
+        ];
+
+        // (NOVO) Sistema de Ranks
+        const RANKS = [
+            { name: "Lava-pratos", icon: "🧼", recipeToUnlock: "Salada" }, // Rank 0
+            { name: "Ajudante de Cozinha", icon: "🧑‍🍳", recipeToUnlock: "Hambúrguer" }, // Rank 1
+            { name: "Cozinheiro Júnior", icon: "🔪", recipeToUnlock: "Taco" }, // Rank 2
+            { name: "Cozinheiro Pleno", icon: "🥘", recipeToUnlock: "Pizza Slice" }, // Rank 3
+            { name: "Subchefe", icon: "🥈", recipeToUnlock: "Ramen" }, // Rank 4
+            { name: "Chefe de Cozinha", icon: "🥇", recipeToUnlock: "Salmão Grelhado" }, // Rank 5
+            { name: "Mestre Cuca", icon: "🏆", recipeToUnlock: null } // Rank 6 (Máx)
+        ];
+
+        // --- 2. VARIÁVEIS DE ESTADO DO JOGO ---
+        const SAVE_KEY = 'recipeGameData_v2'; // Chave salva
+
+        // Estado do jogo salvo
+        let gameState = {
+            money: 50,
+            unlockedRecipeNames: ["Misto Quente"],
+            unlockedIngredientEmojis: ["🍞", "🧈", "🧀", "🍅"], // (MODIFICADO) Tomate é opcional inicial
+            rank: 0 // (NOVO) Ranque inicial
+        };
+
+        // Estado da sessão (não salvo)
+        let currentStreak = 0;
+        let currentOrder = null;
+        let playerSelection = [];
+        let timer = 10;
+        let timerId = null;
+        let gameActive = false;
+        let isPaused = false;
         
-        // --- Estado do App ---
-        let currentUser = null;
-        let currentRoomId = null;
-        let isHost = false;
-        let isUpdatingFromFirestore = false; // Flag para evitar loops de sincronização
-        let unsubscribeRoom = null, unsubscribeParticipants = null, unsubscribeMessages = null;
+        // (MODIFICADO) Economia Rebalanceada
+        const REWARD_SUCCESS = 15; // Reduzido de 30
+        const PENALTY_FAILURE = 10; // Reduzido de 25
+        const STREAK_BONUS = 3; // Reduzido de 5
 
-        // --- AUTENTICAÇÃO E LÓGICA DE SALA (sem alterações) ---
-        onAuthStateChanged(auth, async (user) => { if (user) { currentUser = user; } else { try { if (initialAuthToken) { await signInWithCustomToken(auth, initialAuthToken); } else { await signInAnonymously(auth); } } catch (error) { console.error("Authentication Error:", error); errorMessage.textContent = "Erro de autenticação."; } } });
-        const handleJoinRoom = async (roomId) => { const username = usernameInput.value.trim(); if (!username || !currentUser) { errorMessage.textContent = !username ? "Por favor, digite seu nome." : "Aguardando autenticação..."; return; } const roomRef = doc(db, ROOMS_COLLECTION_PATH, roomId); const roomSnap = await getDoc(roomRef); if (!roomSnap.exists()) { errorMessage.textContent = "Essa sala não existe."; return; } currentRoomId = roomId; const participantRef = doc(db, `${ROOMS_COLLECTION_PATH}/${roomId}/participants`, currentUser.uid); await setDoc(participantRef, { username, joinedAt: serverTimestamp() }); loginScreen.classList.add('hidden'); mainApp.classList.remove('hidden'); mainApp.classList.add('flex'); roomIdDisplay.textContent = roomId; setupRealtimeListeners(roomId); };
-        createRoomBtn.addEventListener('click', async () => { const newRoomId = Math.random().toString(36).substring(2, 8).toUpperCase(); const roomRef = doc(db, ROOMS_COLLECTION_PATH, newRoomId); await setDoc(roomRef, { createdAt: serverTimestamp(), videoUrl: "", isPlaying: false, currentTime: 0, hostId: currentUser.uid, lastUpdateBy: currentUser.uid }); await handleJoinRoom(newRoomId); });
-        joinRoomBtn.addEventListener('click', () => { const roomId = roomIdInput.value.trim().toUpperCase(); if (roomId) { handleJoinRoom(roomId); } else { errorMessage.textContent = "Por favor, digite o código da sala."; } });
+        // --- 3. SELETORES DO DOM ---
+        // Telas
+        const menuScreen = document.getElementById('menu-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const marketScreen = document.getElementById('market-screen');
+        const pauseScreen = document.getElementById('pause-screen');
+        const marketMessageModal = document.getElementById('market-message-modal');
 
-        // --- LISTENERS EM TEMPO REAL ---
-        function setupRealtimeListeners(roomId) {
-            if (unsubscribeRoom) unsubscribeRoom();
-            if (unsubscribeParticipants) unsubscribeParticipants();
-            if (unsubscribeMessages) unsubscribeMessages();
+        // Botões de Navegação
+        const playButton = document.getElementById('play-button');
+        const marketButton = document.getElementById('market-button');
+        const pauseButton = document.getElementById('pause-button');
+        const resumeButton = document.getElementById('resume-button');
+        const menuButtonPause = document.getElementById('menu-button-pause');
+        const menuButtonMarket = document.getElementById('menu-button-market');
+        const marketMessageClose = document.getElementById('market-message-close');
 
-            // Listener da Sala (Vídeo e Estado)
-            const roomRef = doc(db, ROOMS_COLLECTION_PATH, roomId);
-            unsubscribeRoom = onSnapshot(roomRef, (docSnap) => {
-                if (!docSnap.exists()) return;
-                const data = docSnap.data();
-                isHost = data.hostId === currentUser.uid;
-                
-                // Atualiza a URL do vídeo
-                if (data.videoUrl && videoPlayer.src !== data.videoUrl) {
-                    videoPlayer.src = data.videoUrl;
-                    videoPlaceholder.classList.add('hidden');
-                } else if (!data.videoUrl) {
-                    videoPlayer.src = '';
-                    videoPlaceholder.classList.remove('hidden');
-                }
+        // Displays de Dinheiro
+        const moneyDisplayGame = document.getElementById('money-display-game');
+        const moneyDisplayMarket = document.getElementById('money-display-market');
+        const streakDisplay = document.getElementById('streak-display');
+        
+        // (NOVOS) Displays de Ranque (Menu)
+        const rankIcon = document.getElementById('rank-icon');
+        const rankName = document.getElementById('rank-name');
+        const rankGoal = document.getElementById('rank-goal');
+        const rankGoalText = document.getElementById('rank-goal-text');
 
-                // Ignora atualizações de estado que o próprio usuário enviou
-                if (data.lastUpdateBy === currentUser.uid) return;
+        // Jogo
+        const npcDisplay = document.getElementById('npc-display');
+        const dishEmoji = document.getElementById('dish-emoji');
+        const dishName = document.getElementById('dish-name');
+        const orderDisplay = document.getElementById('order-display');
+        const recipeList = document.getElementById('recipe-list');
+        const timerText = document.getElementById('timer-text');
+        const timerBarInner = document.getElementById('timer-bar-inner');
+        const playerPlate = document.getElementById('player-plate');
+        const messageBox = document.getElementById('message-box');
+        const ingredientBin = document.getElementById('ingredient-bin');
+        const orderArea = document.getElementById('order-area');
 
-                isUpdatingFromFirestore = true;
-                
-                // Sincroniza Play/Pause
-                if (data.isPlaying && videoPlayer.paused) {
-                    videoPlayer.play().catch(e => console.log("Playback foi impedido pelo navegador."));
-                } else if (!data.isPlaying && !videoPlayer.paused) {
-                    videoPlayer.pause();
-                }
+        // Mercado
+        const marketItemsGrid = document.getElementById('market-items-grid');
+        const marketMessageIcon = document.getElementById('market-message-icon');
+        const marketMessageTitle = document.getElementById('market-message-title');
+        const marketMessageText = document.getElementById('market-message-text');
 
-                // Sincroniza tempo do vídeo (com uma tolerância para evitar saltos)
-                if (Math.abs(videoPlayer.currentTime - data.currentTime) > 2) {
-                    videoPlayer.currentTime = data.currentTime;
-                }
-                
-                // Habilita/desabilita controles para não-hosts
-                videoControls.classList.toggle('host-controls', isHost);
-                videoControls.classList.toggle('guest-controls', !isHost);
-                progressBar.disabled = !isHost;
-                playPauseBtn.disabled = !isHost;
+        // --- 4. FUNÇÕES DE NAVEGAÇÃO E ESTADO ---
 
-                setTimeout(() => { isUpdatingFromFirestore = false; }, 100);
+        /**
+         * Mostra uma tela e oculta as outras
+         */
+        function showScreen(screenId) {
+            [menuScreen, gameScreen, marketScreen].forEach(screen => {
+                screen.classList.remove('active');
             });
+            document.getElementById(screenId).classList.add('active');
+        }
 
-            // Listeners de Participantes e Mensagens (sem alterações)
-            const participantsRef = collection(db, `${ROOMS_COLLECTION_PATH}/${roomId}/participants`);
-            unsubscribeParticipants = onSnapshot(participantsRef, (snapshot) => { participantsList.innerHTML = ''; snapshot.forEach((doc) => { const p = doc.data(); const li = document.createElement('li'); li.className = 'flex items-center gap-3 p-2 bg-slate-800/50 rounded-lg'; li.innerHTML = `<div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div><span class="font-medium">${p.username}</span>`; participantsList.appendChild(li); }); });
-            const messagesRef = collection(db, `${ROOMS_COLLECTION_PATH}/${roomId}/messages`); const q = query(messagesRef, orderBy('timestamp'));
-            unsubscribeMessages = onSnapshot(q, (snapshot) => { snapshot.docChanges().forEach((change) => { if (change.type === "added") { const msgData = change.doc.data(); const msgEl = document.createElement('div'); const isMe = msgData.senderId === currentUser.uid; msgEl.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`; msgEl.innerHTML = `<div class="text-xs text-slate-400 mb-1 px-1 ${isMe ? 'text-right' : 'text-left'}">${msgData.senderName}</div><div class="max-w-xs text-sm px-3 py-2 rounded-xl ${isMe ? 'bg-blue-600 rounded-br-none' : 'bg-slate-700 rounded-bl-none'}">${msgData.text}</div>`; chatMessages.appendChild(msgEl); } }); chatMessages.scrollTop = chatMessages.scrollHeight; });
+        /**
+         * Salva o estado do jogo no localStorage
+         */
+        function saveGame() {
+            localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
+        }
+
+        /**
+         * Carrega o estado do jogo do localStorage
+         */
+        function loadGame() {
+            const savedData = localStorage.getItem(SAVE_KEY);
+            if (savedData) {
+                gameState = JSON.parse(savedData);
+            }
+            // Garante que os dados iniciais existam se for um save antigo
+            if (!gameState.unlockedRecipeNames) {
+                gameState.unlockedRecipeNames = ["Misto Quente"];
+                gameState.unlockedIngredientEmojis = ["🍞", "🧈", "🧀", "🍅"];
+            }
+            // (NOVO) Garante compatibilidade de ranque
+            if (gameState.rank === undefined) {
+                gameState.rank = 0;
+            }
+            updateAllMoneyDisplays();
+            updateRankDisplay(); // (NOVO) Atualiza a UI de ranque
+        }
+
+        /**
+         * (NOVO) Atualiza a UI de Ranque no Menu
+         */
+        function updateRankDisplay() {
+            const currentRank = RANKS[gameState.rank];
+            rankIcon.textContent = currentRank.icon;
+            rankName.textContent = currentRank.name;
+
+            const nextRank = RANKS[gameState.rank + 1];
+            if (nextRank) {
+                rankGoal.style.display = 'block';
+                rankGoalText.textContent = `Compre a receita "${nextRank.recipeToUnlock}" no Mercado!`;
+                playButton.classList.remove('bg-yellow-500'); // Garante que não está em modo "final"
+                playButton.classList.add('bg-green-500');
+            } else {
+                // Ranque Máximo
+                rankGoal.style.display = 'none';
+                rankName.textContent = "Mestre Cuca"; // Nome especial
+                rankIcon.textContent = "🏆";
+                playButton.classList.remove('bg-green-500');
+                playButton.classList.add('bg-yellow-500'); // Botão dourado
+            }
+        }
+
+        /**
+         * Volta para o menu principal
+         */
+        function goToMenu() {
+            gameActive = false; // Para o jogo
+            isPaused = false;
+            clearInterval(timerId); // Para o timer
+            pauseScreen.classList.add('hidden'); // Esconde a pausa
+            showScreen('menu-screen');
+            updateAllMoneyDisplays(); 
+            updateRankDisplay(); // (NOVO) Atualiza o ranque ao voltar
+        }
+
+        /**
+         * Inicia o jogo
+         */
+        function startGame() {
+            showScreen('game-screen');
+            renderUnlockedIngredientBin();
+            startNewOrder();
+        }
+
+        /**
+         * Mostra o mercado
+         */
+        function showMarket() {
+            showScreen('market-screen');
+            renderMarket();
+            updateAllMoneyDisplays();
+        }
+
+        /**
+         * Mostra uma mensagem no modal do mercado
+         */
+        function showMarketMessage(title, text, isSuccess = true) {
+            marketMessageTitle.textContent = title;
+            marketMessageText.textContent = text;
+            
+            marketMessageIcon.classList.remove(isSuccess ? 'fa-times-circle' : 'fa-check-circle', isSuccess ? 'text-red-500' : 'text-green-500');
+            marketMessageIcon.classList.add(isSuccess ? 'fa-check-circle' : 'fa-times-circle', isSuccess ? 'text-green-500' : 'text-red-500');
+            
+            marketMessageModal.classList.remove('hidden');
+            marketMessageModal.classList.add('flex');
+        }
+
+        // --- 5. FUNÇÕES DE LÓGICA DO MERCADO ---
+
+        /**
+         * Renderiza os itens no mercado
+         */
+        function renderMarket() {
+            marketItemsGrid.innerHTML = '';
+            
+            const nextRank = RANKS[gameState.rank + 1];
+
+            ALL_RECIPES.forEach(recipe => {
+                const isUnlocked = gameState.unlockedRecipeNames.includes(recipe.name);
+                // (NOVO) Verifica se é a receita para subir de ranque
+                const isRankUpRecipe = nextRank && recipe.name === nextRank.recipeToUnlock && !isUnlocked;
+                
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-xl shadow-lg p-4 flex items-center space-x-4 transition-all ${isUnlocked ? 'opacity-70' : ''} ${isRankUpRecipe ? 'rank-up-card' : ''}`;
+                
+                // Mostra todos os ingredientes (base + opcionais)
+                const allRecipeIngredients = [...recipe.baseRecipe, ...recipe.optionalIngredients];
+                const uniqueIngredients = [...new Set(allRecipeIngredients)]; // Remove duplicatas
+                let ingredientsHTML = uniqueIngredients
+                    .map(emoji => `<span class="text-sm">${emoji}</span>`)
+                    .join(' + ');
+
+                card.innerHTML = `
+                    <div class="text-5xl">${recipe.emoji}</div>
+                    <div class="flex-1">
+                        <h4 class="text-xl font-bold text-gray-800">${recipe.name}</h4>
+                        <p class="text-gray-500 text-sm">${ingredientsHTML}</p>
+                    </div>
+                    ${isUnlocked ? 
+                        `<div class="text-green-500 font-bold px-4 py-2 rounded-lg bg-green-100">Comprado</div>` :
+                        `<button class="btn-main ${isRankUpRecipe ? 'bg-yellow-500' : 'bg-purple-500'} text-white font-bold px-6 py-3 rounded-lg text-lg" data-recipe="${recipe.name}">
+                            <i class="fas ${isRankUpRecipe ? 'fa-star' : 'fa-coins'} mr-1"></i> ${recipe.price}
+                        </button>`
+                    }
+                `;
+                
+                if (!isUnlocked) {
+                    card.querySelector('button').addEventListener('click', () => buyRecipe(recipe.name));
+                }
+                
+                marketItemsGrid.appendChild(card);
+            });
+        }
+
+        /**
+         * Tenta comprar uma receita
+         */
+        function buyRecipe(recipeName) {
+            const recipe = ALL_RECIPES.find(r => r.name === recipeName);
+            
+            if (gameState.money >= recipe.price) {
+                // Deduz o dinheiro
+                updateMoney(-recipe.price);
+                
+                // Adiciona a receita
+                gameState.unlockedRecipeNames.push(recipe.name);
+                
+                // Adiciona os ingredientes base E os opcionais (usando Set para evitar duplicatas)
+                const ingredientsSet = new Set(gameState.unlockedIngredientEmojis);
+                recipe.baseRecipe.forEach(ingredient => ingredientsSet.add(ingredient));
+                recipe.optionalIngredients.forEach(ingredient => ingredientsSet.add(ingredient));
+                gameState.unlockedIngredientEmojis = Array.from(ingredientsSet);
+                
+                saveGame();
+                renderMarket(); // Re-renderiza o mercado
+                
+                // (NOVO) Verifica se a compra resultou em subida de ranque
+                const nextRank = RANKS[gameState.rank + 1];
+                if (nextRank && recipeName === nextRank.recipeToUnlock) {
+                    gameState.rank++;
+                    saveGame();
+                    showMarketMessage("Você subiu de ranque!", `Parabéns, você agora é ${RANKS[gameState.rank].name}!`, true);
+                    renderMarket(); // Re-renderiza para remover o destaque
+                } else {
+                    showMarketMessage("Receita Comprada!", `Você aprendeu a fazer ${recipe.name}!`, true);
+                }
+
+            } else {
+                // Dinheiro insuficiente
+                showMarketMessage("Dinheiro Insuficiente!", `Você precisa de $${recipe.price} para comprar ${recipe.name}.`, false);
+            }
+        }
+
+        // --- 6. FUNÇÕES PRINCIPAIS DO JOGO ---
+
+        /**
+         * (NOVO) Retorna a duração do timer baseada no ranque
+         */
+        function getTimerDuration() {
+            const baseTimer = 12; // 12 segundos no ranque 0
+            const duration = baseTimer - gameState.rank; // Perde 1s por ranque
+            return Math.max(duration, 5); // Mínimo de 5 segundos
+        }
+
+        /**
+         * Renderiza APENAS os ingredientes desbloqueados
+         */
+        function renderUnlockedIngredientBin() {
+            ingredientBin.innerHTML = '';
+            // Embaralha apenas os ingredientes desbloqueados
+            const shuffledIngredients = [...gameState.unlockedIngredientEmojis].sort(() => Math.random() - 0.5);
+            
+            shuffledIngredients.forEach(emoji => {
+                const btn = document.createElement('button');
+                btn.className = "ingredient-btn rounded-lg p-3 text-4xl shadow-md no-select";
+                btn.textContent = emoji;
+                btn.dataset.emoji = emoji;
+                ingredientBin.appendChild(btn);
+            });
+            // Animação da bandeja
+            ingredientBin.parentElement.classList.remove('animate-slide-in-bottom');
+            void ingredientBin.parentElement.offsetWidth;
+            ingredientBin.parentElement.classList.add('animate-slide-in-bottom');
+        }
+
+        /**
+         * Inicia um novo pedido
+         */
+        function startNewOrder() {
+            gameActive = true;
+            isPaused = false;
+            playerSelection = [];
+            timer = getTimerDuration(); // (MODIFICADO) Timer dinâmico
+            
+            // Escolhe uma receita APENAS das desbloqueadas
+            const availableRecipes = ALL_RECIPES.filter(r => gameState.unlockedRecipeNames.includes(r.name));
+            currentOrder = { ...availableRecipes[Math.floor(Math.random() * availableRecipes.length)] };
+            
+            // (MODIFICADO) Gerar receita dinâmica com dificuldade baseada no ranque
+            let finalRecipe = [...currentOrder.baseRecipe]; // Começa com a base
+            
+            // Filtra opcionais que o jogador JÁ DESBLOQUEOU
+            const availableOptionals = currentOrder.optionalIngredients.filter(
+                ingredient => gameState.unlockedIngredientEmojis.includes(ingredient)
+            );
+            
+            // (MODIFICADO) Chance de adicionar opcionais aumenta com o ranque
+            const optionalChance = 0.3 + (gameState.rank * 0.1); // 30% (rank 0) -> 90% (rank 6)
+            const optionalsToAdd = availableOptionals.filter(() => Math.random() < optionalChance);
+
+            if (optionalsToAdd.length > 0 && finalRecipe.length > 1) {
+                // Insere os opcionais antes do último item da receita base (ex: antes do último pão)
+                const lastItem = finalRecipe.pop(); // Remove o último item
+                finalRecipe = [...finalRecipe, ...optionalsToAdd, lastItem]; // Adiciona opcionais e dps o último item
+            } else if (optionalsToAdd.length > 0) {
+                // Para receitas de 1 item (ou se a lógica falhar), apenas adiciona no final
+                finalRecipe = [...finalRecipe, ...optionalsToAdd];
+            }
+            
+            currentOrder.recipe = finalRecipe;
+            
+            // Resetar UI
+            playerPlate.innerHTML = '';
+            messageBox.textContent = '';
+            messageBox.className = "text-center text-2xl font-bold";
+            
+            // Mostra a receita imediatamente (com cor)
+            recipeList.innerHTML = `Receita: <span class="font-bold text-purple-600 ml-2">${currentOrder.recipe.join(' ')}</span>`;
+            
+            // Mostrar novo pedido
+            npcDisplay.textContent = NPCS[Math.floor(Math.random() * NPCS.length)];
+            dishEmoji.textContent = currentOrder.emoji;
+            dishName.textContent = currentOrder.name;
+            
+            // Animação do pedido
+            orderArea.classList.remove('animate-pop-in');
+            void orderArea.offsetWidth;
+            orderArea.classList.add('animate-pop-in');
+
+            startTimer();
+        }
+
+        /**
+         * Lida com o clique em um ingrediente
+         */
+        function handleIngredientClick(e) {
+            if (!gameActive || isPaused || !e.target.matches('.ingredient-btn')) return;
+
+            const clickedEmoji = e.target.dataset.emoji;
+            playerSelection.push(clickedEmoji);
+            
+            // Atualiza o prato do jogador (visual)
+            const emojiSpan = document.createElement('span');
+            emojiSpan.className = 'text-3xl animate-pop-in';
+            emojiSpan.textContent = clickedEmoji;
+            playerPlate.appendChild(emojiSpan);
+
+            // Verificação de erro imediato (ordem importa!)
+            const currentIndex = playerSelection.length - 1;
+            if (playerSelection[currentIndex] !== currentOrder.recipe[currentIndex]) {
+                checkOrder(false, "Ingrediente errado!");
+                return;
+            }
+            
+            // Verificação de sucesso (completou a receita)
+            if (playerSelection.length === currentOrder.recipe.length) {
+                checkOrder(true);
+            }
+        }
+
+        /**
+         * Inicia o contador regressivo
+         */
+        function startTimer() {
+            clearInterval(timerId);
+            timer = getTimerDuration(); // (MODIFICADO) Timer dinâmico
+            timerText.textContent = `Tempo: ${timer}s`;
+            
+            // Reseta a animação da barra
+            timerBarInner.classList.remove('timer-bar-inner-animate');
+            void timerBarInner.offsetWidth;
+            timerBarInner.classList.add('timer-bar-inner-animate');
+            timerBarInner.style.animationDuration = `${timer}s`; // Usa o timer dinâmico
+            timerBarInner.style.animationPlayState = 'running';
+
+            startTimerInterval();
+        }
+
+        /**
+         * Inicia o intervalo do contador
+         */
+        function startTimerInterval() {
+            clearInterval(timerId);
+            timerId = setInterval(() => {
+                if (isPaused) return;
+
+                timer--;
+                timerText.textContent = `Tempo: ${timer}s`;
+                
+                if (timer <= 0) {
+                    checkOrder(false, "Tempo esgotado!");
+                }
+            }, 1000);
+        }
+
+        /**
+         * Pausa o jogo
+         */
+        function pauseGame() {
+            if (!gameActive) return;
+            
+            isPaused = true;
+            clearInterval(timerId);
+            timerBarInner.style.animationPlayState = 'paused';
+            pauseScreen.classList.remove('hidden');
+            pauseScreen.classList.add('flex');
+        }
+
+        /**
+         * Retoma o jogo
+         */
+        function resumeGame() {
+            if (!gameActive) return;
+
+            isPaused = false;
+            startTimerInterval();
+            timerBarInner.style.animationPlayState = 'running';
+            pauseScreen.classList.add('hidden');
+            pauseScreen.classList.remove('flex');
+        }
+
+        /**
+         * Verifica o pedido
+         */
+        function checkOrder(isSuccess, failReason = "") {
+            if (!gameActive) return;
+            
+            gameActive = false;
+            clearInterval(timerId);
+            timerBarInner.classList.remove('timer-bar-inner-animate');
+            
+            if (isSuccess) {
+                // Sucesso
+                currentStreak++;
+                // (MODIFICADO) Bônus de combo rebalanceado
+                const streakBonus = currentStreak * STREAK_BONUS; // 3, 6, 9...
+                const totalReward = REWARD_SUCCESS + streakBonus;
+                
+                updateMoney(totalReward);
+                
+                let successMsg = `Perfeito! +$${REWARD_SUCCESS}`;
+                if (streakBonus > 0) {
+                    successMsg += ` (Combo +$${streakBonus})`;
+                }
+                showMessage(successMsg, true);
+                
+            } else {
+                // Falha
+                currentStreak = 0;
+                const reason = failReason || "Pedido errado!";
+                
+                // Garante que a penalidade não deixe o dinheiro negativo
+                let penalty = PENALTY_FAILURE;
+                if (gameState.money < penalty) {
+                    penalty = gameState.money; // Perde apenas o que tem
+                }
+                
+                updateMoney(-penalty); // Passa o valor negativo
+                showMessage(`${reason} -$${penalty}`, false);
+            }
+            
+            updateStreakDisplay();
+            saveGame(); // Salva o progresso (dinheiro e ranque)
+            
+            // Prepara o próximo pedido
+            setTimeout(startNewOrder, 2000);
+        }
+
+        // --- 7. FUNÇÕES AUXILIARES DE UI ---
+
+        /**
+         * Atualiza TODOS os displays de dinheiro
+         */
+        function updateAllMoneyDisplays() {
+            const moneyStr = `$${gameState.money}`;
+            moneyDisplayGame.textContent = moneyStr;
+            moneyDisplayMarket.textContent = moneyStr;
+
+            // Animação de "pulso"
+            [moneyDisplayGame, moneyDisplayMarket].forEach(display => {
+                display.classList.remove('scale-110');
+                void display.offsetWidth;
+                display.classList.add('scale-110');
+                setTimeout(() => display.classList.remove('scale-110'), 200);
+            });
+        }
+
+        /**
+         * Atualiza o dinheiro e chama a atualização da UI
+         */
+        function updateMoney(amount) {
+            gameState.money += amount;
+            
+            // Regra principal: Dinheiro NUNCA fica abaixo de 0
+            if (gameState.money < 0) {
+                gameState.money = 0;
+            }
+            
+            updateAllMoneyDisplays();
+        }
+
+        /**
+         * Atualiza o visual do combo
+         */
+        function updateStreakDisplay() {
+            if (currentStreak > 1) { // Só mostra o combo a partir de 2x
+                streakDisplay.textContent = `${currentStreak}x 🔥`;
+                streakDisplay.classList.add('animate-pulse-orange');
+                setTimeout(() => streakDisplay.classList.remove('animate-pulse-orange'), 300);
+            } else {
+                streakDisplay.textContent = '';
+            }
         }
         
-        // --- FUNÇÕES DE CONTROLE DO PLAYER ---
-        const updateRoomVideoState = (newState) => {
-            if (!isHost || !currentRoomId) return;
-            const roomRef = doc(db, ROOMS_COLLECTION_PATH, currentRoomId);
-            updateDoc(roomRef, { ...newState, lastUpdateBy: currentUser.uid });
-        };
-        
-        const formatTime = (time) => { const minutes = Math.floor(time / 60); const seconds = Math.floor(time % 60); return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; };
-        
-        // --- EVENT LISTENERS DO PLAYER ---
-        videoPlayer.addEventListener('loadedmetadata', () => {
-            progressBar.max = videoPlayer.duration;
-            timeDisplay.textContent = `${formatTime(videoPlayer.currentTime)} / ${formatTime(videoPlayer.duration)}`;
-        });
-        
-        videoPlayer.addEventListener('timeupdate', () => {
-            progressBar.value = videoPlayer.currentTime;
-            timeDisplay.textContent = `${formatTime(videoPlayer.currentTime)} / ${formatTime(videoPlayer.duration)}`;
-        });
-
-        videoPlayer.addEventListener('play', () => {
-            playPauseIcon.setAttribute('data-lucide', 'pause'); lucide.createIcons();
-            if (!isUpdatingFromFirestore) updateRoomVideoState({ isPlaying: true });
-        });
-
-        videoPlayer.addEventListener('pause', () => {
-            playPauseIcon.setAttribute('data-lucide', 'play'); lucide.createIcons();
-            if (!isUpdatingFromFirestore) updateRoomVideoState({ isPlaying: false, currentTime: videoPlayer.currentTime });
-        });
-
-        videoPlayer.addEventListener('seeked', () => {
-            if (!isUpdatingFromFirestore) updateRoomVideoState({ currentTime: videoPlayer.currentTime });
-        });
-
-        playPauseBtn.addEventListener('click', () => {
-            if (!isHost) return;
-            if (videoPlayer.paused) videoPlayer.play();
-            else videoPlayer.pause();
-        });
-
-        progressBar.addEventListener('input', () => {
-             if (!isHost) { progressBar.value = videoPlayer.currentTime; return; }
-             videoPlayer.currentTime = progressBar.value;
-        });
-
-        loadVideoBtn.addEventListener('click', () => {
-            const url = videoUrlInput.value.trim();
-            if (url && currentRoomId && isHost) {
-                 updateRoomVideoState({ videoUrl: url, isPlaying: false, currentTime: 0 });
-            } else if (!isHost) {
-                alert("Apenas o host da sala pode carregar um novo vídeo.");
+        /**
+         * Mostra uma mensagem de feedback
+         */
+        function showMessage(text, isSuccess) {
+            messageBox.textContent = text;
+            if (isSuccess) {
+                messageBox.classList.add('message-success');
+            } else {
+                messageBox.classList.add('message-error');
             }
-        });
-        
-        videoFullscreenBtn.addEventListener('click', () => { if (videoPlayerContainer.requestFullscreen) videoPlayerContainer.requestFullscreen(); });
+        }
 
-        // --- CONTROLES DE INTERFACE (sem alterações) ---
-        const toggleSidebar = (sidebar, action) => { const isLeft = sidebar.id.includes('participants'); const hiddenClass = isLeft ? 'sidebar-left-hidden' : 'sidebar-right-hidden'; if (action === 'open') sidebar.classList.remove(hiddenClass); else if (action === 'close') sidebar.classList.add(hiddenClass); else sidebar.classList.toggle(hiddenClass); };
-        toggleParticipantsBtn.addEventListener('click', () => toggleSidebar(participantsSidebar));
-        closeParticipantsBtn.addEventListener('click', () => toggleSidebar(participantsSidebar, 'close'));
-        toggleChatBtn.addEventListener('click', () => toggleSidebar(chatSidebar));
-        closeChatBtn.addEventListener('click', () => toggleSidebar(chatSidebar, 'close'));
-        copyRoomIdBtn.addEventListener('click', () => { navigator.clipboard.writeText(currentRoomId).then(() => { const icon = copyRoomIdBtn.querySelector('i'); icon.setAttribute('data-lucide', 'check'); lucide.createIcons(); setTimeout(() => { icon.setAttribute('data-lucide', 'copy'); lucide.createIcons(); }, 2000); }); });
-        const appFullscreenBtn = document.getElementById('app-fullscreen-btn'); appFullscreenBtn.addEventListener('click', () => { const icon = document.getElementById('app-fullscreen-icon'); if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } else { if (document.exitFullscreen) { document.exitFullscreen(); } } }); document.addEventListener('fullscreenchange', () => { const icon = document.getElementById('app-fullscreen-icon'); if (!document.fullscreenElement) { icon.setAttribute('data-lucide', 'maximize'); } else { icon.setAttribute('data-lucide', 'minimize'); } lucide.createIcons(); });
-        chatForm.addEventListener('submit', async (e) => { e.preventDefault(); const text = chatInput.value.trim(); if (text && currentUser && currentRoomId) { const username = usernameInput.value.trim(); await addDoc(collection(db, `${ROOMS_COLLECTION_PATH}/${currentRoomId}/messages`), { text, senderName: username, senderId: currentUser.uid, timestamp: serverTimestamp() }); chatInput.value = ''; } });
-        window.addEventListener('beforeunload', () => { if(currentUser && currentRoomId) { const participantRef = doc(db, `${ROOMS_COLLECTION_PATH}/${currentRoomId}/participants`, currentUser.uid); deleteDoc(participantRef); } });
+        // --- 8. INICIAR O JOGO ---
         
-        lucide.createIcons();
+        // Listeners de navegação
+        playButton.addEventListener('click', startGame);
+        marketButton.addEventListener('click', showMarket);
+        
+        pauseButton.addEventListener('click', pauseGame);
+        resumeButton.addEventListener('click', resumeGame);
+        
+        menuButtonPause.addEventListener('click', goToMenu);
+        menuButtonMarket.addEventListener('click', goToMenu);
+
+        marketMessageClose.addEventListener('click', () => {
+            marketMessageModal.classList.add('hidden');
+            marketMessageModal.classList.remove('flex');
+        });
+
+        // Listeners do Jogo
+        ingredientBin.addEventListener('click', handleIngredientClick);
+        
+        // Carregar o jogo quando o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', loadGame);
+
     </script>
 </body>
 </html>
