@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Siga a Receita!/title>
+  <title>Siga a Receita!</title>
 
   <!-- Tailwind config + CDN -->
   <script>
@@ -310,6 +310,14 @@
 
   <div id="app" class="w-full h-full flex items-center justify-center">
     <main class="flex-1 p-3 overflow-y-auto w-full space-y-3 min-h-0">
+      <header class="border-b p-3 flex justify-between items-center z-10">
+        <button id="pause-button" class="text-2xl w-10 h-10 flex items-center justify-center"><i class="fas fa-pause"></i></button>
+        <button id="music-toggle" class="text-2xl w-10 h-10 flex items-center justify-center" title="Música"><i class="fas fa-volume-up"></i></button>
+        <div class="flex items-center space-x-3">
+          <div id="streak-display" class="text-orange-500 font-bold text-lg"></div>
+          <div id="money-display-game" class="money-pill font-bold px-5 py-2 rounded-full text-lg shadow-md">$50</div>
+        </div>
+      </header>
       <div class="tabbar">
         <div class="tab active">Market</div>
         <div class="tab">Recipes</div>
