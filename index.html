@@ -285,6 +285,20 @@
       opacity: 0 !important;
       pointer-events: none;
     }
+
+    #market-items-grid, #market-owned-grid {
+      max-height: calc(60vh - 120px);
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    /* Improve confirm reset modal visual in light mode */
+    #confirm-reset-modal > div {
+      background: var(--panel-bg) !important;
+      border: 1px solid var(--panel-border) !important;
+      box-shadow: var(--shadow);
+      transition: transform .12s ease;
+    }
   </style>
 </head>
 <body class="no-select">
