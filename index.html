@@ -1,9 +1,17 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<!-- (NOVO) Adicionando classe 'light' para o tema e desabilitando menu de contexto -->
+<html lang="pt-BR" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Siga a Receita - Deluxe Chef! v5</title>
+    <title>Siga a Receita - Deluxe Chef! v6</title>
+    
+    <!-- (NOVO) Configuração do Tailwind para Modo Escuro -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Habilita o modo escuro baseado na classe 'dark' no <html>
+        }
+    </script>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,7 +19,7 @@
     <!-- Font Awesome (Ícones) CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- (NOVO) Tone.js (Efeitos Sonoros) CDN -->
+    <!-- Tone.js (Efeitos Sonoros) CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     
     <!-- Font Inter (Estilo Google) -->
@@ -25,6 +33,11 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
             overflow: hidden; /* Prevenir scroll */
+            transition: background-color 0.3s ease;
+        }
+        /* (NOVO) Fundo do Modo Escuro */
+        .dark body {
+            background: #111827; /* gray-900 */
         }
 
         /* Container principal do jogo */
@@ -34,6 +47,11 @@
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
+        }
+        /* (NOVO) Container Modo Escuro */
+        .dark #game-container {
+            background: rgba(31, 41, 55, 0.85); /* gray-800 com transparência */
+            border: 1px solid #374151; /* gray-700 */
         }
 
         /* Botões principais (Menu e Ação) */
@@ -51,7 +69,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* (MODIFICADO) Estilo dos botões de ingrediente (para suportar img) */
+        /* (MODIFICADO) Estilo dos botões de ingrediente */
         .ingredient-btn {
             transition: all 0.15s ease;
             background: #fff;
@@ -76,10 +94,25 @@
             color: white;
             border-color: #a78bfa;
         }
-        /* (NOVO) Estilo para imagens de ingredientes */
+        /* (NOVO) Botões de Ingrediente Modo Escuro */
+        .dark .ingredient-btn {
+            background: #374151; /* gray-700 */
+            border-color: #4b5563; /* gray-600 */
+            color: #f3f4f6; /* gray-100 */
+        }
+        .dark .ingredient-btn:hover {
+            border-color: #a78bfa; /* Roxo */
+        }
+        .dark .ingredient-btn:active {
+             background-color: #a78bfa; /* Roxo */
+             border-color: #a78bfa;
+             color: white;
+        }
+
+        /* (MODIFICADO) Estilo para imagens de ingredientes (Tamanho corrigido) */
         .ingredient-btn img {
-            height: 40px;
-            width: 40px;
+            height: 36px; /* Ajustado para 36px */
+            width: 36px;  /* Ajustado para 36px */
             object-fit: contain;
             pointer-events: none; /* Garante que o clique pegue no botão */
         }
@@ -94,6 +127,14 @@
         .rank-up-card:hover {
             background-color: #fffbeb;
         }
+        /* (NOVO) Card de Ranque Modo Escuro */
+        .dark .rank-up-card {
+            background-color: #422006; /* Laranja escuro */
+            border-color: #f59e0b;
+        }
+        .dark .rank-up-card:hover {
+            background-color: #422006;
+        }
 
         /* Estilo para a lista de receitas interativa */
         #recipe-list {
@@ -107,7 +148,7 @@
             border-radius: 0.5rem; /* rounded-lg */
             background-color: #f9fafb; /* gray-50 */
             transition: all 0.3s ease;
-            display: inline-flex; /* (NOVO) para alinhar imgs */
+            display: inline-flex; 
             align-items: center;
             justify-content: center;
             min-width: 40px;
@@ -121,7 +162,20 @@
             transform: scale(0.9);
             opacity: 0.7;
         }
-        /* (NOVO) Estilo para imagens na lista de receitas */
+        /* (NOVO) Lista de Receitas Modo Escuro */
+        .dark .recipe-step {
+             background-color: #1f2937; /* gray-800 */
+             border-color: #4b5563; /* gray-600 */
+             color: #d1d5db; /* gray-300 */
+        }
+        .dark .recipe-step.correct {
+            background-color: #064e3b; /* green-900 */
+            border-color: #10b981; /* green-500 */
+            color: #6ee7b7; /* green-300 */
+            opacity: 0.6;
+        }
+
+        /* Estilo para imagens na lista de receitas */
         .recipe-step img, #player-plate img {
             height: 24px;
             width: 24px;
@@ -133,12 +187,44 @@
             width: 32px;
         }
 
-        /* Prato do jogador sem scroll */
+        /* (MODIFICADO) Prato do jogador (CORREÇÃO DE BUG) */
         #player-plate {
-            min-height: 7rem; 
-            max-height: 10rem; 
-            overflow-y: hidden; 
+            min-height: 6rem; /* Reduzido */
+            max-height: 8rem; /* Reduzido */
+            overflow-y: auto; /* MUDADO de hidden para auto */
         }
+        /* (NOVO) Prato do Jogador Modo Escuro */
+        .dark #player-plate {
+            background-color: #111827; /* gray-900 */
+            border-color: #374151; /* gray-700 */
+        }
+
+        /* (MODIFICADO) Rodapé (CORREÇÃO DE BUG) */
+        #game-screen > footer {
+            background-color: #f3f4f6; /* gray-100 */
+            overflow-y: auto; /* Adiciona scroll se os ingredientes transbordarem */
+            max-height: 160px; /* Limita a altura máxima (aprox 2 linhas) */
+            flex-shrink: 0; /* Impede que o rodapé encolha */
+        }
+        @media (min-width: 768px) {
+            #game-screen > footer {
+                max-height: 200px; /* Um pouco mais de espaço no desktop */
+            }
+        }
+        /* (NOVO) Rodapé Modo Escuro */
+        .dark #game-screen > footer {
+            background-color: #1f2937; /* gray-800 */
+            border-color: #374151; /* gray-700 */
+        }
+        
+        /* (NOVO) Estilos de texto Modo Escuro */
+        .dark .text-gray-800 { color: #f9fafb; /* gray-50 */ }
+        .dark .text-gray-700 { color: #d1d5db; /* gray-300 */ }
+        .dark .text-gray-600 { color: #9ca3af; /* gray-400 */ }
+        .dark .text-gray-500 { color: #6b7280; /* gray-500 */ }
+        .dark .text-gray-900 { color: #ffffff; /* white */ }
+        .dark .text-purple-600 { color: #c084fc; /* purple-400 */ }
+        .dark .text-gray-400 { color: #4b5563; /* gray-600 */ }
 
         /* Animações */
         @keyframes pop-in {
@@ -179,6 +265,13 @@
             margin-left: -10px;
             margin-bottom: -20px;
         }
+        /* (NOVO) Balão de Fala Modo Escuro */
+        .dark .speech-bubble {
+            background: #374151; /* gray-700 */
+        }
+        .dark .speech-bubble:after {
+            border-top-color: #374151; /* gray-700 */
+        }
         
         /* Classes de feedback */
         .message-success { color: #10b981; transform: scale(1); opacity: 1; }
@@ -213,7 +306,7 @@
         }
         .animate-rotate-in { animation: rotate-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
         
-        /* (MODIFICADO) Animação para ingrediente errado (sem fade) */
+        /* Animação para ingrediente errado */
         @keyframes jiggle-wrong {
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-5px); }
@@ -224,7 +317,7 @@
             animation: jiggle-wrong 0.3s ease-in-out forwards;
         }
 
-        /* (NOVO) Animação para tela de erro */
+        /* Animação para tela de erro */
         @keyframes shake-hard {
             0%, 100% { transform: translateX(0); }
             10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
@@ -256,12 +349,41 @@
         .screen.active {
             display: flex;
         }
+        
+        /* (NOVO) Estilo para Modais Modo Escuro */
+        .dark .modal-content {
+             background-color: #1f2937; /* gray-800 */
+        }
+        
+        /* (NOVO) Estilo para Botão de Tema */
+        .btn-theme {
+            @apply w-12 h-12 rounded-full text-lg flex items-center justify-center transition-all duration-200 shadow-md;
+            @apply bg-gray-200 text-gray-700;
+            @apply dark:bg-gray-700 dark:text-gray-200;
+        }
+        .btn-theme:hover {
+            @apply bg-gray-300 dark:bg-gray-600;
+        }
+        
+        /* (MODIFICADO) Modal de Ranque Up (Mais Bonito) */
+        #rank-up-modal {
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.7), rgba(245, 158, 11, 0.8)); /* Ouro */
+        }
+        #rank-up-modal .modal-content {
+            border: 3px solid #fde047; /* yellow-300 */
+            box-shadow: 0 0 30px rgba(253, 224, 71, 0.7);
+        }
+        .dark #rank-up-modal .modal-content {
+            background-color: #1f2937; /* gray-800 */
+        }
+
     </style>
 </head>
-<body class="flex items-center justify-center h-screen no-select">
+<!-- (NOVO) Desabilitando menu de contexto (botão direito) -->
+<body class="flex items-center justify-center h-screen no-select" oncontextmenu="return false;">
 
     <!-- Container Principal do App (Mobile-First) -->
-    <div id="game-container" class="w-full max-w-md h-full md:h-[95vh] md:max-h-[800px] bg-white shadow-xl rounded-2xl flex flex-col overflow-hidden relative">
+    <div id="game-container" class="w-full max-w-md h-full md:h-[95vh] md:max-h-[800px] shadow-xl rounded-2xl flex flex-col overflow-hidden relative">
 
         <!-- ====================================================== -->
         <!-- 1. TELA DE BEM-VINDO                                     -->
@@ -273,9 +395,13 @@
             <button id="welcome-play-button" class="btn-main w-full bg-green-500 text-white font-bold px-12 py-5 rounded-xl text-3xl shadow-lg">
                 <i class="fas fa-play mr-3"></i> Jogar
             </button>
-            <div class="mt-auto text-gray-500 text-sm">
+            <div class="mt-auto flex justify-between items-center w-full text-gray-500 text-sm">
                 <button id="reset-button-welcome" class="text-gray-400 hover:text-red-500 hover:underline transition-colors">
                     <i class="fas fa-trash-alt mr-1"></i> Resetar Progresso
+                </button>
+                <!-- (NOVO) Botão de Tema -->
+                <button id="theme-toggle-welcome" class="btn-theme">
+                    <i class="fas fa-moon"></i>
                 </button>
             </div>
         </div>
@@ -290,7 +416,7 @@
                 <h2 id="rank-name" class="text-3xl font-bold text-gray-700">Lava-pratos</h2>
             </div>
 
-            <div id="rank-goal" class="bg-gray-100 p-4 rounded-xl mb-6 text-center w-full shadow-inner">
+            <div id="rank-goal" class="bg-gray-100 p-4 rounded-xl mb-6 text-center w-full shadow-inner dark:bg-gray-900 dark:border dark:border-gray-700">
                 <h4 class="text-lg font-bold text-purple-600">Próximo Nível</h4>
                 <p id="rank-goal-text" class="text-gray-600">Compre a receita "Salada" no Mercado!</p>
             </div>
@@ -301,9 +427,13 @@
             <button id="market-button" class="btn-main w-full bg-blue-500 text-white font-bold px-12 py-5 rounded-xl text-3xl shadow-lg">
                 <i class="fas fa-store mr-3"></i> Mercado
             </button>
-            <div class="mt-auto text-gray-500 text-sm">
+            <div class="mt-auto flex justify-between items-center w-full text-gray-500 text-sm">
                 <button id="reset-button-menu" class="text-gray-400 hover:text-red-500 hover:underline transition-colors">
                     <i class="fas fa-trash-alt mr-1"></i> Resetar Progresso
+                </button>
+                <!-- (NOVO) Botão de Tema -->
+                <button id="theme-toggle-menu" class="btn-theme">
+                    <i class="fas fa-moon"></i>
                 </button>
             </div>
         </div>
@@ -311,9 +441,10 @@
         <!-- ====================================================== -->
         <!-- 2. TELA DE JOGO (MODIFICADA)                             -->
         <!-- ====================================================== -->
-        <div id="game-screen" class="screen">
-            <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex justify-between items-center z-10">
-                <button id="pause-button" class="text-gray-500 hover:text-purple-600 transition-colors duration-200 text-3xl w-10 h-10 flex items-center justify-center">
+        <!-- (MODIFICADO) A tela de jogo agora é flex-col -->
+        <div id="game-screen" class="screen flex-col">
+            <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 dark:bg-gray-800/80 dark:border-gray-700">
+                <button id="pause-button" class="text-gray-500 hover:text-purple-600 transition-colors duration-200 text-3xl w-10 h-10 flex items-center justify-center dark:text-gray-400 dark:hover:text-purple-400">
                     <i class="fas fa-pause"></i>
                 </button>
                 
@@ -325,13 +456,15 @@
                 </div>
             </header>
 
-            <main class="flex-1 flex flex-col p-4 overflow-hidden relative text-gray-800 bg-gradient-to-b from-white to-gray-50">
+            <!-- (MODIFICADO) Área de conteúdo principal rolável -->
+            <main class="flex-1 flex flex-col p-4 overflow-y-auto relative text-gray-800 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-800">
                 
                 <div id="rush-hour-banner" class="hidden absolute top-0 left-0 right-0 bg-red-500 text-white text-center p-2 font-bold z-20 animate-pulse">
                     <i class="fas fa-shipping-fast mr-2"></i> HORÁRIO DE PICO! (Recompensas 2x)
                 </div>
 
-                <div id="order-area" class="flex flex-col items-center mb-4 pt-8">
+                <!-- (MODIFICADO) Padding top reduzido -->
+                <div id="order-area" class="flex flex-col items-center mb-4 pt-4"> 
                     <div id="npc-display" class="text-8xl transition-transform duration-300"></div>
                     <div id="order-display" class="speech-bubble text-gray-900 font-bold text-center mt-4 w-52 transition-transform duration-200">
                         <span id="dish-emoji" class="text-6xl block"></span>
@@ -344,13 +477,13 @@
                     <!-- Gerado por JS -->
                 </div>
                 
-                <div class="w-full bg-gray-200 rounded-full h-5 mb-2 overflow-hidden shadow-inner border border-gray-300">
+                <div class="w-full bg-gray-200 rounded-full h-5 mb-2 overflow-hidden shadow-inner border border-gray-300 dark:bg-gray-700 dark:border-gray-600">
                     <div id="timer-bar-inner" class="h-full rounded-full bg-gradient-to-r from-red-500 to-orange-400 transition-all duration-300"></div>
                 </div>
                 <div id="timer-text" class="text-center font-bold text-lg mb-2 text-gray-700">Tempo: 12s</div>
 
-                <!-- Prato do Jogador (Sem Scroll) -->
-                <div class="bg-gray-100 border border-gray-300 rounded-lg p-3 min-h-[7rem] max-h-[10rem] mb-4 shadow-inner flex flex-wrap justify-center items-center gap-2" id="player-plate">
+                <!-- (MODIFICADO) Prato do Jogador (Agora rolável) -->
+                <div class="bg-gray-100 border border-gray-300 rounded-lg p-3 min-h-[6rem] max-h-[8rem] mb-4 shadow-inner flex flex-wrap justify-center items-center gap-2 overflow-y-auto" id="player-plate">
                     <!-- Ingredientes selecionados -->
                 </div>
 
@@ -359,7 +492,8 @@
                 </div>
             </main>
 
-            <footer class="bg-gray-100 p-4 shadow-inner border-t-2 border-gray-200">
+            <!-- (MODIFICADO) Rodapé agora tem altura máxima e scroll -->
+            <footer class="bg-gray-100 p-4 shadow-inner border-t-2 border-gray-200 overflow-y-auto max-h-[160px] md:max-h-[200px] flex-shrink-0 dark:bg-gray-900 dark:border-gray-700">
                 <div id="ingredient-bin" class="grid grid-cols-5 gap-2 justify-items-center">
                     <!-- Botões de ingredientes serão injetados aqui -->
                 </div>
@@ -369,9 +503,9 @@
         <!-- ====================================================== -->
         <!-- 3. TELA DE MERCADO (MODIFICADA)                          -->
         <!-- ====================================================== -->
-        <div id="market-screen" class="screen">
-            <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 w-full">
-                <button id="menu-button-market" class="text-gray-500 hover:text-purple-600 transition-colors duration-200 text-3xl w-10 h-10 flex items-center justify-center">
+        <div id="market-screen" class="screen flex-col">
+            <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 w-full dark:bg-gray-800/80 dark:border-gray-700">
+                <button id="menu-button-market" class="text-gray-500 hover:text-purple-600 transition-colors duration-200 text-3xl w-10 h-10 flex items-center justify-center dark:text-gray-400 dark:hover:text-purple-400">
                     <i class="fas fa-arrow-left"></i>
                 </button>
                 <h2 class="text-2xl font-bold text-purple-600">Mercado</h2>
@@ -380,7 +514,7 @@
                 </div>
             </header>
 
-            <main class="flex-1 p-4 overflow-y-auto w-full space-y-3">
+            <main class="flex-1 p-4 overflow-y-auto w-full space-y-3 dark:bg-gray-900">
                 <div id="market-items-grid" class="space-y-3">
                     <!-- Cards de receitas serão injetados aqui -->
                 </div>
@@ -398,14 +532,19 @@
             <button id="resume-button" class="btn-main w-full max-w-xs bg-green-500 text-white font-bold px-12 py-4 rounded-xl text-2xl shadow-lg mb-4">
                 Continuar
             </button>
-            <button id="menu-button-pause" class="btn-main w-full max-w-xs bg-red-500 text-white font-bold px-12 py-4 rounded-xl text-2xl shadow-lg">
+            <button id="menu-button-pause" class="btn-main w-full max-w-xs bg-red-500 text-white font-bold px-12 py-4 rounded-xl text-2xl shadow-lg mb-6">
                 Voltar ao Menu
+            </button>
+            <!-- (NOVO) Botão de Tema -->
+            <button id="theme-toggle-pause" class="btn-theme !bg-white/20 !text-white hover:!bg-white/30">
+                <i class="fas fa-moon"></i>
             </button>
         </div>
 
         <!-- Mensagem de Feedback do Mercado (MODAL) -->
         <div id="market-message-modal" class="hidden absolute inset-0 bg-black/70 z-50 flex flex-col items-center justify-center p-8 backdrop-blur-sm">
-            <div id="market-message-content" class="bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
+            <!-- (NOVO) Classe 'modal-content' para tema -->
+            <div id="market-message-content" class="modal-content bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
                 <i id="market-message-icon" class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
                 <h3 id="market-message-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
                 <p id="market-message-text" class="text-gray-600 mb-6"></p>
@@ -417,7 +556,8 @@
 
         <!-- Modal de Confirmação de Reset -->
         <div id="confirm-reset-modal" class="hidden absolute inset-0 bg-black/70 z-50 flex flex-col items-center justify-center p-8 backdrop-blur-sm">
-            <div class="bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
+            <!-- (NOVO) Classe 'modal-content' para tema -->
+            <div class="modal-content bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
                 <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
                 <h3 class="text-2xl font-bold text-gray-800 mb-2">Resetar Progresso?</h3>
                 <p class="text-gray-600 mb-6">Todo o seu dinheiro, receitas e ranque serão perdidos. Esta ação não pode ser desfeita!</p>
@@ -432,10 +572,11 @@
             </div>
         </div>
 
-        <!-- Modal de Ranque Up -->
-        <div id="rank-up-modal" class="hidden absolute inset-0 bg-yellow-500/70 z-50 flex flex-col items-center justify-center p-8 backdrop-blur-sm">
-            <div class="bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
-                <i id="rank-up-icon-modal" class="fas fa-star text-6xl text-yellow-500 mb-4 animate-pulse-success"></i>
+        <!-- (MODIFICADO) Modal de Ranque Up (Estilizado) -->
+        <div id="rank-up-modal" class="hidden absolute inset-0 z-50 flex flex-col items-center justify-center p-8 backdrop-blur-sm">
+            <!-- (NOVO) Classe 'modal-content' para tema -->
+            <div class="modal-content bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
+                <i id="rank-up-icon-modal" class="fas fa-star text-8xl text-yellow-400 mb-4 animate-pulse-success"></i>
                 <h3 id="rank-up-title" class="text-2xl font-bold text-gray-800 mb-2">Você subiu de ranque!</h3>
                 <p id="rank-up-text" class="text-gray-600 mb-6">Parabéns, você agora é Ajudante de Cozinha!</p>
                 <button id="rank-up-close" class="btn-main w-full bg-purple-500 text-white font-bold py-3 rounded-lg text-lg">
@@ -450,7 +591,7 @@
             <h2 id="success-message" class="text-4xl font-bold text-white">Perfeito! +$18</h2>
         </div>
         
-        <!-- (NOVO) Tela de Falha (MODAL) -->
+        <!-- Tela de Falha (MODAL) -->
         <div id="failure-modal" class="hidden absolute inset-0 bg-red-600/70 z-50 flex flex-col items-center justify-center p-8 text-center backdrop-blur-sm">
             <i id="failure-icon" class="fas fa-times-circle text-8xl text-white mb-6"></i>
             <h2 id="failure-message" class="text-4xl font-bold text-white">Errado! -$10</h2>
@@ -463,7 +604,7 @@
 
         const NPCS = ["👩‍💼", "🧑‍💻", "👨‍🎨", "👩‍🚀", "🧑‍🚒", "👮‍♀️", "👷‍♂️", "👩‍⚕️", "🧑‍🎤", "👨‍🌾"];
         
-        // (REFATORADO) Dicionário de Ingredientes (ID -> {type, value})
+        // Dicionário de Ingredientes (ID -> {type, value})
         const ALL_INGREDIENTS = {
             // Rank 0-1
             'pao': { type: 'emoji', value: '🍞' },
@@ -531,15 +672,13 @@
             'bagel': { type: 'emoji', value: '🥯' },
             'laranja': { type: 'emoji', value: '🍊' },
             'melancia': { type: 'emoji', value: '🍉' },
-            // (NOVO) Tofu como Imagem
             'tofu': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4463/4463838.png' },
-            // (NOVOS) Ingredientes
             'cafe': { type: 'emoji', value: '☕' },
-            'manteiga_amendoim': { type: 'emoji', value: '🥜' }, // Reutilizando amendoim visualmente, mas é outro ID
-            'geleia': { type: 'emoji', value: '🍇' } // Reutilizando uva visualmente
+            'manteiga_amendoim': { type: 'emoji', value: '🥜' }, 
+            'geleia': { type: 'emoji', value: '🍇' } 
         };
         
-        // (REFATORADO) Receitas usam IDs
+        // Receitas usam IDs
         const ALL_RECIPES = [
             // minRank 0 (Lava-pratos)
             { name: "Misto Quente", emoji: "🥪", price: 0, minRank: 0, baseRecipe: ["pao", "manteiga", "queijo", "pao"], optionalIngredients: ["tomate"] }, // Inicial
@@ -616,9 +755,10 @@
         ];
 
         // --- 2. VARIÁVEIS DE ESTADO DO JOGO ---
-        const SAVE_KEY = 'recipeGameData_v5'; // Chave salva (v5 para nova estrutura de IDs)
+        const SAVE_KEY = 'recipeGameData_v6'; // (NOVO) v6 para novo estado (tema)
+        const THEME_KEY = 'recipeGameTheme_v6';
 
-        // (REFATORADO) Estado inicial usa IDs
+        // Estado inicial usa IDs
         const getInitialGameState = () => ({
             money: 50,
             unlockedRecipeNames: ["Misto Quente", "Limonada", "Café"],
@@ -641,7 +781,7 @@
         let gameActive = false;
         let isPaused = false;
         let isRushHour = false;
-        let hasAudioStarted = false; // (NOVO) Controle de áudio
+        let hasAudioStarted = false; 
         
         const PENALTY_FAILURE = 10;
 
@@ -660,7 +800,6 @@
         const rushHourBanner = document.getElementById('rush-hour-banner');
         const confirmResetModal = document.getElementById('confirm-reset-modal');
         const rankUpModal = document.getElementById('rank-up-modal');
-        // (NOVO) Modal de Falha
         const failureModal = document.getElementById('failure-modal');
         const failureMessage = document.getElementById('failure-message');
         const failureIcon = document.getElementById('failure-icon');
@@ -679,6 +818,12 @@
         const confirmResetCancel = document.getElementById('confirm-reset-cancel');
         const confirmResetConfirm = document.getElementById('confirm-reset-confirm');
         const rankUpClose = document.getElementById('rank-up-close');
+        
+        // (NOVO) Botões de Tema
+        const themeToggleWelcome = document.getElementById('theme-toggle-welcome');
+        const themeToggleMenu = document.getElementById('theme-toggle-menu');
+        const themeTogglePause = document.getElementById('theme-toggle-pause');
+        const allThemeToggles = [themeToggleWelcome, themeToggleMenu, themeTogglePause];
 
         // Displays de Dinheiro
         const moneyDisplayGame = document.getElementById('money-display-game');
@@ -715,7 +860,7 @@
         const rankUpTitle = document.getElementById('rank-up-title');
         const rankUpText = document.getElementById('rank-up-text');
 
-        // --- 4. (NOVO) LÓGICA DE ÁUDIO ---
+        // --- 4. LÓGICA DE ÁUDIO ---
         
         /**
          * Sintetizadores de áudio
@@ -784,7 +929,56 @@
             }
         }
 
-        // --- 5. FUNÇÕES DE NAVEGAÇÃO E ESTADO ---
+        // --- 5. (NOVO) LÓGICA DE TEMA (CLARO/ESCURO) ---
+        
+        /**
+         * Aplica o tema (claro ou escuro) e atualiza os ícones
+         */
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            const iconClass = theme === 'dark' ? 'fa-sun' : 'fa-moon';
+            
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                html.classList.remove('light');
+            } else {
+                html.classList.add('light');
+                html.classList.remove('dark');
+            }
+            
+            // Atualiza todos os botões de tema
+            allThemeToggles.forEach(btn => {
+                btn.innerHTML = `<i class="fas ${iconClass}"></i>`;
+            });
+            
+            localStorage.setItem(THEME_KEY, theme);
+        }
+
+        /**
+         * Alterna entre os temas
+         */
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            applyTheme(isDark ? 'light' : 'dark');
+            playSound('click');
+        }
+
+        /**
+         * Carrega o tema salvo do localStorage
+         */
+        function loadTheme() {
+            const savedTheme = localStorage.getItem(THEME_KEY);
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else {
+                // Opcional: detectar preferência do sistema
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyTheme(prefersDark ? 'dark' : 'light');
+            }
+        }
+
+        // --- 6. FUNÇÕES DE NAVEGAÇÃO E ESTADO ---
 
         /**
          * Mostra uma tela e oculta as outras
@@ -817,7 +1011,6 @@
             
             if (gameState.rank === undefined) gameState.rank = 0;
             
-            // (CORREÇÃO DE BUG) Verifica se o jogador deveria ter subido de ranque
             checkRankUpOnLoad();
             
             updateAllMoneyDisplays();
@@ -868,7 +1061,7 @@
         }
 
         /**
-         * (CORREÇÃO DE BUG) Verifica se o jogador tem a receita de rank up
+         * Verifica se o jogador tem a receita de rank up
          */
         function checkRankUpOnLoad() {
             let rankedUp = false;
@@ -902,8 +1095,8 @@
                 
                 rankGoal.style.display = 'block';
                 rankGoalText.innerHTML = `Compre a receita 
-                    <span class="font-bold text-gray-800">${goalRecipe.emoji} ${currentRank.recipeToUnlock}</span> 
-                    no Mercado para atingir <span class="text-purple-600">${nextRank.name}</span>!`;
+                    <span class="font-bold text-gray-800 dark:text-gray-100">${goalRecipe.emoji} ${currentRank.recipeToUnlock}</span> 
+                    no Mercado para atingir <span class="text-purple-600 dark:text-purple-400">${nextRank.name}</span>!`;
                 
                 playButton.classList.remove('bg-yellow-500');
                 playButton.classList.add('bg-green-500');
@@ -964,7 +1157,6 @@
             marketMessageIcon.classList.remove(isSuccess ? 'fa-times-circle' : 'fa-check-circle', isSuccess ? 'text-red-500' : 'text-green-500');
             marketMessageIcon.classList.add(isSuccess ? 'fa-check-circle' : 'fa-times-circle', isSuccess ? 'text-green-500' : 'text-red-500');
             
-            // (NOVO) Animação de pop-in no conteúdo
             marketMessageContent.classList.remove('animate-pop-in');
             void marketMessageContent.offsetWidth;
             marketMessageContent.classList.add('animate-pop-in');
@@ -973,10 +1165,10 @@
             marketMessageModal.classList.add('flex');
         }
 
-        // --- 6. (REFATORADO) LÓGICA DE INGREDIENTES ---
+        // --- 7. LÓGICA DE INGREDIENTES ---
         
         /**
-         * (NOVO) Helper para criar o HTML de um ingrediente (emoji ou img)
+         * Helper para criar o HTML de um ingrediente (emoji ou img)
          */
         function getIngredientHTML(id, classes = '') {
             const ingredient = ALL_INGREDIENTS[id];
@@ -985,7 +1177,6 @@
             }
             
             if (ingredient.type === 'image') {
-                // Fallback com placehold.co
                 const fallbackUrl = `https://placehold.co/40x40/f87171/ffffff?text=${id.substring(0,1).toUpperCase()}`;
                 return `<img src="${ingredient.value}" class="${classes}" alt="${id}" onerror="this.src='${fallbackUrl}'; this.classList.add('border-red-500');">`;
             }
@@ -993,7 +1184,7 @@
             return `<span class="${classes}">${ingredient.value}</span>`;
         }
 
-        // --- 7. (REFATORADO) FUNÇÕES DE LÓGICA DO MERCADO ---
+        // --- 8. FUNÇÕES DE LÓGICA DO MERCADO ---
 
         /**
          * Renderiza os itens no mercado (COM ORDENAÇÃO)
@@ -1003,7 +1194,6 @@
             
             const currentRank = RANKS[gameState.rank];
             
-            // (NOVA LÓGICA DE ORDENAÇÃO)
             const rankUp = [];
             const buyable = [];
             const locked = [];
@@ -1033,9 +1223,9 @@
             // Renderiza a lista ordenada
             sortedMarketList.forEach(({ recipe, isUnlocked, isBuyable, isRankUpCard }) => {
                 const card = document.createElement('div');
-                card.className = `bg-white rounded-xl shadow-lg p-4 flex items-center space-x-4 transition-all relative ${isUnlocked ? 'opacity-60' : 'hover:bg-gray-50'} ${!isBuyable && !isUnlocked ? 'opacity-50' : ''} ${isRankUpCard ? 'rank-up-card' : ''}`;
+                // (NOVO) Classes de tema
+                card.className = `bg-white rounded-xl shadow-lg p-4 flex items-center space-x-4 transition-all relative ${isUnlocked ? 'opacity-60' : 'hover:bg-gray-50'} ${!isBuyable && !isUnlocked ? 'opacity-50' : ''} ${isRankUpCard ? 'rank-up-card' : ''} dark:bg-gray-800 dark:hover:bg-gray-700`;
                 
-                // (REFATORADO) Mostra ingredientes usando getIngredientHTML
                 const allRecipeIngredients = [...recipe.baseRecipe, ...recipe.optionalIngredients];
                 const uniqueIngredients = [...new Set(allRecipeIngredients)]; 
                 let ingredientsHTML = uniqueIngredients
@@ -1057,12 +1247,12 @@
                         <p class="text-gray-500 text-sm flex flex-wrap gap-1 items-center">${ingredientsHTML}</p>
                     </div>
                     ${isUnlocked ? 
-                        `<div class="text-green-500 font-bold px-4 py-2 rounded-lg bg-green-100">Comprado</div>` :
+                        `<div class="text-green-500 font-bold px-4 py-2 rounded-lg bg-green-100 dark:bg-green-900 dark:text-green-300">Comprado</div>` :
                     isBuyable ? 
                         `<button class="btn-main ${isRankUpCard ? 'bg-yellow-500' : 'bg-purple-500'} text-white font-bold px-6 py-3 rounded-lg text-lg" data-recipe="${recipe.name}">
                             <i class="fas ${isRankUpCard ? 'fa-star' : 'fa-coins'} mr-1"></i> $${recipe.price}
                         </button>` :
-                        `<div class="text-red-500 font-bold px-4 py-2 rounded-lg bg-red-100 text-center">
+                        `<div class="text-red-500 font-bold px-4 py-2 rounded-lg bg-red-100 text-center dark:bg-red-900 dark:text-red-300">
                             <i class="fas fa-lock mr-1"></i><br>
                             <span class="text-sm">Ranque Necessário:<br>
                             ${RANKS[recipe.minRank].icon} ${RANKS[recipe.minRank].name}</span>
@@ -1089,7 +1279,6 @@
                 updateMoney(-recipe.price);
                 gameState.unlockedRecipeNames.push(recipe.name);
                 
-                // (REFATORADO) Adiciona IDs de ingredientes
                 const ingredientsSet = new Set(gameState.unlockedIngredientIds);
                 recipe.baseRecipe.forEach(id => ingredientsSet.add(id));
                 recipe.optionalIngredients.forEach(id => ingredientsSet.add(id));
@@ -1114,7 +1303,7 @@
             }
         }
 
-        // --- 8. (REFATORADO) FUNÇÕES PRINCIPAIS DO JOGO ---
+        // --- 9. FUNÇÕES PRINCIPAIS DO JOGO ---
 
         /**
          * Retorna os valores de recompensa
@@ -1159,7 +1348,7 @@
          */
         function renderUnlockedIngredientBin() {
             ingredientBin.innerHTML = '';
-            // (REFATORADO) Embaralha IDs
+            // Embaralha IDs
             const shuffledIngredientIds = [...gameState.unlockedIngredientIds].sort(() => Math.random() - 0.5);
             
             shuffledIngredientIds.forEach(id => {
@@ -1170,9 +1359,11 @@
                 ingredientBin.appendChild(btn);
             });
 
-            ingredientBin.parentElement.classList.remove('animate-slide-in-bottom');
-            void ingredientBin.parentElement.offsetWidth;
-            ingredientBin.parentElement.classList.add('animate-slide-in-bottom');
+            // (MODIFICADO) Animação no container do rodapé
+            const footer = ingredientBin.closest('footer');
+            footer.classList.remove('animate-slide-in-bottom');
+            void footer.offsetWidth;
+            footer.classList.add('animate-slide-in-bottom');
         }
 
         /**
@@ -1217,7 +1408,7 @@
             messageBox.textContent = '';
             messageBox.className = "text-center text-2xl font-bold";
             
-            // (REFATORADO) Mostra a receita com a nova UI (usando IDs)
+            // Mostra a receita com a nova UI (usando IDs)
             recipeList.innerHTML = currentOrder.recipe.map((id, index) => 
                 `<span class="recipe-step" id="step-${index}">${getIngredientHTML(id)}</span>`
             ).join('');
@@ -1251,9 +1442,9 @@
             const clickedId = btn.dataset.id;
             playerSelection.push(clickedId);
             
-            // (REFATORADO) Atualiza o prato do jogador (visual)
+            // Atualiza o prato do jogador (visual)
             const ingredientEl = document.createElement('span');
-            ingredientEl.className = 'text-3xl animate-pop-in'; // O span vai conter o emoji ou a img
+            ingredientEl.className = 'text-3xl animate-pop-in'; 
             ingredientEl.innerHTML = getIngredientHTML(clickedId, 'inline-block');
             
             const currentIndex = playerSelection.length - 1;
@@ -1269,6 +1460,8 @@
             
             // Ingrediente correto
             playerPlate.appendChild(ingredientEl);
+            // (NOVO) Scrolla o prato para o final
+            playerPlate.scrollTop = playerPlate.scrollHeight;
 
             const recipeStepEl = document.getElementById(`step-${currentIndex}`);
             if (recipeStepEl) {
@@ -1379,7 +1572,6 @@
                 showSuccessScreen(successMsg);
                 
             } else {
-                // (MODIFICADO) Lógica de Falha
                 playSound('error');
                 currentStreak = 0;
                 isRushHour = false;
@@ -1391,7 +1583,6 @@
                 }
                 
                 updateMoney(-penalty);
-                // (NOVO) Chama a tela de falha
                 showFailureScreen(reason, penalty);
             }
             
@@ -1399,7 +1590,7 @@
             saveGame();
         }
 
-        // --- 9. FUNÇÕES AUXILIARES DE UI ---
+        // --- 10. FUNÇÕES AUXILIARES DE UI ---
 
         /**
          * Mostra a tela de sucesso
@@ -1421,7 +1612,7 @@
         }
 
         /**
-         * (NOVO) Mostra a tela de falha
+         * Mostra a tela de falha
          */
         function showFailureScreen(reason, penalty) {
             failureMessage.textContent = `${reason} -$${penalty}`;
@@ -1492,11 +1683,11 @@
             }
         }
 
-        // --- 10. INICIAR O JOGO ---
+        // --- 11. INICIAR O JOGO ---
         
         // Listeners de navegação
         welcomePlayButton.addEventListener('click', () => {
-            initializeAudio(); // (NOVO) Inicia o áudio
+            initializeAudio(); // Inicia o áudio
             showScreen('menu-screen');
         });
         playButton.addEventListener('click', startGame);
@@ -1530,13 +1721,20 @@
             rankUpModal.classList.remove('flex');
         });
 
+        // (NOVO) Listeners de Tema
+        allThemeToggles.forEach(btn => {
+            btn.addEventListener('click', toggleTheme);
+        });
+
         // Listeners do Jogo
         ingredientBin.addEventListener('click', handleIngredientClick);
         
         // Carregar o jogo quando o DOM estiver pronto
-        document.addEventListener('DOMContentLoaded', loadGame);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme(); // Carrega o tema primeiro
+            loadGame();  // Depois carrega o estado do jogo
+        });
 
     </script>
 </body>
 </html>
-
