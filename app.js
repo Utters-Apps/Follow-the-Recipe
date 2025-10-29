@@ -18,6 +18,7 @@ const RUSH_HOUR_TIMER_MULTIPLIER = 0.7;
 const VIP_REWARD_MULTIPLIER = 1.8;
 const SUCCESS_MODAL_DURATION = 1600;
 const FAILURE_MODAL_DURATION = 2000;
+const BGM_KEY = 'recipeGameBGMMuted_v6';
 /* ---------------------- */
 
 function buildLayout() {
@@ -292,6 +293,7 @@ const rushHourBanner = query('rush-hour-banner');
 const pauseModal = query('pause-modal');
 const pauseResume = query('pause-resume');
 const pauseReturnMenu = query('pause-return-menu');
+const musicToggle = query('music-toggle');
 
 /* NEW: Loading Screen Ref */
 const loadingScreen = document.getElementById('loading-screen'); 
@@ -610,7 +612,7 @@ function startNewOrder(){
     if (fallback && !gameState.unlockedRecipeNames.includes(fallback.name)){
       gameState.unlockedRecipeNames.push(fallback.name);
       const s = new Set(gameState.unlockedIngredientIds);
-      [...fallback.baseRecipe, ...fallback.optionalIngredients].forEach(id=>s.add(id));
+      [...fallback.baseRecipe, ...fallback.optionalIngredients].forEach(i=>s.add(i));
       gameState.unlockedIngredientIds = Array.from(s);
       saveGame();
     }
@@ -645,6 +647,10 @@ function startNewOrder(){
   npcDisplay.textContent = NPCS[Math.floor(Math.random()*NPCS.length)];
   dishEmoji.textContent = session.currentOrder.emoji + (session.isVIP ? ' ✨' : '');
   dishName.textContent = session.currentOrder.name + (session.isVIP ? ' (CLIENTE VIP)' : '');
+
+  // Ensure the ingredient bin reflects the new order (always include needed ingredients)
+  renderUnlockedIngredientBin();
+
   startTimer();
 }
 
@@ -703,12 +709,37 @@ function initBackgroundMusic() {
     bgAudio = new Audio('BGmusic.mp3');
     bgAudio.loop = true;
     bgAudio.volume = 0.32;
+    // Some browsers may not reliably honor loop on certain files; ensure restart on ended
+    bgAudio.addEventListener('ended', () => {
+      try { bgAudio.currentTime = 0; bgAudio.play().catch(()=>{}); } catch(e){}
+    });
     // will attempt to play on user interaction (see setupConfirm and welcomePlay)
   } catch (e) { bgAudio = null; console.warn('BG music init failed', e); }
 }
 function tryPlayBgMusic() {
   if (!bgAudio) return;
+  const muted = localStorage.getItem(BGM_KEY) === '1';
+  if (muted) { bgAudio.pause(); return; }
   bgAudio.play().catch(()=>{ /* autoplay blocked; will play on next user gesture */ });
+}
+
+function setBgmIcon(){
+  if (!musicToggle) return;
+  const muted = localStorage.getItem(BGM_KEY) === '1';
+  musicToggle.innerHTML = `<i class="fas ${muted ? 'fa-volume-mute text-gray-400' : 'fa-volume-up text-purple-600'}"></i>`;
+}
+
+function toggleBgm(){
+  const muted = localStorage.getItem(BGM_KEY) === '1';
+  const nowMuted = !muted;
+  localStorage.setItem(BGM_KEY, nowMuted ? '1':'0');
+  if (!bgAudio) initBackgroundMusic();
+  if (bgAudio){
+    if (nowMuted) bgAudio.pause();
+    else { bgAudio.currentTime = 0; bgAudio.play().catch(()=>{}); }
+  }
+  setBgmIcon();
+  playSound('click');
 }
 
 /* Ingredient click handling */
@@ -793,7 +824,9 @@ welcomePlayButton.addEventListener('click', ()=>{
   showScreen('menu-screen');
 });
 
-playButton.addEventListener('click', ()=>{ renderUnlockedIngredientBin(); startNewOrder(); showScreen('game-screen'); });
+playButton.addEventListener('click', ()=>{ 
+  startNewOrder(); renderUnlockedIngredientBin(); showScreen('game-screen'); 
+});
 marketButton.addEventListener('click', ()=>{ renderMarket(); updateAllMoneyDisplays(); showScreen('market-screen'); activateTab('buy'); });
 
 pauseButton.addEventListener('click', ()=>{ 
@@ -818,6 +851,8 @@ pauseReturnMenu.addEventListener('click', () => {
   pauseModal.classList.add('hidden');
   showScreen('menu-screen');
 });
+
+if (musicToggle) musicToggle.addEventListener('click', toggleBgm);
 
 menuButtonMarket.addEventListener('click', ()=>{ showScreen('menu-screen'); });
 marketMessageClose.addEventListener('click', ()=>{ playSound('click'); marketMessageModal.classList.add('hidden'); });
@@ -849,6 +884,9 @@ function init(){
     updateRankDisplay();
     showScreen('welcome-screen');
   }
+  
+  // Restore BGM icon state
+  setBgmIcon();
   
   // Hide loading screen
   if (loadingScreen) {
