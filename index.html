@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Siga a Receita - Deluxe Chef!</title>
+    <title>Siga a Receita - Deluxe Chef! v5</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Font Awesome (Ícones) CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- (NOVO) Tone.js (Efeitos Sonoros) CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     
     <!-- Font Inter (Estilo Google) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,14 +23,12 @@
         /* Estilo base com a fonte Inter */
         body {
             font-family: 'Inter', sans-serif;
-            /* Fundo gradiente vibrante e vivo */
             background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
             overflow: hidden; /* Prevenir scroll */
         }
 
         /* Container principal do jogo */
         #game-container {
-            /* Efeito de vidro fosco (glassmorphism) */
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -50,12 +51,19 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Estilo dos botões de ingrediente */
+        /* (MODIFICADO) Estilo dos botões de ingrediente (para suportar img) */
         .ingredient-btn {
             transition: all 0.15s ease;
             background: #fff;
             color: #333;
             border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.25rem; /* 36px */
+            line-height: 1;
+            width: 60px; /* Tamanho fixo */
+            height: 60px; /* Tamanho fixo */
         }
         .ingredient-btn:hover {
             border-color: #a78bfa; /* Roxo */
@@ -68,8 +76,15 @@
             color: white;
             border-color: #a78bfa;
         }
-        
-        /* (NOVO) Estilo para o card de "Subir de Ranque" no mercado */
+        /* (NOVO) Estilo para imagens de ingredientes */
+        .ingredient-btn img {
+            height: 40px;
+            width: 40px;
+            object-fit: contain;
+            pointer-events: none; /* Garante que o clique pegue no botão */
+        }
+
+        /* Estilo para o card de "Subir de Ranque" */
         .rank-up-card {
             border: 3px solid #f59e0b; /* Amarelo/Ouro */
             box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
@@ -78,6 +93,51 @@
         }
         .rank-up-card:hover {
             background-color: #fffbeb;
+        }
+
+        /* Estilo para a lista de receitas interativa */
+        #recipe-list {
+            min-height: 3rem; 
+        }
+        .recipe-step {
+            font-size: 1.5rem; /* 24px */
+            padding: 0.25rem 0.5rem;
+            margin: 0.125rem;
+            border: 2px solid #e5e7eb; /* gray-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            background-color: #f9fafb; /* gray-50 */
+            transition: all 0.3s ease;
+            display: inline-flex; /* (NOVO) para alinhar imgs */
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            min-height: 40px;
+        }
+        .recipe-step.correct {
+            background-color: #d1fae5; /* green-100 */
+            border-color: #10b981; /* green-500 */
+            color: #047857; /* green-700 */
+            text-decoration: line-through;
+            transform: scale(0.9);
+            opacity: 0.7;
+        }
+        /* (NOVO) Estilo para imagens na lista de receitas */
+        .recipe-step img, #player-plate img {
+            height: 24px;
+            width: 24px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        #player-plate img {
+            height: 32px;
+            width: 32px;
+        }
+
+        /* Prato do jogador sem scroll */
+        #player-plate {
+            min-height: 7rem; 
+            max-height: 10rem; 
+            overflow-y: hidden; 
         }
 
         /* Animações */
@@ -99,10 +159,10 @@
         }
         .timer-bar-inner-animate { animation: countdown 10s linear forwards; }
         
-        /* Balão de fala melhorado */
+        /* Balão de fala */
         .speech-bubble {
             position: relative;
-            background: #f3f4f6; /* Cinza claro */
+            background: #f3f4f6;
             border-radius: .4em;
             padding: 1rem 1.25rem;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
@@ -114,15 +174,15 @@
             left: 15%;
             width: 0; height: 0;
             border: 20px solid transparent;
-            border-top-color: #f3f4f6; /* Cor igual ao balão */
+            border-top-color: #f3f4f6;
             border-bottom: 0;
             margin-left: -10px;
             margin-bottom: -20px;
         }
         
         /* Classes de feedback */
-        .message-success { color: #10b981; /* Verde */ transform: scale(1); opacity: 1; }
-        .message-error { color: #ef4444; /* Vermelho */ transform: scale(1); opacity: 1; }
+        .message-success { color: #10b981; transform: scale(1); opacity: 1; }
+        .message-error { color: #ef4444; transform: scale(1); opacity: 1; }
         #message-box {
             transition: all 0.3s ease;
             transform: scale(0.8);
@@ -137,7 +197,7 @@
         }
         .animate-pulse-orange { animation: pulse-orange 0.3s ease-out; }
 
-        /* (NOVO) Animação para a tela de sucesso */
+        /* Animação para tela de sucesso */
         @keyframes pulse-success {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.2); opacity: 0.9; }
@@ -146,48 +206,55 @@
             animation: pulse-success 0.4s ease-out;
         }
 
-        /* (NOVO) Animação para o NPC ao receber um pedido */
+        /* Animação do NPC */
         @keyframes rotate-in {
             0% { transform: translateY(-50px) rotateY(180deg); opacity: 0; }
             100% { transform: translateY(0) rotateY(0deg); opacity: 1; }
         }
         .animate-rotate-in { animation: rotate-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
         
-        /* (NOVO) Animação para o ícone de ingrediente errado */
-        @keyframes shake-and-fade {
-            0%, 100% { transform: translateX(0); opacity: 1; }
+        /* (MODIFICADO) Animação para ingrediente errado (sem fade) */
+        @keyframes jiggle-wrong {
+            0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-5px); }
             40%, 80% { transform: translateX(5px); }
-            99% { opacity: 0; }
         }
         .ingredient-wrong { 
             color: #ef4444; /* Vermelho */
-            animation: shake-and-fade 0.5s ease-in-out forwards;
+            animation: jiggle-wrong 0.3s ease-in-out forwards;
         }
 
-        /* (NOVO) Transição de cor de fundo para a tela de sucesso */
-        #success-modal {
-            transition: background-color 0.4s ease-out;
+        /* (NOVO) Animação para tela de erro */
+        @keyframes shake-hard {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake-hard {
+            animation: shake-hard 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* Ícone da tela de boas-vindas */
+        @keyframes chef-wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(15deg); }
+            75% { transform: rotate(-10deg); }
+        }
+        .animate-chef-wave {
+            animation: chef-wave 1.5s ease-in-out infinite;
         }
 
         /* Evitar seleção de texto */
         .no-select {
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+/Edge */
-            user-select: none; /* Padrão */
+            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
         }
 
         /* Estilo para as "telas" */
         .screen {
-            display: none; /* Oculto por padrão */
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            animation: pop-in 0.4s ease-out;
+            display: none; flex-direction: column; width: 100%; height: 100%; animation: pop-in 0.4s ease-out;
         }
         .screen.active {
-            display: flex; /* Visível quando ativo */
+            display: flex;
         }
     </style>
 </head>
@@ -197,33 +264,32 @@
     <div id="game-container" class="w-full max-w-md h-full md:h-[95vh] md:max-h-[800px] bg-white shadow-xl rounded-2xl flex flex-col overflow-hidden relative">
 
         <!-- ====================================================== -->
-        <!-- 1. TELA DE BEM-VINDO                            -->
+        <!-- 1. TELA DE BEM-VINDO                                     -->
         <!-- ====================================================== -->
         <div id="welcome-screen" class="screen active p-8 flex-col items-center justify-center text-center">
-            <i class="fas fa-utensils text-9xl text-purple-500 mb-8 animate-pulse"></i>
-            <!-- (MODIFICADO) Fonte mais grossa para o título -->
+            <i class="fas fa-hat-chef text-9xl text-purple-500 mb-8 animate-chef-wave"></i>
             <h1 class="text-5xl font-black text-gray-800 mb-4">Siga a Receita</h1>
             <p class="text-xl text-gray-600 mb-12">Torne-se um Mestre Cuca!</p>
             <button id="welcome-play-button" class="btn-main w-full bg-green-500 text-white font-bold px-12 py-5 rounded-xl text-3xl shadow-lg">
                 <i class="fas fa-play mr-3"></i> Jogar
             </button>
             <div class="mt-auto text-gray-500 text-sm">
-                Chef Deluxe v3.0
+                <button id="reset-button-welcome" class="text-gray-400 hover:text-red-500 hover:underline transition-colors">
+                    <i class="fas fa-trash-alt mr-1"></i> Resetar Progresso
+                </button>
             </div>
         </div>
         
         <!-- ====================================================== -->
-        <!-- 2. TELA DE MENU (RANQUE)                               -->
+        <!-- 2. TELA DE MENU (RANQUE)                                 -->
         <!-- ====================================================== -->
         <div id="menu-screen" class="screen p-8 flex-col items-center justify-center text-center">
             
-            <!-- (NOVO) Display de Ranque -->
             <div id="rank-display" class="text-center mb-6 w-full">
                 <div id="rank-icon" class="text-8xl mb-2">🧼</div>
                 <h2 id="rank-name" class="text-3xl font-bold text-gray-700">Lava-pratos</h2>
             </div>
 
-            <!-- (NOVO) Meta para Próximo Ranque -->
             <div id="rank-goal" class="bg-gray-100 p-4 rounded-xl mb-6 text-center w-full shadow-inner">
                 <h4 class="text-lg font-bold text-purple-600">Próximo Nível</h4>
                 <p id="rank-goal-text" class="text-gray-600">Compre a receita "Salada" no Mercado!</p>
@@ -236,15 +302,16 @@
                 <i class="fas fa-store mr-3"></i> Mercado
             </button>
             <div class="mt-auto text-gray-500 text-sm">
-                Chef Deluxe v3.0
+                <button id="reset-button-menu" class="text-gray-400 hover:text-red-500 hover:underline transition-colors">
+                    <i class="fas fa-trash-alt mr-1"></i> Resetar Progresso
+                </button>
             </div>
         </div>
 
         <!-- ====================================================== -->
-        <!-- 2. TELA DE JOGO (MODIFICADA)                           -->
+        <!-- 2. TELA DE JOGO (MODIFICADA)                             -->
         <!-- ====================================================== -->
         <div id="game-screen" class="screen">
-            <!-- Header (Dinheiro e Pausa) -->
             <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex justify-between items-center z-10">
                 <button id="pause-button" class="text-gray-500 hover:text-purple-600 transition-colors duration-200 text-3xl w-10 h-10 flex items-center justify-center">
                     <i class="fas fa-pause"></i>
@@ -258,15 +325,12 @@
                 </div>
             </header>
 
-            <!-- Área do Jogo -->
             <main class="flex-1 flex flex-col p-4 overflow-hidden relative text-gray-800 bg-gradient-to-b from-white to-gray-50">
                 
-                <!-- (NOVO) Banner de Horário de Pico -->
                 <div id="rush-hour-banner" class="hidden absolute top-0 left-0 right-0 bg-red-500 text-white text-center p-2 font-bold z-20 animate-pulse">
                     <i class="fas fa-shipping-fast mr-2"></i> HORÁRIO DE PICO! (Recompensas 2x)
                 </div>
 
-                <!-- Cliente e Pedido -->
                 <div id="order-area" class="flex flex-col items-center mb-4 pt-8">
                     <div id="npc-display" class="text-8xl transition-transform duration-300"></div>
                     <div id="order-display" class="speech-bubble text-gray-900 font-bold text-center mt-4 w-52 transition-transform duration-200">
@@ -275,29 +339,26 @@
                     </div>
                 </div>
 
-                <!-- Receita -->
-                <div id="recipe-list" class="text-center text-2xl min-h-[3rem] mb-2 flex flex-wrap justify-center items-center space-x-2">
-                    <!-- Receita: 🍞 🧈 🧀 🍞 -->
+                <!-- Receita Interativa -->
+                <div id="recipe-list" class="text-center mb-2 flex flex-wrap justify-center items-center">
+                    <!-- Gerado por JS -->
                 </div>
                 
-                <!-- Barra de Tempo -->
                 <div class="w-full bg-gray-200 rounded-full h-5 mb-2 overflow-hidden shadow-inner border border-gray-300">
                     <div id="timer-bar-inner" class="h-full rounded-full bg-gradient-to-r from-red-500 to-orange-400 transition-all duration-300"></div>
                 </div>
                 <div id="timer-text" class="text-center font-bold text-lg mb-2 text-gray-700">Tempo: 12s</div>
 
-                <!-- Prato do Jogador -->
-                <div class="bg-gray-100 border border-gray-300 rounded-lg p-3 h-[7rem] overflow-y-auto mb-4 shadow-inner flex flex-wrap justify-center items-center gap-2" id="player-plate">
+                <!-- Prato do Jogador (Sem Scroll) -->
+                <div class="bg-gray-100 border border-gray-300 rounded-lg p-3 min-h-[7rem] max-h-[10rem] mb-4 shadow-inner flex flex-wrap justify-center items-center gap-2" id="player-plate">
                     <!-- Ingredientes selecionados -->
                 </div>
 
-                <!-- Mensagem de Feedback -->
                 <div id="message-box" class="text-center text-2xl font-bold">
                     <!-- Mensagens de "Perfeito!" ou "Errado!" -->
                 </div>
             </main>
 
-            <!-- Bandeja de Ingredientes -->
             <footer class="bg-gray-100 p-4 shadow-inner border-t-2 border-gray-200">
                 <div id="ingredient-bin" class="grid grid-cols-5 gap-2 justify-items-center">
                     <!-- Botões de ingredientes serão injetados aqui -->
@@ -306,10 +367,9 @@
         </div>
 
         <!-- ====================================================== -->
-        <!-- 3. TELA DE MERCADO (MODIFICADA)                        -->
+        <!-- 3. TELA DE MERCADO (MODIFICADA)                          -->
         <!-- ====================================================== -->
         <div id="market-screen" class="screen">
-            <!-- Header do Mercado -->
             <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 w-full">
                 <button id="menu-button-market" class="text-gray-500 hover:text-purple-600 transition-colors duration-200 text-3xl w-10 h-10 flex items-center justify-center">
                     <i class="fas fa-arrow-left"></i>
@@ -320,7 +380,6 @@
                 </div>
             </header>
 
-            <!-- Lista de Itens do Mercado -->
             <main class="flex-1 p-4 overflow-y-auto w-full space-y-3">
                 <div id="market-items-grid" class="space-y-3">
                     <!-- Cards de receitas serão injetados aqui -->
@@ -329,7 +388,7 @@
         </div>
 
         <!-- ====================================================== -->
-        <!-- MODAIS (SOBREPOSIÇÃO)                                  -->
+        <!-- MODAIS (SOBREPOSIÇÃO)                                    -->
         <!-- ====================================================== -->
 
         <!-- Tela de Pausa (MODAL) -->
@@ -346,11 +405,40 @@
 
         <!-- Mensagem de Feedback do Mercado (MODAL) -->
         <div id="market-message-modal" class="hidden absolute inset-0 bg-black/70 z-50 flex flex-col items-center justify-center p-8 backdrop-blur-sm">
-            <div class="bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
+            <div id="market-message-content" class="bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
                 <i id="market-message-icon" class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
                 <h3 id="market-message-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
                 <p id="market-message-text" class="text-gray-600 mb-6"></p>
                 <button id="market-message-close" class="btn-main w-full bg-purple-500 text-white font-bold py-3 rounded-lg text-lg">
+                    OK
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmação de Reset -->
+        <div id="confirm-reset-modal" class="hidden absolute inset-0 bg-black/70 z-50 flex flex-col items-center justify-center p-8 backdrop-blur-sm">
+            <div class="bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
+                <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">Resetar Progresso?</h3>
+                <p class="text-gray-600 mb-6">Todo o seu dinheiro, receitas e ranque serão perdidos. Esta ação não pode ser desfeita!</p>
+                <div class="flex gap-3">
+                    <button id="confirm-reset-cancel" class="btn-main w-full bg-gray-400 text-white font-bold py-3 rounded-lg text-lg">
+                        Cancelar
+                    </button>
+                    <button id="confirm-reset-confirm" class="btn-main w-full bg-red-600 text-white font-bold py-3 rounded-lg text-lg">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Ranque Up -->
+        <div id="rank-up-modal" class="hidden absolute inset-0 bg-yellow-500/70 z-50 flex flex-col items-center justify-center p-8 backdrop-blur-sm">
+            <div class="bg-white p-6 rounded-2xl shadow-2xl text-center w-full max-w-sm animate-pop-in">
+                <i id="rank-up-icon-modal" class="fas fa-star text-6xl text-yellow-500 mb-4 animate-pulse-success"></i>
+                <h3 id="rank-up-title" class="text-2xl font-bold text-gray-800 mb-2">Você subiu de ranque!</h3>
+                <p id="rank-up-text" class="text-gray-600 mb-6">Parabéns, você agora é Ajudante de Cozinha!</p>
+                <button id="rank-up-close" class="btn-main w-full bg-purple-500 text-white font-bold py-3 rounded-lg text-lg">
                     OK
                 </button>
             </div>
@@ -361,6 +449,12 @@
             <i id="success-icon" class="fas fa-check-circle text-8xl text-white mb-6"></i>
             <h2 id="success-message" class="text-4xl font-bold text-white">Perfeito! +$18</h2>
         </div>
+        
+        <!-- (NOVO) Tela de Falha (MODAL) -->
+        <div id="failure-modal" class="hidden absolute inset-0 bg-red-600/70 z-50 flex flex-col items-center justify-center p-8 text-center backdrop-blur-sm">
+            <i id="failure-icon" class="fas fa-times-circle text-8xl text-white mb-6"></i>
+            <h2 id="failure-message" class="text-4xl font-bold text-white">Errado! -$10</h2>
+        </div>
 
     </div>
 
@@ -369,67 +463,148 @@
 
         const NPCS = ["👩‍💼", "🧑‍💻", "👨‍🎨", "👩‍🚀", "🧑‍🚒", "👮‍♀️", "👷‍♂️", "👩‍⚕️", "🧑‍🎤", "👨‍🌾"];
         
-        // (MAIS INGREDIENTES)
-        const ALL_INGREDIENTS = [
-            "🍞", "🥬", "🥩", "🧀", "🍅", "🥒", "🧅", "🌶️", "🌮", "🍙", 
-            "🐟", "🥑", "🥚", "🥓", "🍄", "🌭", "🍗", "🌽", "🦐", "🍕",
-            "🥛", "🍯", "🧇", "🥞", "🥦", "🥕", "🫐", "🍚", "🥟", "🍋",
-            "🧂", "🥣", "🥜", "🫘", "🎂", "🧈", "🌿", "🍓", "🍍", "🍆", "🥔"
-        ];
+        // (REFATORADO) Dicionário de Ingredientes (ID -> {type, value})
+        const ALL_INGREDIENTS = {
+            // Rank 0-1
+            'pao': { type: 'emoji', value: '🍞' },
+            'alface': { type: 'emoji', value: '🥬' },
+            'bife': { type: 'emoji', value: '🥩' },
+            'queijo': { type: 'emoji', value: '🧀' },
+            'tomate': { type: 'emoji', value: '🍅' },
+            'pepino': { type: 'emoji', value: '🥒' },
+            'cebola': { type: 'emoji', value: '🧅' },
+            'pimenta': { type: 'emoji', value: '🌶️' },
+            'taco_shell': { type: 'emoji', value: '🌮' },
+            'alga': { type: 'emoji', value: '🍙' },
+            'peixe': { type: 'emoji', value: '🐟' },
+            'abacate': { type: 'emoji', value: '🥑' },
+            'ovo': { type: 'emoji', value: '🥚' },
+            'bacon': { type: 'emoji', value: '🥓' },
+            'cogumelo': { type: 'emoji', value: '🍄' },
+            'salsicha': { type: 'emoji', value: '🌭' },
+            'frango': { type: 'emoji', value: '🍗' },
+            'milho': { type: 'emoji', value: '🌽' },
+            'camarao': { type: 'emoji', value: '🦐' },
+            'pizza_massa': { type: 'emoji', value: '🍕' },
+            'leite': { type: 'emoji', value: '🥛' },
+            'mel': { type: 'emoji', value: '🍯' },
+            'waffle': { type: 'emoji', value: '🧇' },
+            'panqueca': { type: 'emoji', value: '🥞' },
+            'brocolis': { type: 'emoji', value: '🥦' },
+            'cenoura': { type: 'emoji', value: '🥕' },
+            'mirtilo': { type: 'emoji', value: '🫐' },
+            'arroz': { type: 'emoji', value: '🍚' },
+            'guioza_massa': { type: 'emoji', value: '🥟' },
+            'limao': { type: 'emoji', value: '🍋' },
+            'sal': { type: 'emoji', value: '🧂' },
+            'sopa_base': { type: 'emoji', value: '🥣' },
+            'amendoim': { type: 'emoji', value: '🥜' },
+            'feijao': { type: 'emoji', value: '🫘' },
+            'bolo_massa': { type: 'emoji', value: '🎂' },
+            'manteiga': { type: 'emoji', value: '🧈' },
+            'ervas': { type: 'emoji', value: '🌿' },
+            'morango': { type: 'emoji', value: '🍓' },
+            'abacaxi': { type: 'emoji', value: '🍍' },
+            'berinjela': { type: 'emoji', value: '🍆' },
+            'batata': { type: 'emoji', value: '🥔' },
+            'azeitona': { type: 'emoji', value: '🫒' },
+            'alho': { type: 'emoji', value: '🧄' },
+            'pimentao': { type: 'emoji', value: '🫑' },
+            'massa': { type: 'emoji', value: '🍝' },
+            'ramen_massa': { type: 'emoji', value: '🍜' },
+            'sushi_base': { type: 'emoji', value: '🍣' },
+            'croissant_massa': { type: 'emoji', value: '🥐' },
+            'baguete': { type: 'emoji', value: '🥖' },
+            'chocolate': { type: 'emoji', value: '🍫' },
+            'gelo': { type: 'emoji', value: '🧊' },
+            'molho_soja': { type: 'emoji', value: '🫙' },
+            'coco': { type: 'emoji', value: '🥥' },
+            'banana': { type: 'emoji', value: '🍌' },
+            'maca': { type: 'emoji', value: '🍎' },
+            'uva': { type: 'emoji', value: '🍇' },
+            'kiwi': { type: 'emoji', value: '🥝' },
+            'donut_massa': { type: 'emoji', value: '🍩' },
+            'cookie_massa': { type: 'emoji', value: '🍪' },
+            'sorvete_base': { type: 'emoji', value: '🍦' },
+            'ervilha': { type: 'emoji', value: '🫛' },
+            'pretzel': { type: 'emoji', value: '🥨' },
+            'bagel': { type: 'emoji', value: '🥯' },
+            'laranja': { type: 'emoji', value: '🍊' },
+            'melancia': { type: 'emoji', value: '🍉' },
+            // (NOVO) Tofu como Imagem
+            'tofu': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4463/4463838.png' },
+            // (NOVOS) Ingredientes
+            'cafe': { type: 'emoji', value: '☕' },
+            'manteiga_amendoim': { type: 'emoji', value: '🥜' }, // Reutilizando amendoim visualmente, mas é outro ID
+            'geleia': { type: 'emoji', value: '🍇' } // Reutilizando uva visualmente
+        };
         
-        // (MAIS RECEITAS + Estrutura de Ranque)
+        // (REFATORADO) Receitas usam IDs
         const ALL_RECIPES = [
-            // name: Nome do prato
-            // emoji: Emoji do prato
-            // price: Preço no mercado
-            // minRank: O ranque MÍNIMO que o jogador deve ter para comprar.
-            // baseRecipe: A receita mínima obrigatória
-            // optionalIngredients: Ingredientes que podem ser adicionados se o jogador os tiver desbloqueado
+            // minRank 0 (Lava-pratos)
+            { name: "Misto Quente", emoji: "🥪", price: 0, minRank: 0, baseRecipe: ["pao", "manteiga", "queijo", "pao"], optionalIngredients: ["tomate"] }, // Inicial
+            { name: "Limonada", emoji: "🍋", price: 60, minRank: 0, baseRecipe: ["limao", "mel", "gelo"], optionalIngredients: ["ervas"] }, // Inicial
+            { name: "Torrada", emoji: "🍞", price: 40, minRank: 0, baseRecipe: ["pao", "manteiga"], optionalIngredients: ["morango", "mel"] },
+            { name: "Café", emoji: "☕", price: 50, minRank: 0, baseRecipe: ["cafe", "leite"], optionalIngredients: ["mel"] },
+            { name: "Salada", emoji: "🥗", price: 100, minRank: 0, baseRecipe: ["alface", "tomate", "pepino"], optionalIngredients: ["cebola", "abacate", "milho", "ovo"] }, // Ranque Up
             
-             // minRank 0 (Ranque Lava-pratos) -> Receitas que devem estar disponíveis no início
-            { name: "Misto Quente", emoji: "🥪", price: 0, minRank: 0, baseRecipe: ["🍞", "🧈", "🧀", "🍞"], optionalIngredients: ["🍅"] }, // Inicial
-            { name: "Limonada", emoji: "🍋", price: 60, minRank: 0, baseRecipe: ["🍋", "🍯"], optionalIngredients: ["🌿"] },
-            { name: "Salada", emoji: "🥗", price: 100, minRank: 0, baseRecipe: ["🥬", "🍅", "🥒"], optionalIngredients: ["🧅", "🥑", "🌽", "🥚"] }, // Ranque Up para Ranque 1
+            // minRank 1 (Ajudante de Cozinha)
+            { name: "Sopa de Tomate", emoji: "🥣", price: 110, minRank: 1, baseRecipe: ["tomate", "cebola", "ervas"], optionalIngredients: ["manteiga"] },
+            { name: "Vitamina de Banana", emoji: "🍌", price: 120, minRank: 1, baseRecipe: ["banana", "leite", "mel"], optionalIngredients: ["morango", "abacate"] },
+            { name: "Sushi", emoji: "🍣", price: 150, minRank: 1, baseRecipe: ["alga", "peixe", "pepino"], optionalIngredients: ["abacate"] },
+            { name: "Suco de Laranja", emoji: "🍊", price: 90, minRank: 1, baseRecipe: ["laranja", "gelo"], optionalIngredients: [] },
+            { name: "Sanduíche Simples", emoji: "🥪", price: 130, minRank: 1, baseRecipe: ["pao", "alface", "tomate"], optionalIngredients: ["queijo", "bacon"] },
+            { name: "Sand. de Geleia", emoji: "🥪", price: 160, minRank: 1, baseRecipe: ["pao", "manteiga_amendoim", "geleia", "pao"], optionalIngredients: ["banana"] },
+            { name: "Hambúrguer", emoji: "🍔", price: 200, minRank: 1, baseRecipe: ["pao", "bife", "alface", "pao"], optionalIngredients: ["queijo", "tomate", "bacon", "cebola"] }, // Ranque Up
             
-            // minRank 1 (Ranque Ajudante de Cozinha) -> Receitas disponíveis APÓS subir de Ranque
-            { name: "Sopa de Tomate", emoji: "🥣", price: 110, minRank: 1, baseRecipe: ["🍅", "🧅", "🌿"], optionalIngredients: ["🧈"] },
-            { name: "Vitamina", emoji: "🥑", price: 120, minRank: 1, baseRecipe: ["🥑", "🥛", "🍯"], optionalIngredients: ["🍓"] },
-            { name: "Sushi", emoji: "🍣", price: 150, minRank: 1, baseRecipe: ["🍙", "🐟", "🥒"], optionalIngredients: ["🥑"] },
-            { name: "Hambúrguer", emoji: "🍔", price: 200, minRank: 1, baseRecipe: ["🍞", "🥩", "🥬", "🍞"], optionalIngredients: ["🧀", "🍅", "🥓", "🧅"] }, // Ranque Up para Ranque 2
+            // minRank 2 (Cozinheiro Júnior)
+            { name: "Batata Frita", emoji: "🍟", price: 200, minRank: 2, baseRecipe: ["batata", "manteiga", "sal"], optionalIngredients: ["queijo"] },
+            { name: "Panquecas", emoji: "🥞", price: 220, minRank: 2, baseRecipe: ["panqueca", "manteiga", "mel"], optionalIngredients: ["morango", "mirtilo", "banana"] },
+            { name: "Cachorro-Quente", emoji: "🌭", price: 250, minRank: 2, baseRecipe: ["salsicha", "bacon"], optionalIngredients: ["cebola", "pepino", "pimenta"] },
+            { name: "Waffles", emoji: "🧇", price: 280, minRank: 2, baseRecipe: ["waffle", "manteiga", "morango"], optionalIngredients: ["mirtilo", "mel", "chocolate"] },
+            { name: "Omelete", emoji: "🍳", price: 300, minRank: 2, baseRecipe: ["ovo", "ovo", "manteiga"], optionalIngredients: ["queijo", "cogumelo", "ervas", "tomate"] },
+            { name: "Croissant", emoji: "🥐", price: 180, minRank: 2, baseRecipe: ["croissant_massa", "manteiga"], optionalIngredients: ["chocolate"] },
+            { name: "Macarrão Alho e Óleo", emoji: "🍝", price: 260, minRank: 2, baseRecipe: ["massa", "alho", "azeitona"], optionalIngredients: ["ervas"] },
+            { name: "Taco", emoji: "🌮", price: 350, minRank: 2, baseRecipe: ["taco_shell", "bife", "alface"], optionalIngredients: ["tomate", "queijo", "pimenta"] }, // Ranque Up
             
-            // minRank 2 (Ranque Cozinheiro Júnior)
-            { name: "Batata Frita", emoji: "🍟", price: 200, minRank: 2, baseRecipe: ["🥔", "🧈", "🧂"], optionalIngredients: ["🧀"] },
-            { name: "Panquecas", emoji: "🥞", price: 220, minRank: 2, baseRecipe: ["🥞", "🧈", "🍯"], optionalIngredients: ["🍓", "🫐"] },
-            { name: "Cachorro-Quente", emoji: "🌭", price: 250, minRank: 2, baseRecipe: ["🌭", "🥓"], optionalIngredients: ["🧅", "🥒", "🌶️"] },
-            { name: "Waffles", emoji: "🧇", price: 280, minRank: 2, baseRecipe: ["🧇", "🧈", "🍓"], optionalIngredients: ["🫐", "🍯"] },
-            { name: "Omelete", emoji: "🍳", price: 300, minRank: 2, baseRecipe: ["🥚", "🥚", "🧈"], optionalIngredients: ["🧀", "🍄", "🌿", "🍅"] },
-            { name: "Taco", emoji: "🌮", price: 350, minRank: 2, baseRecipe: ["🌮", "🥩", "🥬"], optionalIngredients: ["🍅", "🧀", "🌶️"] }, // Ranque Up para Ranque 3
-
-            // minRank 3 (Ranque Cozinheiro Pleno)
-            { name: "Frango c/ Legumes", emoji: "🍗", price: 320, minRank: 3, baseRecipe: ["🍗", "🥦", "🥕"], optionalIngredients: ["🌿"] },
-            { name: "Salada Caesar", emoji: "🥗", price: 360, minRank: 3, baseRecipe: ["🥬", "🍞", "🧀", "🍗"], optionalIngredients: ["🥓"] },
-            { name: "Sanduíche de Atum", emoji: "🥪", price: 380, minRank: 3, baseRecipe: ["🍞", "🐟", "🥬"], optionalIngredients: ["🍅", "🧅"] },
-            { name: "Kebab", emoji: "🥙", price: 400, minRank: 3, baseRecipe: ["🍞", "🍗", "🥬"], optionalIngredients: ["🍅", "🧅"] },
-            { name: "Onigiri", emoji: "🍙", price: 450, minRank: 3, baseRecipe: ["🍙", "🍚", "🐟"], optionalIngredients: ["🌿"] },
-            { name: "Pizza Slice", emoji: "🍕", price: 500, minRank: 3, baseRecipe: ["🍕", "🍅", "🧀"], optionalIngredients: ["🌶️", "🥓", "🍄"] }, // Ranque Up para Ranque 4
-
-            // minRank 4 (Ranque Subchefe)
-            { name: "Ensopado", emoji: "🍲", price: 550, minRank: 4, baseRecipe: ["🥔", "🥕", "🧅"], optionalIngredients: ["🥦", "🥩"] },
-            { name: "Chilli", emoji: "🌶️", price: 580, minRank: 4, baseRecipe: ["🥩", "🫘", "🌶️", "🍅"], optionalIngredients: ["🧅"] },
-            { name: "Ratatouille", emoji: "🍲", price: 600, minRank: 4, baseRecipe: ["🍅", "🍆", "🥒"], optionalIngredients: ["🧅", "🌿"] },
-            { name: "Guioza", emoji: "🥟", price: 650, minRank: 4, baseRecipe: ["🥟", "🥩", "🥬"], optionalIngredients: ["🧅"] },
-            { name: "Temaki", emoji: "🍣", price: 750, minRank: 4, baseRecipe: ["🍙", "🍚", "🐟", "🥑"], optionalIngredients: ["🥒"] },
-            { name: "Ramen", emoji: "🍜", price: 800, minRank: 4, baseRecipe: ["🍜", "🥩", "🥚"], optionalIngredients: ["🌿", "🌽"] }, // Ranque Up para Ranque 5
-
-            // minRank 5 (Ranque Chefe de Cozinha)
-            { name: "Salada de Frutas", emoji: "🍓", price: 800, minRank: 5, baseRecipe: ["🍓", "🍍"], optionalIngredients: ["🥑", "🫐", "🍯"] },
-            { name: "Camarão", emoji: "🦐", price: 850, minRank: 5, baseRecipe: ["🦐", "🧈", "🌿"], optionalIngredients: ["🍋"] },
-            { name: "Bolo", emoji: "🎂", price: 900, minRank: 5, baseRecipe: ["🎂", "🍓", "🥛", "🍯"], optionalIngredients: ["🫐"] },
-            { name: "Paella", emoji: "🥘", price: 950, minRank: 5, baseRecipe: ["🍚", "🦐", "🌶️", "🍗"], optionalIngredients: ["🍋"] },
-            { name: "Salmão Grelhado", emoji: "🐟", price: 1000, minRank: 5, baseRecipe: ["🐟", "🍋", "🌿"], optionalIngredients: ["🥔"] } // Ranque Up para Ranque 6
+            // minRank 3 (Cozinheiro Pleno)
+            { name: "Frango c/ Legumes", emoji: "🍗", price: 320, minRank: 3, baseRecipe: ["frango", "brocolis", "cenoura"], optionalIngredients: ["ervas"] },
+            { name: "Salada Caesar", emoji: "🥗", price: 360, minRank: 3, baseRecipe: ["alface", "pao", "queijo", "frango"], optionalIngredients: ["bacon"] },
+            { name: "Sanduíche de Atum", emoji: "🥪", price: 380, minRank: 3, baseRecipe: ["pao", "peixe", "alface"], optionalIngredients: ["tomate", "cebola"] },
+            { name: "Kebab", emoji: "🥙", price: 400, minRank: 3, baseRecipe: ["pao", "frango", "alface"], optionalIngredients: ["tomate", "cebola"] },
+            { name: "Onigiri", emoji: "🍙", price: 450, minRank: 3, baseRecipe: ["alga", "arroz", "peixe"], optionalIngredients: ["ervas"] },
+            { name: "Bruschetta", emoji: "🥖", price: 330, minRank: 3, baseRecipe: ["baguete", "tomate", "alho", "azeitona"], optionalIngredients: ["ervas"] },
+            { name: "Spaghetti Bolonhesa", emoji: "🍝", price: 420, minRank: 3, baseRecipe: ["massa", "tomate", "bife", "ervas"], optionalIngredients: ["cebola", "alho"] },
+            { name: "Pizza Slice", emoji: "🍕", price: 500, minRank: 3, baseRecipe: ["pizza_massa", "tomate", "queijo"], optionalIngredients: ["pimenta", "bacon", "cogumelo", "azeitona"] }, // Ranque Up
+            
+            // minRank 4 (Subchefe)
+            { name: "Ensopado", emoji: "🍲", price: 550, minRank: 4, baseRecipe: ["batata", "cenoura", "cebola", "bife"], optionalIngredients: ["brocolis", "ervilha"] },
+            { name: "Chilli", emoji: "🌶️", price: 580, minRank: 4, baseRecipe: ["bife", "feijao", "pimenta", "tomate"], optionalIngredients: ["cebola", "alho"] },
+            { name: "Ratatouille", emoji: "🍲", price: 600, minRank: 4, baseRecipe: ["tomate", "berinjela", "pepino", "pimentao"], optionalIngredients: ["cebola", "ervas"] },
+            { name: "Guioza", emoji: "🥟", price: 650, minRank: 4, baseRecipe: ["guioza_massa", "bife", "alface"], optionalIngredients: ["cebola", "molho_soja"] },
+            { name: "Temaki", emoji: "🍣", price: 750, minRank: 4, baseRecipe: ["alga", "arroz", "peixe", "abacate"], optionalIngredients: ["pepino"] },
+            { name: "Tofu Grelhado", emoji: "🍜", price: 520, minRank: 4, baseRecipe: ["tofu", "molho_soja", "arroz"], optionalIngredients: ["ervas", "cenoura"] }, // Emoji de prato
+            { name: "Sopa de Legumes", emoji: "🥣", price: 500, minRank: 4, baseRecipe: ["sopa_base", "batata", "cenoura", "ervilha"], optionalIngredients: ["cebola"] },
+            { name: "Ramen", emoji: "🍜", price: 800, minRank: 4, baseRecipe: ["ramen_massa", "bife", "ovo", "molho_soja"], optionalIngredients: ["ervas", "milho", "cogumelo"] }, // Ranque Up
+            
+            // minRank 5 (Chefe de Cozinha)
+            { name: "Salada de Frutas", emoji: "🍓", price: 800, minRank: 5, baseRecipe: ["morango", "abacaxi", "kiwi", "banana"], optionalIngredients: ["abacate", "mirtilo", "mel", "coco", "maca", "uva"] },
+            { name: "Camarão Alho e Óleo", emoji: "🦐", price: 850, minRank: 5, baseRecipe: ["camarao", "manteiga", "ervas", "alho"], optionalIngredients: ["limao"] },
+            { name: "Bolo de Morango", emoji: "🎂", price: 900, minRank: 5, baseRecipe: ["bolo_massa", "morango", "leite", "mel"], optionalIngredients: ["mirtilo", "manteiga"] },
+            { name: "Paella", emoji: "🥘", price: 950, minRank: 5, baseRecipe: ["arroz", "camarao", "pimenta", "frango", "ervilha"], optionalIngredients: ["limao", "pimentao"] },
+            { name: "Donut", emoji: "🍩", price: 400, minRank: 5, baseRecipe: ["donut_massa", "chocolate"], optionalIngredients: ["morango"] },
+            { name: "Sorvete", emoji: "🍦", price: 450, minRank: 5, baseRecipe: ["sorvete_base", "leite", "morango"], optionalIngredients: ["banana", "chocolate"] },
+            { name: "Cookie", emoji: "🍪", price: 380, minRank: 5, baseRecipe: ["cookie_massa", "chocolate", "manteiga"], optionalIngredients: ["amendoim"] },
+            { name: "Salmão Grelhado", emoji: "🐟", price: 1000, minRank: 5, baseRecipe: ["peixe", "limao", "ervas", "azeitona"], optionalIngredients: ["batata", "brocolis"] }, // Ranque Up
+            
+            // minRank 6 (Mestre Cuca)
+            { name: "Bolo de Chocolate", emoji: "🎂", price: 1200, minRank: 6, baseRecipe: ["bolo_massa", "chocolate", "leite", "manteiga"], optionalIngredients: ["morango"] },
+            { name: "Bife à Parmegiana", emoji: "🥩", price: 1500, minRank: 6, baseRecipe: ["bife", "queijo", "tomate", "massa", "pao"], optionalIngredients: ["ervas"] },
+            { name: "Banquete de Frutos do Mar", emoji: "🥘", price: 2000, minRank: 6, baseRecipe: ["camarao", "peixe", "azeitona", "limao", "ervas"], optionalIngredients: ["batata"] },
+            { name: "Fondue de Queijo", emoji: "🧀", price: 1800, minRank: 6, baseRecipe: ["queijo", "pao", "baguete", "uva"], optionalIngredients: ["maca", "brocolis"] }
         ];
 
-        // (NOVO) Sistema de Ranks
+        // Sistema de Ranks
         const RANKS = [
             { name: "Lava-pratos", icon: "🧼", recipeToUnlock: "Salada" }, // Rank 0
             { name: "Ajudante de Cozinha", icon: "🧑‍🍳", recipeToUnlock: "Hambúrguer" }, // Rank 1
@@ -441,16 +616,21 @@
         ];
 
         // --- 2. VARIÁVEIS DE ESTADO DO JOGO ---
-        const SAVE_KEY = 'recipeGameData_v2'; // Chave salva
+        const SAVE_KEY = 'recipeGameData_v5'; // Chave salva (v5 para nova estrutura de IDs)
 
-        // Estado do jogo salvo
-        let gameState = {
+        // (REFATORADO) Estado inicial usa IDs
+        const getInitialGameState = () => ({
             money: 50,
-            unlockedRecipeNames: ["Misto Quente"],
-            // (CORREÇÃO) Adicionado todos os ingredientes base das receitas minRank: 0
-            unlockedIngredientEmojis: ["🍞", "🧈", "🧀", "🍅", "🍋", "🍯", "🥬", "🥒"],
+            unlockedRecipeNames: ["Misto Quente", "Limonada", "Café"],
+            unlockedIngredientIds: [
+                "pao", "manteiga", "queijo", "tomate", // Misto
+                "limao", "mel", "gelo", "ervas", // Limonada
+                "cafe", "leite" // Café
+            ],
             rank: 0
-        };
+        });
+
+        let gameState = getInitialGameState();
 
         // Estado da sessão (não salvo)
         let currentStreak = 0;
@@ -461,6 +641,7 @@
         let gameActive = false;
         let isPaused = false;
         let isRushHour = false;
+        let hasAudioStarted = false; // (NOVO) Controle de áudio
         
         const PENALTY_FAILURE = 10;
 
@@ -472,10 +653,17 @@
         const marketScreen = document.getElementById('market-screen');
         const pauseScreen = document.getElementById('pause-screen');
         const marketMessageModal = document.getElementById('market-message-modal');
+        const marketMessageContent = document.getElementById('market-message-content');
         const successModal = document.getElementById('success-modal');
         const successMessage = document.getElementById('success-message');
         const successIcon = document.getElementById('success-icon');
         const rushHourBanner = document.getElementById('rush-hour-banner');
+        const confirmResetModal = document.getElementById('confirm-reset-modal');
+        const rankUpModal = document.getElementById('rank-up-modal');
+        // (NOVO) Modal de Falha
+        const failureModal = document.getElementById('failure-modal');
+        const failureMessage = document.getElementById('failure-message');
+        const failureIcon = document.getElementById('failure-icon');
 
         // Botões de Navegação
         const welcomePlayButton = document.getElementById('welcome-play-button');
@@ -486,6 +674,11 @@
         const menuButtonPause = document.getElementById('menu-button-pause');
         const menuButtonMarket = document.getElementById('menu-button-market');
         const marketMessageClose = document.getElementById('market-message-close');
+        const resetButtonWelcome = document.getElementById('reset-button-welcome');
+        const resetButtonMenu = document.getElementById('reset-button-menu');
+        const confirmResetCancel = document.getElementById('confirm-reset-cancel');
+        const confirmResetConfirm = document.getElementById('confirm-reset-confirm');
+        const rankUpClose = document.getElementById('rank-up-close');
 
         // Displays de Dinheiro
         const moneyDisplayGame = document.getElementById('money-display-game');
@@ -517,7 +710,81 @@
         const marketMessageTitle = document.getElementById('market-message-title');
         const marketMessageText = document.getElementById('market-message-text');
 
-        // --- 4. FUNÇÕES DE NAVEGAÇÃO E ESTADO ---
+        // Modal de Ranque Up
+        const rankUpIconModal = document.getElementById('rank-up-icon-modal');
+        const rankUpTitle = document.getElementById('rank-up-title');
+        const rankUpText = document.getElementById('rank-up-text');
+
+        // --- 4. (NOVO) LÓGICA DE ÁUDIO ---
+        
+        /**
+         * Sintetizadores de áudio
+         */
+        const audioSynths = {
+            click: new Tone.MembraneSynth({
+                octaves: 5,
+                pitchDecay: 0.1,
+                volume: -12,
+            }).toDestination(),
+            
+            success: new Tone.Synth({
+                oscillator: { type: 'sine' },
+                envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 },
+                volume: -10
+            }).toDestination(),
+            
+            error: new Tone.Synth({
+                oscillator: { type: 'square' },
+                envelope: { attack: 0.01, decay: 0.3, sustain: 0, release: 0.1 },
+                volume: -15
+            }).toDestination(),
+            
+            buy: new Tone.PolySynth(Tone.Synth, {
+                volume: -15,
+                envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.1 }
+            }).toDestination()
+        };
+
+        /**
+         * Inicia o contexto de áudio (requer interação do usuário)
+         */
+        async function initializeAudio() {
+            if (hasAudioStarted) return;
+            await Tone.start();
+            console.log("Áudio iniciado!");
+            hasAudioStarted = true;
+            playSound('click');
+        }
+
+        /**
+         * Toca um som
+         */
+        function playSound(soundName) {
+            if (!hasAudioStarted) return;
+            
+            try {
+                const now = Tone.now();
+                switch (soundName) {
+                    case 'click':
+                        audioSynths.click.triggerAttackRelease("C2", "8n", now);
+                        break;
+                    case 'success':
+                        audioSynths.success.triggerAttackRelease("C5", "8n", now);
+                        audioSynths.success.triggerAttackRelease("G5", "8n", now + 0.1);
+                        break;
+                    case 'error':
+                        audioSynths.error.triggerAttackRelease("F#2", "8n", now);
+                        break;
+                    case 'buy':
+                        audioSynths.buy.triggerAttackRelease(["C4", "E4", "G4"], "16n", now);
+                        break;
+                }
+            } catch (e) {
+                console.warn("Erro ao tocar som:", e);
+            }
+        }
+
+        // --- 5. FUNÇÕES DE NAVEGAÇÃO E ESTADO ---
 
         /**
          * Mostra uma tela e oculta as outras
@@ -542,24 +809,87 @@
         function loadGame() {
             const savedData = localStorage.getItem(SAVE_KEY);
             if (savedData) {
-                gameState = JSON.parse(savedData);
+                const savedState = JSON.parse(savedData);
+                gameState = { ...getInitialGameState(), ...savedState };
+            } else {
+                gameState = getInitialGameState();
             }
-            // Garante que os dados iniciais existam se for um save antigo
-            if (!gameState.unlockedRecipeNames || !gameState.unlockedIngredientEmojis.length) {
-                gameState.unlockedRecipeNames = ["Misto Quente"];
-                // (CORREÇÃO) Inicialização robusta
-                gameState.unlockedIngredientEmojis = ["🍞", "🧈", "🧀", "🍅", "🍋", "🍯", "🥬", "🥒"];
-            }
-            // Garante compatibilidade de ranque
-            if (gameState.rank === undefined) {
-                gameState.rank = 0;
-            }
+            
+            if (gameState.rank === undefined) gameState.rank = 0;
+            
+            // (CORREÇÃO DE BUG) Verifica se o jogador deveria ter subido de ranque
+            checkRankUpOnLoad();
+            
             updateAllMoneyDisplays();
             updateRankDisplay();
         }
 
         /**
-         * (NOVO) Atualiza a UI de Ranque no Menu
+         * Reseta o jogo para o estado inicial
+         */
+        function resetGame() {
+            playSound('error');
+            gameState = getInitialGameState();
+            saveGame();
+            confirmResetModal.classList.add('hidden');
+            confirmResetModal.classList.remove('flex');
+            loadGame();
+            goToMenu();
+            showMarketMessage("Jogo Resetado!", "Seu progresso foi reiniciado.", true);
+        }
+
+        /**
+         * Mostra o modal de confirmação de reset
+         */
+        function showConfirmResetModal() {
+            playSound('click');
+            confirmResetModal.classList.remove('hidden');
+            confirmResetModal.classList.add('flex');
+        }
+        
+        /**
+         * Mostra o modal de Ranque Up
+         */
+        function showRankUpModal(newRankName, isCorrection = false) {
+            playSound('success');
+            const currentRank = RANKS[gameState.rank];
+            rankUpIconModal.textContent = currentRank.icon;
+            rankUpText.textContent = `Parabéns, você agora é ${currentRank.name}!`;
+            
+            if (isCorrection) {
+                rankUpTitle.textContent = "Ranque Corrigido!";
+                rankUpText.textContent = `Seu progresso foi atualizado! Você agora é ${currentRank.name}!`;
+            } else {
+                rankUpTitle.textContent = "Você subiu de ranque!";
+            }
+            
+            rankUpModal.classList.remove('hidden');
+            rankUpModal.classList.add('flex');
+        }
+
+        /**
+         * (CORREÇÃO DE BUG) Verifica se o jogador tem a receita de rank up
+         */
+        function checkRankUpOnLoad() {
+            let rankedUp = false;
+            while (
+                gameState.rank < (RANKS.length - 1) && 
+                RANKS[gameState.rank].recipeToUnlock && 
+                gameState.unlockedRecipeNames.includes(RANKS[gameState.rank].recipeToUnlock)
+            ) {
+                gameState.rank++;
+                rankedUp = true;
+            }
+            
+            if (rankedUp) {
+                console.log("Correção de ranque aplicada. Novo ranque:", gameState.rank);
+                saveGame();
+                showRankUpModal(RANKS[gameState.rank].name, true);
+            }
+        }
+
+        /**
+         * Atualiza a UI de Ranque no Menu
          */
         function updateRankDisplay() {
             const currentRank = RANKS[gameState.rank];
@@ -568,24 +898,22 @@
 
             const nextRank = RANKS[gameState.rank + 1];
             if (nextRank) {
-                // Adiciona o emoji do prato ao texto do objetivo
                 const goalRecipe = ALL_RECIPES.find(r => r.name === currentRank.recipeToUnlock);
                 
                 rankGoal.style.display = 'block';
-                // Ranque up é definido pela receita do ranque ATUAL.
                 rankGoalText.innerHTML = `Compre a receita 
                     <span class="font-bold text-gray-800">${goalRecipe.emoji} ${currentRank.recipeToUnlock}</span> 
                     no Mercado para atingir <span class="text-purple-600">${nextRank.name}</span>!`;
                 
-                playButton.classList.remove('bg-yellow-500'); // Garante que não está em modo "final"
+                playButton.classList.remove('bg-yellow-500');
                 playButton.classList.add('bg-green-500');
             } else {
                 // Ranque Máximo
                 rankGoal.style.display = 'none';
-                rankName.textContent = "Mestre Cuca"; // Nome especial
+                rankName.textContent = "Mestre Cuca";
                 rankIcon.textContent = "🏆";
                 playButton.classList.remove('bg-green-500');
-                playButton.classList.add('bg-yellow-500'); // Botão dourado
+                playButton.classList.add('bg-yellow-500');
             }
         }
 
@@ -593,10 +921,14 @@
          * Volta para o menu principal
          */
         function goToMenu() {
-            gameActive = false; // Para o jogo
+            playSound('click');
+            gameActive = false; 
             isPaused = false;
-            clearInterval(timerId); // Para o timer
-            pauseScreen.classList.add('hidden'); // Esconde a pausa
+            clearInterval(timerId); 
+            pauseScreen.classList.add('hidden'); 
+            
+            checkRankUpOnLoad();
+            
             showScreen('menu-screen');
             updateAllMoneyDisplays(); 
             updateRankDisplay();
@@ -606,6 +938,7 @@
          * Inicia o jogo
          */
         function startGame() {
+            playSound('click');
             showScreen('game-screen');
             renderUnlockedIngredientBin();
             startNewOrder();
@@ -615,6 +948,7 @@
          * Mostra o mercado
          */
         function showMarket() {
+            playSound('click');
             showScreen('market-screen');
             renderMarket();
             updateAllMoneyDisplays();
@@ -630,44 +964,86 @@
             marketMessageIcon.classList.remove(isSuccess ? 'fa-times-circle' : 'fa-check-circle', isSuccess ? 'text-red-500' : 'text-green-500');
             marketMessageIcon.classList.add(isSuccess ? 'fa-check-circle' : 'fa-times-circle', isSuccess ? 'text-green-500' : 'text-red-500');
             
+            // (NOVO) Animação de pop-in no conteúdo
+            marketMessageContent.classList.remove('animate-pop-in');
+            void marketMessageContent.offsetWidth;
+            marketMessageContent.classList.add('animate-pop-in');
+            
             marketMessageModal.classList.remove('hidden');
             marketMessageModal.classList.add('flex');
         }
 
-        // --- 5. FUNÇÕES DE LÓGICA DO MERCADO ---
+        // --- 6. (REFATORADO) LÓGICA DE INGREDIENTES ---
+        
+        /**
+         * (NOVO) Helper para criar o HTML de um ingrediente (emoji ou img)
+         */
+        function getIngredientHTML(id, classes = '') {
+            const ingredient = ALL_INGREDIENTS[id];
+            if (!ingredient) {
+                return `<span class="text-red-500 ${classes}">?</span>`; // Ingrediente não encontrado
+            }
+            
+            if (ingredient.type === 'image') {
+                // Fallback com placehold.co
+                const fallbackUrl = `https://placehold.co/40x40/f87171/ffffff?text=${id.substring(0,1).toUpperCase()}`;
+                return `<img src="${ingredient.value}" class="${classes}" alt="${id}" onerror="this.src='${fallbackUrl}'; this.classList.add('border-red-500');">`;
+            }
+            // Tipo 'emoji'
+            return `<span class="${classes}">${ingredient.value}</span>`;
+        }
+
+        // --- 7. (REFATORADO) FUNÇÕES DE LÓGICA DO MERCADO ---
 
         /**
-         * Renderiza os itens no mercado
+         * Renderiza os itens no mercado (COM ORDENAÇÃO)
          */
         function renderMarket() {
             marketItemsGrid.innerHTML = '';
             
             const currentRank = RANKS[gameState.rank];
-            const rankUpRecipe = ALL_RECIPES.find(r => r.name === currentRank.recipeToUnlock);
             
+            // (NOVA LÓGICA DE ORDENAÇÃO)
+            const rankUp = [];
+            const buyable = [];
+            const locked = [];
+            const unlocked = [];
+
             ALL_RECIPES.forEach(recipe => {
                 const isUnlocked = gameState.unlockedRecipeNames.includes(recipe.name);
-                
-                // Ranque Mínimo para comprar
                 const isBuyable = gameState.rank >= recipe.minRank;
-                
-                // Se o Ranque Atual ainda não comprou a Receita de Ranque Up
                 const isRankUpCard = currentRank.recipeToUnlock && recipe.name === currentRank.recipeToUnlock && !isUnlocked;
-                
+
+                const recipeData = { recipe, isUnlocked, isBuyable, isRankUpCard };
+
+                if (isRankUpCard) rankUp.push(recipeData);
+                else if (isUnlocked) unlocked.push(recipeData);
+                else if (isBuyable) buyable.push(recipeData);
+                else locked.push(recipeData);
+            });
+
+            // Ordena cada grupo por preço
+            const sortByPrice = (a, b) => a.recipe.price - b.recipe.price;
+            buyable.sort(sortByPrice);
+            locked.sort(sortByPrice);
+            unlocked.sort(sortByPrice);
+
+            const sortedMarketList = [...rankUp, ...buyable, ...locked, ...unlocked];
+            
+            // Renderiza a lista ordenada
+            sortedMarketList.forEach(({ recipe, isUnlocked, isBuyable, isRankUpCard }) => {
                 const card = document.createElement('div');
-                card.className = `bg-white rounded-xl shadow-lg p-4 flex items-center space-x-4 transition-all ${isUnlocked ? 'opacity-60' : 'hover:bg-gray-50'} ${!isBuyable && !isUnlocked ? 'opacity-50' : ''} ${isRankUpCard ? 'rank-up-card' : ''}`;
+                card.className = `bg-white rounded-xl shadow-lg p-4 flex items-center space-x-4 transition-all relative ${isUnlocked ? 'opacity-60' : 'hover:bg-gray-50'} ${!isBuyable && !isUnlocked ? 'opacity-50' : ''} ${isRankUpCard ? 'rank-up-card' : ''}`;
                 
-                // Mostra todos os ingredientes
+                // (REFATORADO) Mostra ingredientes usando getIngredientHTML
                 const allRecipeIngredients = [...recipe.baseRecipe, ...recipe.optionalIngredients];
-                const uniqueIngredients = [...new Set(allRecipeIngredients)]; // Remove duplicatas
+                const uniqueIngredients = [...new Set(allRecipeIngredients)]; 
                 let ingredientsHTML = uniqueIngredients
-                    .map(emoji => `<span class="text-sm">${emoji}</span>`)
+                    .map(id => getIngredientHTML(id, 'text-sm')) // Usa o helper
                     .join(' + ');
 
-                // Adiciona um rótulo de Ranque Up
                 let labelHTML = '';
                 if (isRankUpCard) {
-                    const nextRankName = RANKS[gameState.rank + 1]?.name || 'Ranque Máximo';
                     labelHTML = `<span class="absolute top-0 right-0 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl shadow-md">
                         META RANQUE ${RANKS[gameState.rank].icon}
                     </span>`;
@@ -678,15 +1054,14 @@
                     <div class="text-5xl">${recipe.emoji}</div>
                     <div class="flex-1">
                         <h4 class="text-xl font-bold text-gray-800">${recipe.name}</h4>
-                        <p class="text-gray-500 text-sm">${ingredientsHTML}</p>
+                        <p class="text-gray-500 text-sm flex flex-wrap gap-1 items-center">${ingredientsHTML}</p>
                     </div>
                     ${isUnlocked ? 
                         `<div class="text-green-500 font-bold px-4 py-2 rounded-lg bg-green-100">Comprado</div>` :
-                    isBuyable ? // Verifica se é comprável
+                    isBuyable ? 
                         `<button class="btn-main ${isRankUpCard ? 'bg-yellow-500' : 'bg-purple-500'} text-white font-bold px-6 py-3 rounded-lg text-lg" data-recipe="${recipe.name}">
                             <i class="fas ${isRankUpCard ? 'fa-star' : 'fa-coins'} mr-1"></i> $${recipe.price}
                         </button>` :
-                        // (APRIMORADO) Mostra explicitamente o ranque necessário para maior clareza
                         `<div class="text-red-500 font-bold px-4 py-2 rounded-lg bg-red-100 text-center">
                             <i class="fas fa-lock mr-1"></i><br>
                             <span class="text-sm">Ranque Necessário:<br>
@@ -695,7 +1070,6 @@
                     }
                 `;
                 
-                // Só adiciona listener se for comprável e não desbloqueado
                 if (!isUnlocked && isBuyable) {
                     card.querySelector('button').addEventListener('click', () => buyRecipe(recipe.name));
                 }
@@ -711,89 +1085,71 @@
             const recipe = ALL_RECIPES.find(r => r.name === recipeName);
             
             if (gameState.money >= recipe.price) {
-                // Deduz o dinheiro
+                playSound('buy');
                 updateMoney(-recipe.price);
-                
-                // Adiciona a receita
                 gameState.unlockedRecipeNames.push(recipe.name);
                 
-                // Adiciona os ingredientes base E os opcionais (usando Set para evitar duplicatas)
-                const ingredientsSet = new Set(gameState.unlockedIngredientEmojis);
-                recipe.baseRecipe.forEach(ingredient => ingredientsSet.add(ingredient));
-                recipe.optionalIngredients.forEach(ingredient => ingredientsSet.add(ingredient));
-                gameState.unlockedIngredientEmojis = Array.from(ingredientsSet);
+                // (REFATORADO) Adiciona IDs de ingredientes
+                const ingredientsSet = new Set(gameState.unlockedIngredientIds);
+                recipe.baseRecipe.forEach(id => ingredientsSet.add(id));
+                recipe.optionalIngredients.forEach(id => ingredientsSet.add(id));
+                gameState.unlockedIngredientIds = Array.from(ingredientsSet);
                 
                 saveGame();
                 
-                // Verifica o objetivo do SEU ranque ATUAL.
                 const currentRankGoal = RANKS[gameState.rank].recipeToUnlock;
                 
-                // Se a receita comprada é a meta do ranque atual, sobe de ranque.
                 if (currentRankGoal && recipeName === currentRankGoal) {
                     gameState.rank++;
                     saveGame();
-                    showMarketMessage("Você subiu de ranque!", `Parabéns, você agora é ${RANKS[gameState.rank].name}!`, true);
-                    // O novo ranque será exibido corretamente quando o mercado for re-renderizado
+                    showRankUpModal(RANKS[gameState.rank].name, false);
                 } else {
                     showMarketMessage("Receita Comprada!", `Você aprendeu a fazer ${recipe.name}!`, true);
                 }
                 
-                renderMarket(); // Re-renderiza o mercado
+                renderMarket(); 
             } else {
-                // Dinheiro insuficiente
+                playSound('error');
                 showMarketMessage("Dinheiro Insuficiente!", `Você precisa de $${recipe.price} para comprar ${recipe.name}.`, false);
             }
         }
 
-        // --- 6. FUNÇÕES PRINCIPAIS DO JOGO ---
+        // --- 8. (REFATORADO) FUNÇÕES PRINCIPAIS DO JOGO ---
 
         /**
-         * Retorna os valores de recompensa e bônus baseados no ranque atual.
+         * Retorna os valores de recompensa
          */
         function getRankRewardInfo() {
             const currentRank = gameState.rank;
-            
-            // O targetMinRank é o ranque atual.
-            const targetMinRank = Math.min(currentRank, RANKS.length - 2); 
-            
-            // Encontra as receitas para o rank que o jogador está jogando
-            const rankRecipes = ALL_RECIPES.filter(r => r.minRank === targetMinRank);
+            const targetMinRank = Math.min(currentRank, RANKS.length - 1);
+            let rankRecipes = ALL_RECIPES.filter(r => r.minRank === targetMinRank);
             
             if (rankRecipes.length === 0) {
-                // Fallback para Ranque Máximo
-                if (currentRank === RANKS.length - 1) {
+                if (currentRank >= RANKS.length - 1) {
                      const maxRank = RANKS.length - 2; // Rank 5
-                     const maxRankRecipes = ALL_RECIPES.filter(r => r.minRank === maxRank);
-                     const maxPrice = Math.max(...maxRankRecipes.map(r => r.price));
-                     
-                     const baseReward = Math.max(15, Math.round(maxPrice * 0.08)); 
-                     const streakBonus = Math.max(3, Math.round(baseReward * 0.2));
-                     return { baseReward, streakBonus };
+                     rankRecipes = ALL_RECIPES.filter(r => r.minRank === maxRank);
+                } else {
+                     return { baseReward: 10, streakBonus: 2 }; // Fallback
                 }
-                return { baseReward: 10, streakBonus: 2 }; // Fallback geral
             }
             
-            // Acha o preço máximo nesse Rank
             const maxPrice = Math.max(...rankRecipes.map(r => r.price));
-            
-            // Recompensa base: 5% do preço máximo, com mínimo de $10
-            const baseReward = Math.max(10, Math.round(maxPrice * 0.05));
-            // Bônus de combo: 20% da recompensa base, com mínimo de $2
+            const baseReward = Math.max(10, Math.round(maxPrice * 0.08));
             const streakBonus = Math.max(2, Math.round(baseReward * 0.2));
             
             return { baseReward, streakBonus };
         }
 
         /**
-         * Retorna a duração do timer baseada no ranque
+         * Retorna a duração do timer
          */
         function getTimerDuration() {
-            const baseTimer = 12; // 12 segundos no ranque 0
-            const duration = baseTimer - gameState.rank; // Perde 1s por ranque
-            let finalDuration = Math.max(duration, 5); // Mínimo de 5 segundos
+            const baseTimer = 12; 
+            const duration = baseTimer - gameState.rank; 
+            let finalDuration = Math.max(duration, 5); 
             
             if (isRushHour) {
-                finalDuration = Math.max(Math.round(finalDuration * 0.7), 3); // 30% mais rápido, min 3s
+                finalDuration = Math.max(Math.round(finalDuration * 0.7), 3);
             }
             return finalDuration;
         }
@@ -803,17 +1159,17 @@
          */
         function renderUnlockedIngredientBin() {
             ingredientBin.innerHTML = '';
-            // Embaralha apenas os ingredientes desbloqueados
-            const shuffledIngredients = [...gameState.unlockedIngredientEmojis].sort(() => Math.random() - 0.5);
+            // (REFATORADO) Embaralha IDs
+            const shuffledIngredientIds = [...gameState.unlockedIngredientIds].sort(() => Math.random() - 0.5);
             
-            shuffledIngredients.forEach(emoji => {
+            shuffledIngredientIds.forEach(id => {
                 const btn = document.createElement('button');
-                btn.className = "ingredient-btn rounded-lg p-3 text-4xl shadow-md no-select";
-                btn.textContent = emoji;
-                btn.dataset.emoji = emoji;
+                btn.className = "ingredient-btn rounded-lg p-3 shadow-md no-select";
+                btn.innerHTML = getIngredientHTML(id); // Usa o helper
+                btn.dataset.id = id; // Armazena o ID
                 ingredientBin.appendChild(btn);
             });
-            // Animação da bandeja
+
             ingredientBin.parentElement.classList.remove('animate-slide-in-bottom');
             void ingredientBin.parentElement.offsetWidth;
             ingredientBin.parentElement.classList.add('animate-slide-in-bottom');
@@ -834,40 +1190,37 @@
                 rushHourBanner.classList.add('hidden');
             }
 
-            // Escolhe uma receita APENAS das desbloqueadas
             const availableRecipes = ALL_RECIPES.filter(r => gameState.unlockedRecipeNames.includes(r.name));
             currentOrder = { ...availableRecipes[Math.floor(Math.random() * availableRecipes.length)] };
             
-            // Gerar receita dinâmica
-            let finalRecipe = [...currentOrder.baseRecipe]; // Começa com a base
+            // Gerar receita dinâmica (usando IDs)
+            let finalRecipe = [...currentOrder.baseRecipe]; 
             
-            // Filtra opcionais que o jogador JÁ DESBLOQUEOU
             const availableOptionals = currentOrder.optionalIngredients.filter(
-                ingredient => gameState.unlockedIngredientEmojis.includes(ingredient)
+                id => gameState.unlockedIngredientIds.includes(id)
             );
             
-            // Chance de adicionar opcionais aumenta com o ranque
-            const optionalChance = 0.3 + (gameState.rank * 0.1); // 30% (rank 0) -> 90% (rank 6)
+            const optionalChance = 0.3 + (gameState.rank * 0.1);
             const optionalsToAdd = availableOptionals.filter(() => Math.random() < optionalChance);
 
             if (optionalsToAdd.length > 0 && finalRecipe.length > 1) {
-                // Insere os opcionais antes do último item da receita base
                 const lastItem = finalRecipe.pop();
                 finalRecipe = [...finalRecipe, ...optionalsToAdd, lastItem];
             } else if (optionalsToAdd.length > 0) {
-                // Para receitas de 1 item, apenas adiciona no final
                 finalRecipe = [...finalRecipe, ...optionalsToAdd];
             }
             
-            currentOrder.recipe = finalRecipe;
+            currentOrder.recipe = finalRecipe; // Armazena a receita final (array de IDs)
             
             // Resetar UI
             playerPlate.innerHTML = '';
             messageBox.textContent = '';
             messageBox.className = "text-center text-2xl font-bold";
             
-            // Mostra a receita imediatamente (com cor)
-            recipeList.innerHTML = `Receita: <span class="font-bold text-purple-600 ml-2">${currentOrder.recipe.join(' ')}</span>`;
+            // (REFATORADO) Mostra a receita com a nova UI (usando IDs)
+            recipeList.innerHTML = currentOrder.recipe.map((id, index) => 
+                `<span class="recipe-step" id="step-${index}">${getIngredientHTML(id)}</span>`
+            ).join('');
             
             // Mostrar novo pedido
             npcDisplay.textContent = NPCS[Math.floor(Math.random() * NPCS.length)];
@@ -877,10 +1230,8 @@
             // Animação do NPC e do pedido
             npcDisplay.classList.remove('animate-rotate-in');
             orderArea.classList.remove('animate-pop-in');
-            
-            void npcDisplay.offsetWidth; // Força reinício da animação
+            void npcDisplay.offsetWidth; 
             void orderArea.offsetWidth;
-            
             npcDisplay.classList.add('animate-rotate-in');
             orderArea.classList.add('animate-pop-in');
 
@@ -891,30 +1242,40 @@
          * Lida com o clique em um ingrediente
          */
         function handleIngredientClick(e) {
-            if (!gameActive || isPaused || !e.target.matches('.ingredient-btn')) return;
+            if (!gameActive || isPaused) return;
+            
+            const btn = e.target.closest('.ingredient-btn');
+            if (!btn) return;
 
-            const clickedEmoji = e.target.dataset.emoji;
-            playerSelection.push(clickedEmoji);
+            playSound('click');
+            const clickedId = btn.dataset.id;
+            playerSelection.push(clickedId);
             
-            // Atualiza o prato do jogador (visual)
-            const emojiSpan = document.createElement('span');
-            emojiSpan.className = 'text-3xl animate-pop-in';
-            emojiSpan.textContent = clickedEmoji;
+            // (REFATORADO) Atualiza o prato do jogador (visual)
+            const ingredientEl = document.createElement('span');
+            ingredientEl.className = 'text-3xl animate-pop-in'; // O span vai conter o emoji ou a img
+            ingredientEl.innerHTML = getIngredientHTML(clickedId, 'inline-block');
             
-            // Verificação de erro imediato (ordem importa!)
             const currentIndex = playerSelection.length - 1;
+            
+            // Verificação de erro imediato
             if (playerSelection[currentIndex] !== currentOrder.recipe[currentIndex]) {
-                // Feedback visual de erro
-                emojiSpan.classList.add('ingredient-wrong'); 
-                playerPlate.appendChild(emojiSpan);
+                playSound('error');
+                ingredientEl.classList.add('ingredient-wrong'); 
+                playerPlate.appendChild(ingredientEl);
                 checkOrder(false, "Ingrediente errado!");
                 return;
             }
             
             // Ingrediente correto
-            playerPlate.appendChild(emojiSpan);
+            playerPlate.appendChild(ingredientEl);
 
-            // Verificação de sucesso (completou a receita)
+            const recipeStepEl = document.getElementById(`step-${currentIndex}`);
+            if (recipeStepEl) {
+                recipeStepEl.classList.add('correct');
+            }
+
+            // Verificação de sucesso
             if (playerSelection.length === currentOrder.recipe.length) {
                 checkOrder(true);
             }
@@ -928,11 +1289,10 @@
             timer = getTimerDuration();
             timerText.textContent = `Tempo: ${timer}s`;
             
-            // Reseta a animação da barra
             timerBarInner.classList.remove('timer-bar-inner-animate');
             void timerBarInner.offsetWidth;
             timerBarInner.classList.add('timer-bar-inner-animate');
-            timerBarInner.style.animationDuration = `${timer}s`; // Usa o timer dinâmico
+            timerBarInner.style.animationDuration = `${timer}s`;
             timerBarInner.style.animationPlayState = 'running';
 
             startTimerInterval();
@@ -960,7 +1320,7 @@
          */
         function pauseGame() {
             if (!gameActive) return;
-            
+            playSound('click');
             isPaused = true;
             clearInterval(timerId);
             timerBarInner.style.animationPlayState = 'paused';
@@ -973,7 +1333,7 @@
          */
         function resumeGame() {
             if (!gameActive) return;
-
+            playSound('click');
             isPaused = false;
             startTimerInterval();
             timerBarInner.style.animationPlayState = 'running';
@@ -992,58 +1352,54 @@
             timerBarInner.classList.remove('timer-bar-inner-animate');
             
             if (isSuccess) {
-                // Sucesso
+                playSound('success');
                 currentStreak++;
                 
                 const { baseReward, streakBonus } = getRankRewardInfo();
-                const currentStreakBonus = (currentStreak - 1) * streakBonus; // Bônus só começa no segundo acerto
+                const currentStreakBonus = (currentStreak - 1) * streakBonus;
                 let totalReward;
                 let successMsg;
 
                 if (isRushHour) {
                     totalReward = (baseReward * 2) + (currentStreakBonus * 2);
                     successMsg = `HORÁRIO DE PICO! +$${totalReward}`;
-                    isRushHour = false; // Termina o rush hour
-                } else { // Pedido normal
+                    isRushHour = false; 
+                } else { 
                     totalReward = baseReward + currentStreakBonus;
                     successMsg = `Perfeito! +$${baseReward}`;
                     if (currentStreakBonus > 0) {
                         successMsg += ` (Combo +$${currentStreakBonus})`;
                     }
-                    // Chance de iniciar o próximo rush hour
                     if (Math.random() < 0.20) { // 20% de chance
                         isRushHour = true;
                     }
                 }
                 
                 updateMoney(totalReward);
-                // Chama a nova tela de sucesso
                 showSuccessScreen(successMsg);
                 
             } else {
-                // Falha
+                // (MODIFICADO) Lógica de Falha
+                playSound('error');
                 currentStreak = 0;
                 isRushHour = false;
                 const reason = failReason || "Pedido errado!";
                 
-                // Garante que a penalidade não deixe o dinheiro negativo
                 let penalty = PENALTY_FAILURE;
                 if (gameState.money < penalty) {
-                    penalty = gameState.money; // Perde apenas o que tem
+                    penalty = gameState.money;
                 }
                 
-                updateMoney(-penalty); // Passa o valor negativo
-                showMessage(`${reason} -$${penalty}`, false);
-
-                // Só inicia o próximo pedido se falhar
-                setTimeout(startNewOrder, 2000);
+                updateMoney(-penalty);
+                // (NOVO) Chama a tela de falha
+                showFailureScreen(reason, penalty);
             }
             
             updateStreakDisplay();
-            saveGame(); // Salva o progresso (dinheiro e ranque)
+            saveGame();
         }
 
-        // --- 7. FUNÇÕES AUXILIARES DE UI ---
+        // --- 9. FUNÇÕES AUXILIARES DE UI ---
 
         /**
          * Mostra a tela de sucesso
@@ -1053,17 +1409,36 @@
             successModal.classList.remove('hidden');
             successModal.classList.add('flex');
             
-            // Animação do ícone
             successIcon.classList.remove('animate-pulse-success');
-            void successIcon.offsetWidth; // Reinicia a animação
+            void successIcon.offsetWidth; 
             successIcon.classList.add('animate-pulse-success');
 
-            // Esconde a tela e inicia o próximo pedido
             setTimeout(() => {
                 successModal.classList.add('hidden');
                 successModal.classList.remove('flex');
                 startNewOrder(); // Inicia o próximo pedido AQUI
             }, 1500); // Tela de sucesso dura 1.5s
+        }
+
+        /**
+         * (NOVO) Mostra a tela de falha
+         */
+        function showFailureScreen(reason, penalty) {
+            failureMessage.textContent = `${reason} -$${penalty}`;
+            failureModal.classList.remove('hidden');
+            failureModal.classList.add('flex');
+            
+            // Animação de shake
+            failureIcon.parentElement.classList.remove('animate-shake-hard');
+            void failureIcon.parentElement.offsetWidth;
+            failureIcon.parentElement.classList.add('animate-shake-hard');
+            
+            setTimeout(() => {
+                failureModal.classList.add('hidden');
+                failureModal.classList.remove('flex');
+                failureIcon.parentElement.classList.remove('animate-shake-hard');
+                startNewOrder(); // Inicia o próximo pedido AQUI
+            }, 2000); // Tela de falha dura 2s
         }
 
         /**
@@ -1074,7 +1449,6 @@
             moneyDisplayGame.textContent = moneyStr;
             moneyDisplayMarket.textContent = moneyStr;
 
-            // Animação de "pulso"
             [moneyDisplayGame, moneyDisplayMarket].forEach(display => {
                 display.classList.remove('scale-110');
                 void display.offsetWidth;
@@ -1088,12 +1462,7 @@
          */
         function updateMoney(amount) {
             gameState.money += amount;
-            
-            // Regra principal: Dinheiro NUNCA fica abaixo de 0
-            if (gameState.money < 0) {
-                gameState.money = 0;
-            }
-            
+            if (gameState.money < 0) gameState.money = 0;
             updateAllMoneyDisplays();
         }
 
@@ -1101,7 +1470,7 @@
          * Atualiza o visual do combo
          */
         function updateStreakDisplay() {
-            if (currentStreak > 1) { // Só mostra o combo a partir de 2x
+            if (currentStreak > 1) { 
                 streakDisplay.textContent = `${currentStreak}x 🔥`;
                 streakDisplay.classList.add('animate-pulse-orange');
                 setTimeout(() => streakDisplay.classList.remove('animate-pulse-orange'), 300);
@@ -1111,10 +1480,11 @@
         }
         
         /**
-         * Mostra uma mensagem de feedback
+         * Mostra uma mensagem de feedback (Usado para falhas antes do modal)
          */
         function showMessage(text, isSuccess) {
             messageBox.textContent = text;
+            messageBox.classList.remove('message-success', 'message-error');
             if (isSuccess) {
                 messageBox.classList.add('message-success');
             } else {
@@ -1122,10 +1492,13 @@
             }
         }
 
-        // --- 8. INICIAR O JOGO ---
+        // --- 10. INICIAR O JOGO ---
         
         // Listeners de navegação
-        welcomePlayButton.addEventListener('click', () => showScreen('menu-screen'));
+        welcomePlayButton.addEventListener('click', () => {
+            initializeAudio(); // (NOVO) Inicia o áudio
+            showScreen('menu-screen');
+        });
         playButton.addEventListener('click', startGame);
         marketButton.addEventListener('click', showMarket);
         
@@ -1136,8 +1509,25 @@
         menuButtonMarket.addEventListener('click', goToMenu);
 
         marketMessageClose.addEventListener('click', () => {
+            playSound('click');
             marketMessageModal.classList.add('hidden');
             marketMessageModal.classList.remove('flex');
+        });
+
+        // Listeners de Reset
+        resetButtonWelcome.addEventListener('click', showConfirmResetModal);
+        resetButtonMenu.addEventListener('click', showConfirmResetModal);
+        confirmResetCancel.addEventListener('click', () => {
+            playSound('click');
+            confirmResetModal.classList.add('hidden');
+            confirmResetModal.classList.remove('flex');
+        });
+        confirmResetConfirm.addEventListener('click', resetGame);
+        
+        rankUpClose.addEventListener('click', () => {
+            playSound('click');
+            rankUpModal.classList.add('hidden');
+            rankUpModal.classList.remove('flex');
         });
 
         // Listeners do Jogo
@@ -1149,3 +1539,4 @@
     </script>
 </body>
 </html>
+
