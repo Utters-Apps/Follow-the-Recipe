@@ -16,4 +16,3 @@ export function getIngredientHTML(id, classes = '') {
   }
   return `<span class="${classes}">${ingredient.value}</span>`;
 }
-
