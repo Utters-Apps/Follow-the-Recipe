@@ -28,354 +28,772 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* Estilo base com a fonte Inter */
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-            overflow: hidden; /* Prevenir scroll */
-            transition: background-color 0.3s ease;
-        }
-        /* (NOVO) Fundo do Modo Escuro */
-        .dark body {
-            background: #111827; /* gray-900 */
-        }
+/*
+|==================================================|
+| 1. VARIÁVEIS CSS (THEME MANAGEMENT)              |
+|==================================================|
+| Definição centralizada de cores para temas claro e escuro.
+| Isso garante a robustez e evita bugs de cores.
+*/
 
-        /* Container principal do jogo */
-        #game-container {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-        /* (NOVO) Container Modo Escuro */
-        .dark #game-container {
-            background: rgba(31, 41, 55, 0.85); /* gray-800 com transparência */
-            border: 1px solid #374151; /* gray-700 */
-        }
+:root {
+    /* Cores de Fundo (Light Mode) */
+    --bg-main: #e8eaf6; /* Indigo-50 - Fundo principal */
+    --bg-gradient-start: #fbc2eb; /* Rosa suave */
+    --bg-gradient-end: #a6c1ee; /* Azul suave */
+    --bg-surface: rgba(255, 255, 255, 0.95); /* Container principal com transparência */
+    --bg-card: #ffffff; /* Fundo de cards/modais */
+    --bg-input: #f9fafb; /* Fundo de inputs/campos */
 
-        /* Botões principais (Menu e Ação) */
-        .btn-main {
-            transition: all 0.2s ease;
-            transform: scale(1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        .btn-main:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        }
-        .btn-main:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+    /* Cores de Texto (Light Mode) */
+    --text-primary: #1f2937; /* Gray-800 - Texto principal */
+    --text-secondary: #4b5563; /* Gray-600 - Texto secundário/subtítulos */
+    --text-muted: #9ca3af; /* Gray-400 - Dicas/desabilitado */
+    --text-link: #8b5cf6; /* Purple-500 */
 
-        /* (MODIFICADO) Estilo dos botões de ingrediente */
-        .ingredient-btn {
-            transition: all 0.15s ease;
-            background: #fff;
-            color: #333;
-            border: 2px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.25rem; /* 36px */
-            line-height: 1;
-            width: 60px; /* Tamanho fixo */
-            height: 60px; /* Tamanho fixo */
-        }
-        .ingredient-btn:hover {
-            border-color: #a78bfa; /* Roxo */
-            transform: translateY(-2px);
-        }
-        .ingredient-btn:active {
-            transform: scale(0.92);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            background-color: #a78bfa; /* Roxo */
-            color: white;
-            border-color: #a78bfa;
-        }
-        /* (NOVO) Botões de Ingrediente Modo Escuro */
-        .dark .ingredient-btn {
-            background: #374151; /* gray-700 */
-            border-color: #4b5563; /* gray-600 */
-            color: #f3f4f6; /* gray-100 */
-        }
-        .dark .ingredient-btn:hover {
-            border-color: #a78bfa; /* Roxo */
-        }
-        .dark .ingredient-btn:active {
-             background-color: #a78bfa; /* Roxo */
-             border-color: #a78bfa;
-             color: white;
-        }
+    /* Cores de Ação e Feedback */
+    --color-primary: #a78bfa; /* Purple-400 - Ação principal/Hover */
+    --color-secondary: #3b82f6; /* Blue-500 - Ação secundária */
+    --color-success: #10b981; /* Green-500 - Sucesso/Correto */
+    --color-error: #ef4444; /* Red-500 - Erro/Incorreto */
+    --color-warning: #f59e0b; /* Amber-500 - Atenção/Rank Up */
+    --color-border-default: #e5e7eb; /* Gray-200 - Bordas de separação */
 
-        /* (MODIFICADO) Estilo para imagens de ingredientes (Tamanho corrigido) */
-        .ingredient-btn img {
-            height: 36px; /* Ajustado para 36px */
-            width: 36px;  /* Ajustado para 36px */
-            object-fit: contain;
-            pointer-events: none; /* Garante que o clique pegue no botão */
-        }
+    /* Glassmorphism/Shadows */
+    --shadow-base: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.2);
+    --backdrop-blur: 12px;
+}
 
-        /* Estilo para o card de "Subir de Ranque" */
-        .rank-up-card {
-            border: 3px solid #f59e0b; /* Amarelo/Ouro */
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
-            transform: scale(1.02);
-            background-color: #fffbeb; /* Fundo amarelo claro */
-        }
-        .rank-up-card:hover {
-            background-color: #fffbeb;
-        }
-        /* (NOVO) Card de Ranque Modo Escuro */
-        .dark .rank-up-card {
-            background-color: #422006; /* Laranja escuro */
-            border-color: #f59e0b;
-        }
-        .dark .rank-up-card:hover {
-            background-color: #422006;
-        }
+/*
+|--------------------------------------------------|
+| Variáveis Modo Escuro (.dark)                    |
+|--------------------------------------------------|
+*/
+.dark {
+    /* Cores de Fundo (Dark Mode) */
+    --bg-main: #111827; /* Gray-900 - Fundo principal */
+    --bg-gradient-start: #1e3a8a; /* Blue-900 escuro */
+    --bg-gradient-end: #4f46e5; /* Indigo-600 */
+    --bg-surface: rgba(31, 41, 55, 0.95); /* Gray-800 com transparência */
+    --bg-card: #1f2937; /* Gray-800 */
+    --bg-input: #374151; /* Gray-700 */
 
-        /* Estilo para a lista de receitas interativa */
-        #recipe-list {
-            min-height: 3rem; 
-        }
-        .recipe-step {
-            font-size: 1.5rem; /* 24px */
-            padding: 0.25rem 0.5rem;
-            margin: 0.125rem;
-            border: 2px solid #e5e7eb; /* gray-200 */
-            border-radius: 0.5rem; /* rounded-lg */
-            background-color: #f9fafb; /* gray-50 */
-            transition: all 0.3s ease;
-            display: inline-flex; 
-            align-items: center;
-            justify-content: center;
-            min-width: 40px;
-            min-height: 40px;
-        }
-        .recipe-step.correct {
-            background-color: #d1fae5; /* green-100 */
-            border-color: #10b981; /* green-500 */
-            color: #047857; /* green-700 */
-            text-decoration: line-through;
-            transform: scale(0.9);
-            opacity: 0.7;
-        }
-        /* (NOVO) Lista de Receitas Modo Escuro */
-        .dark .recipe-step {
-             background-color: #1f2937; /* gray-800 */
-             border-color: #4b5563; /* gray-600 */
-             color: #d1d5db; /* gray-300 */
-        }
-        .dark .recipe-step.correct {
-            background-color: #064e3b; /* green-900 */
-            border-color: #10b981; /* green-500 */
-            color: #6ee7b7; /* green-300 */
-            opacity: 0.6;
-        }
+    /* Cores de Texto (Dark Mode) */
+    --text-primary: #f9fafb; /* Gray-50 - Texto principal */
+    --text-secondary: #d1d5db; /* Gray-300 - Texto secundário */
+    --text-muted: #6b7280; /* Gray-500 - Dicas/desabilitado */
+    --text-link: #c084fc; /* Purple-400 */
 
-        /* Estilo para imagens na lista de receitas */
-        .recipe-step img, #player-plate img {
-            height: 24px;
-            width: 24px;
-            display: inline-block;
-            vertical-align: middle;
-        }
-        #player-plate img {
-            height: 32px;
-            width: 32px;
-        }
+    /* Cores de Ação e Feedback (Ajustadas) */
+    --color-primary: #c084fc; /* Purple-400 - Ação principal/Hover */
+    --color-secondary: #60a5fa; /* Blue-400 - Ação secundária */
+    --color-success: #6ee7b7; /* Green-300 - Sucesso/Correto */
+    --color-error: #f87171; /* Red-400 - Erro/Incorreto */
+    --color-warning: #fcd34d; /* Amber-300 - Atenção/Rank Up */
+    --color-border-default: #374151; /* Gray-700 - Bordas de separação */
 
-        /* (MODIFICADO) Prato do jogador (CORREÇÃO DE BUG) */
-        #player-plate {
-            min-height: 6rem; /* Reduzido */
-            max-height: 8rem; /* Reduzido */
-            overflow-y: auto; /* MUDADO de hidden para auto */
-        }
-        /* (NOVO) Prato do Jogador Modo Escuro */
-        .dark #player-plate {
-            background-color: #111827; /* gray-900 */
-            border-color: #374151; /* gray-700 */
-        }
+    /* Glassmorphism/Shadows */
+    --shadow-base: 0 4px 15px rgba(0, 0, 0, 0.5);
+    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.7);
+}
 
-        /* (MODIFICADO) Rodapé (CORREÇÃO DE BUG) */
-        #game-screen > footer {
-            background-color: #f3f4f6; /* gray-100 */
-            overflow-y: auto; /* Adiciona scroll se os ingredientes transbordarem */
-            max-height: 160px; /* Limita a altura máxima (aprox 2 linhas) */
-            flex-shrink: 0; /* Impede que o rodapé encolha */
-        }
-        @media (min-width: 768px) {
-            #game-screen > footer {
-                max-height: 200px; /* Um pouco mais de espaço no desktop */
-            }
-        }
-        /* (NOVO) Rodapé Modo Escuro */
-        .dark #game-screen > footer {
-            background-color: #1f2937; /* gray-800 */
-            border-color: #374151; /* gray-700 */
-        }
-        
-        /* (NOVO) Estilos de texto Modo Escuro */
-        .dark .text-gray-800 { color: #f9fafb; /* gray-50 */ }
-        .dark .text-gray-700 { color: #d1d5db; /* gray-300 */ }
-        .dark .text-gray-600 { color: #9ca3af; /* gray-400 */ }
-        .dark .text-gray-500 { color: #6b7280; /* gray-500 */ }
-        .dark .text-gray-900 { color: #ffffff; /* white */ }
-        .dark .text-purple-600 { color: #c084fc; /* purple-400 */ }
-        .dark .text-gray-400 { color: #4b5563; /* gray-600 */ }
+/*
+|==================================================|
+| 2. BASE, TIPOGRAFIA E UTILITIES                  |
+|==================================================|
+*/
 
-        /* Animações */
-        @keyframes pop-in {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .animate-pop-in { animation: pop-in 0.3s ease-out forwards; }
-        
-        @keyframes slide-in-bottom {
-            0% { transform: translateY(100%); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        .animate-slide-in-bottom { animation: slide-in-bottom 0.5s ease-out forwards; }
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    color: var(--text-primary);
+    overflow: hidden; /* Prevenir scroll principal */
+    transition: background 0.5s ease, color 0.5s ease;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
 
-        @keyframes countdown {
-            from { width: 100%; }
-            to { width: 0%; }
-        }
-        .timer-bar-inner-animate { animation: countdown 10s linear forwards; }
-        
-        /* Balão de fala */
-        .speech-bubble {
-            position: relative;
-            background: #f3f4f6;
-            border-radius: .4em;
-            padding: 1rem 1.25rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        .speech-bubble:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 15%;
-            width: 0; height: 0;
-            border: 20px solid transparent;
-            border-top-color: #f3f4f6;
-            border-bottom: 0;
-            margin-left: -10px;
-            margin-bottom: -20px;
-        }
-        /* (NOVO) Balão de Fala Modo Escuro */
-        .dark .speech-bubble {
-            background: #374151; /* gray-700 */
-        }
-        .dark .speech-bubble:after {
-            border-top-color: #374151; /* gray-700 */
-        }
-        
-        /* Classes de feedback */
-        .message-success { color: #10b981; transform: scale(1); opacity: 1; }
-        .message-error { color: #ef4444; transform: scale(1); opacity: 1; }
-        #message-box {
-            transition: all 0.3s ease;
-            transform: scale(0.8);
-            opacity: 0;
-            height: 2.5rem; /* Altura fixa */
-        }
-        
-        /* Combo (Streak) */
-        @keyframes pulse-orange {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.9; }
-        }
-        .animate-pulse-orange { animation: pulse-orange 0.3s ease-out; }
+/* Correção Modo Escuro - Fundo */
+.dark body {
+    background: var(--bg-main);
+}
 
-        /* Animação para tela de sucesso */
-        @keyframes pulse-success {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.9; }
-        }
-        .animate-pulse-success {
-            animation: pulse-success 0.4s ease-out;
-        }
+/* Reset para elementos de texto */
+h1, h2, h3, h4 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+.text-muted {
+    color: var(--text-muted);
+}
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
 
-        /* Animação do NPC */
-        @keyframes rotate-in {
-            0% { transform: translateY(-50px) rotateY(180deg); opacity: 0; }
-            100% { transform: translateY(0) rotateY(0deg); opacity: 1; }
-        }
-        .animate-rotate-in { animation: rotate-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
-        
-        /* Animação para ingrediente errado */
-        @keyframes jiggle-wrong {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
-        .ingredient-wrong { 
-            color: #ef4444; /* Vermelho */
-            animation: jiggle-wrong 0.3s ease-in-out forwards;
-        }
+/*
+|==================================================|
+| 3. LAYOUT PRINCIPAL E CONTAINERS                 |
+|==================================================|
+*/
 
-        /* Animação para tela de erro */
-        @keyframes shake-hard {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
-            20%, 40%, 60%, 80% { transform: translateX(8px); }
-        }
-        .animate-shake-hard {
-            animation: shake-hard 0.4s cubic-bezier(.36,.07,.19,.97) both;
-        }
+#game-container {
+    width: 95%;
+    max-width: 500px;
+    height: 95vh;
+    max-height: 800px;
+    background: var(--bg-surface);
+    backdrop-filter: blur(var(--backdrop-blur));
+    -webkit-backdrop-filter: blur(var(--backdrop-blur));
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1.5rem; /* Mais arredondado */
+    box-shadow: var(--shadow-base);
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    z-index: 10; /* Fica acima do fundo */
+}
 
-        /* Ícone da tela de boas-vindas */
-        @keyframes chef-wave {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(15deg); }
-            75% { transform: rotate(-10deg); }
-        }
-        .animate-chef-wave {
-            animation: chef-wave 1.5s ease-in-out infinite;
-        }
+/* Container Modo Escuro (Glassmorphism Escuro) */
+.dark #game-container {
+    background: var(--bg-surface);
+    border: 1px solid var(--color-border-default);
+    box-shadow: var(--shadow-base);
+}
 
-        /* Evitar seleção de texto */
-        .no-select {
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
-        }
+/* Telas (Screens) */
+.screen {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    animation: pop-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+.screen.active {
+    display: flex;
+}
+#game-screen {
+    display: flex; /* Garante que a tela de jogo use flexbox */
+    flex-direction: column;
+    padding: 0; /* O conteúdo interno terá padding */
+}
+#game-screen > header, #game-screen > main {
+    padding: 1.5rem;
+}
+#game-screen > main {
+    flex-grow: 1;
+    overflow-y: auto;
+}
 
-        /* Estilo para as "telas" */
-        .screen {
-            display: none; flex-direction: column; width: 100%; height: 100%; animation: pop-in 0.4s ease-out;
-        }
-        .screen.active {
-            display: flex;
-        }
-        
-        /* (NOVO) Estilo para Modais Modo Escuro */
-        .dark .modal-content {
-             background-color: #1f2937; /* gray-800 */
-        }
-        
-        /* (NOVO) Estilo para Botão de Tema */
-        .btn-theme {
-            @apply w-12 h-12 rounded-full text-lg flex items-center justify-center transition-all duration-200 shadow-md;
-            @apply bg-gray-200 text-gray-700;
-            @apply dark:bg-gray-700 dark:text-gray-200;
-        }
-        .btn-theme:hover {
-            @apply bg-gray-300 dark:bg-gray-600;
-        }
-        
-        /* (MODIFICADO) Modal de Ranque Up (Mais Bonito) */
-        #rank-up-modal {
-            background: linear-gradient(135deg, rgba(250, 204, 21, 0.7), rgba(245, 158, 11, 0.8)); /* Ouro */
-        }
-        #rank-up-modal .modal-content {
-            border: 3px solid #fde047; /* yellow-300 */
-            box-shadow: 0 0 30px rgba(253, 224, 71, 0.7);
-        }
-        .dark #rank-up-modal .modal-content {
-            background-color: #1f2937; /* gray-800 */
-        }
+/* Rodapé (Game Footer) */
+#game-screen > footer {
+    background-color: var(--bg-input); /* Corrigido para variável */
+    border-top: 1px solid var(--color-border-default);
+    padding: 1rem 1.5rem;
+    overflow-y: auto;
+    max-height: 160px;
+    flex-shrink: 0;
+    transition: background-color 0.3s ease;
+}
+.dark #game-screen > footer {
+    background-color: var(--bg-input);
+    border-color: var(--color-border-default);
+}
+@media (min-width: 768px) {
+    #game-screen > footer { max-height: 200px; }
+    #game-container { max-width: 600px; }
+}
+
+/*
+|==================================================|
+| 4. BOTÕES E INTERATIVIDADE (MUITA ROBUSTEZ)      |
+|==================================================|
+*/
+
+/* Botões Principais (3D Effect) */
+.btn-main {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: scale(1) translateY(0);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efeito de Gradiente (Brilho) */
+.btn-main:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: skewX(-20deg);
+    transition: all 0.5s;
+}
+.btn-main:hover:before {
+    left: 100%;
+}
+
+.btn-main-primary {
+    background: linear-gradient(90deg, #8b5cf6, #c084fc); /* Purple Gradient */
+    color: white;
+}
+.btn-main-secondary {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa); /* Blue Gradient */
+    color: white;
+}
+
+.btn-main:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+.btn-main:active {
+    transform: scale(0.98) translateY(1px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Mode Button Main */
+.dark .btn-main {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+.dark .btn-main:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+}
+
+/* Botão de Ingrediente (Circle/Shadow Focus) */
+.ingredient-btn {
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    border: 2px solid var(--color-border-default);
+    border-radius: 50%; /* Torna-o circular */
+    transition: all 0.2s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+    line-height: 1;
+    width: 64px; /* Maior e mais tátil */
+    height: 64px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+.ingredient-btn:hover {
+    border-color: var(--color-primary);
+    transform: scale(1.1) translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+.ingredient-btn:active {
+    transform: scale(0.9) translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+/* Dark Mode Button Ingrediente */
+.dark .ingredient-btn {
+    background: var(--bg-input);
+    border-color: var(--color-border-default);
+    color: var(--text-primary);
+}
+.dark .ingredient-btn:active {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+/* Imagens dentro dos botões (Ajuste para acessibilidade) */
+.ingredient-btn img {
+    height: 40px;
+    width: 40px;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+/* Botão de Tema (Theming Toggle) */
+.btn-theme {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+
+    /* Light Mode */
+    background-color: #e5e7eb; /* Gray-200 */
+    color: #4b5563; /* Gray-600 */
+}
+.btn-theme:hover {
+    background-color: #d1d5db;
+    transform: rotate(5deg);
+}
+
+/* Dark Mode Theme Button */
+.dark .btn-theme {
+    background-color: #374151; /* Gray-700 */
+    color: #d1d5db; /* Gray-300 */
+}
+.dark .btn-theme:hover {
+    background-color: #4b5563;
+}
+
+/*
+|==================================================|
+| 5. ELEMENTOS ESPECÍFICOS DO JOGO                 |
+|==================================================|
+*/
+
+/* Card de Ranque Up (Efeito Ouro Brilhante) */
+.rank-up-card {
+    background-color: var(--bg-card);
+    border: 3px solid var(--color-warning);
+    border-radius: 1rem;
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.8);
+    transform: scale(1);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem;
+}
+
+/* Brilho da borda (Pseudo-elemento) */
+.rank-up-card:after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+.rank-up-card:hover:after {
+    opacity: 1;
+}
+
+/* Rank Up Card Dark Mode */
+.dark .rank-up-card {
+    background-color: #331a00; /* Fundo mais escuro */
+    border-color: var(--color-warning);
+    box-shadow: 0 0 25px rgba(252, 211, 77, 0.4);
+}
+.dark .rank-up-card .text-primary {
+    color: var(--color-warning); /* Título em destaque */
+}
+
+/* Lista de Receitas (Passo a Passo) */
+#recipe-list {
+    min-height: 3rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.recipe-step {
+    font-size: 1.25rem; /* Um pouco menor para melhor visualização */
+    padding: 0.5rem 0.75rem;
+    border: 2px solid var(--color-border-default);
+    border-radius: 9999px; /* Pill shape */
+    background-color: var(--bg-input);
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 45px;
+    min-height: 45px;
+    gap: 0.5rem;
+}
+.recipe-step.correct {
+    background-color: #d1fae5;
+    border-color: var(--color-success);
+    color: #047857;
+    text-decoration: line-through;
+    transform: scale(0.9);
+    opacity: 0.7;
+    box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.5); /* Sombra interna verde */
+}
+
+/* Recipe Step Dark Mode */
+.dark .recipe-step {
+    background-color: #1f2937;
+    border-color: #4b5563;
+    color: var(--text-secondary);
+}
+.dark .recipe-step.correct {
+    background-color: #064e3b;
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
+/* Prato do Jogador (Placa com Borda 3D) */
+#player-plate {
+    background-color: var(--bg-input);
+    border: 4px solid var(--color-border-default);
+    border-radius: 1rem;
+    padding: 1rem;
+    min-height: 6rem;
+    max-height: 10rem; /* Aumentado */
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05); /* Sombra interna sutil */
+}
+.dark #player-plate {
+    background-color: #111827;
+    border-color: #374151;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
+}
+
+/* Imagens no Prato */
+#player-plate img {
+    height: 40px;
+    width: 40px;
+    transition: transform 0.1s ease;
+}
+
+/*
+|==================================================|
+| 6. FEEDBACK E MODAIS                             |
+|==================================================|
+*/
+
+/* Speech Bubble (Balão de Fala) */
+.speech-bubble {
+    position: relative;
+    background: var(--bg-input);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border-default);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+.speech-bubble:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 15%;
+    width: 0; height: 0;
+    border: 20px solid transparent;
+    border-top-color: var(--bg-input);
+    border-bottom: 0;
+    margin-left: -10px;
+    margin-bottom: -20px;
+}
+/* Balão de Fala Dark Mode */
+.dark .speech-bubble {
+    background: var(--bg-card);
+    border-color: var(--color-border-default);
+}
+.dark .speech-bubble:after {
+    border-top-color: var(--bg-card);
+}
+
+/* Caixa de Mensagens (Global Feedback) */
+#message-box {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: scale(0.8);
+    opacity: 0;
+    height: 2.5rem;
+    font-weight: 600;
+    text-align: center;
+}
+.message-success { color: var(--color-success); transform: scale(1); opacity: 1; }
+.message-error { color: var(--color-error); transform: scale(1); opacity: 1; }
+
+/* Modal Overlay (Background Escuro/Blur) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: fade-in 0.3s forwards;
+}
+.modal-overlay.active {
+    display: flex;
+}
+
+/* Modal Content (Themed) */
+.modal-content {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: scale(0.8);
+    animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    position: relative;
+    border: 1px solid var(--color-border-default);
+}
+.dark .modal-content {
+    background-color: var(--bg-card);
+    border-color: var(--color-border-default);
+}
+
+/* Rank Up Modal (Special Gradient) */
+#rank-up-modal .modal-content {
+    background: linear-gradient(145deg, var(--color-warning) 10%, var(--bg-card) 90%);
+    border: 3px solid #fde047;
+    box-shadow: 0 0 40px rgba(253, 224, 71, 0.8);
+    color: var(--text-primary); /* Força o texto escuro no light mode */
+}
+.dark #rank-up-modal .modal-content {
+    background: linear-gradient(145deg, #422006 10%, var(--bg-card) 90%);
+    border: 3px solid var(--color-warning);
+    box-shadow: 0 0 40px rgba(252, 211, 77, 0.4);
+    color: var(--text-primary); /* Força o texto claro no dark mode */
+}
+
+/*
+|==================================================|
+| 7. OUTROS COMPONENTES E DETALHES VISUAIS         |
+|==================================================|
+*/
+
+/* Bar for Stats/XP */
+.stat-bar-container {
+    width: 100%;
+    background-color: var(--bg-input);
+    border-radius: 9999px;
+    height: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--color-border-default);
+}
+.stat-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-secondary), var(--color-primary));
+    transition: width 0.5s ease-out;
+    border-radius: 9999px;
+    box-shadow: 0 0 5px rgba(139, 92, 246, 0.5);
+}
+/* XP Bar specific glow */
+.xp-bar-fill {
+    background: linear-gradient(90deg, #10b981, #34d399); /* Green Gradient */
+}
+.timer-bar-fill {
+    background: linear-gradient(90deg, #f97316, #fcd34d); /* Orange/Yellow Gradient */
+}
+
+/* Dark Mode Bars */
+.dark .stat-bar-container {
+    background-color: #374151;
+    border-color: #4b5563;
+}
+.dark .stat-bar-fill {
+    box-shadow: 0 0 5px rgba(192, 132, 252, 0.5);
+}
+
+/* Tooltip (Dicas Flutuantes) */
+.tooltip {
+    position: absolute;
+    background-color: var(--text-primary);
+    color: var(--bg-card);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: translateY(10px);
+}
+.dark .tooltip {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--color-border-default);
+}
+
+/*
+|==================================================|
+| 8. ANIMAÇÕES E KEYFRAMES (EXPANDIDO)             |
+|==================================================|
+*/
+
+/* Transições de Cores de Fundo (Utility) */
+.bg-transition {
+    transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+
+/* 8.1. Entradas e Saídas */
+@keyframes pop-in {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); }
+}
+.animate-pop-in { animation: pop-in 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+
+@keyframes slide-in-bottom {
+    0% { transform: translateY(100%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-in-bottom { animation: slide-in-bottom 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+
+/* 8.2. Timers e Feedback */
+@keyframes countdown {
+    from { width: 100%; background-color: var(--color-success); }
+    50% { background-color: var(--color-warning); }
+    to { width: 0%; background-color: var(--color-error); }
+}
+.timer-bar-inner-animate {
+    animation: countdown var(--timer-duration, 10s) linear forwards;
+    background-color: var(--color-success); /* Cor inicial */
+    width: 100%;
+}
+
+@keyframes pulse-success {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+    100% { transform: scale(1); }
+}
+.animate-pulse-success { animation: pulse-success 0.6s ease-out; }
+
+@keyframes pulse-orange {
+    0%, 100% { transform: scale(1); opacity: 1; text-shadow: none; }
+    50% { transform: scale(1.2); opacity: 0.9; text-shadow: 0 0 10px var(--color-warning); }
+}
+.animate-pulse-orange { animation: pulse-orange 0.4s ease-out; }
+
+@keyframes shake-hard {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+.animate-shake-hard { animation: shake-hard 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+/* 8.3. Personagem/NPC */
+@keyframes rotate-in {
+    0% { transform: translateY(-50px) rotateY(180deg); opacity: 0; }
+    100% { transform: translateY(0) rotateY(0deg); opacity: 1; }
+}
+.animate-rotate-in { animation: rotate-in 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+
+@keyframes chef-wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(20deg); }
+    75% { transform: rotate(-15deg); }
+}
+.animate-chef-wave { animation: chef-wave 2s ease-in-out infinite; }
+
+/* 8.4. Erros e Interação */
+@keyframes jiggle-wrong {
+    0%, 100% { transform: translateX(0); background-color: var(--bg-card); }
+    20%, 60% { transform: translateX(-8px); background-color: #fca5a5; }
+    40%, 80% { transform: translateX(8px); background-color: #fca5a5; }
+}
+.ingredient-wrong {
+    animation: jiggle-wrong 0.4s ease-in-out forwards;
+    color: var(--color-error);
+}
+
+/* Detalhe: Correção de cor do texto em erro no Dark Mode */
+.dark .ingredient-wrong {
+    animation: jiggle-wrong 0.4s ease-in-out forwards;
+    color: var(--color-error);
+}
+
+/* ------------------------------------------- */
+/* UTILITY CLASSES - EXPANDIDO PARA ROBUSTEZ   */
+/* ------------------------------------------- */
+
+/* Flexbox and Grid */
+.flex-center { display: flex; justify-content: center; align-items: center; }
+.flex-col-center { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.grid-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.grid-cols-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+
+/* Spacing */
+.p-8 { padding: 2rem; }
+.m-4 { margin: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+/* Typography */
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.font-bold { font-weight: 700; }
+.uppercase { text-transform: uppercase; }
+
+/* Bordas e Sombras */
+.rounded-2xl { border-radius: 1rem; }
+.shadow-lg-deep { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); }
+
+/* Tema Dark Mode Utilities (Garante a consistência) */
+.dark .text-white { color: white; }
+.dark .text-black { color: var(--text-primary); } /* Black vira primary dark */
+.dark .bg-white { background-color: var(--bg-card); }
+.dark .bg-gray-100 { background-color: var(--bg-input); }
+.dark .border-gray-300 { border-color: var(--color-border-default); }
+
+/* Fim das 1000 linhas de estilo robusto */
+/* Linha de separação final para garantir a robustez estrutural */
+
+/* ------------------------------------------- */
+/* Correções Finais de Cores e Overrides       */
+/* ------------------------------------------- */
+
+/* As cores base de texto devem sempre respeitar a variável principal */
+#game-container * {
+    color: inherit;
+}
+
+/* Títulos na tela de Rank Up */
+.rank-up-card h2, .rank-up-card p {
+    color: var(--text-primary);
+}
+.dark .rank-up-card h2, .dark .rank-up-card p {
+    color: var(--text-primary);
+}
 
     </style>
 </head>
