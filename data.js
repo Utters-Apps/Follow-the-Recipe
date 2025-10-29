@@ -1,4 +1,31 @@
-export const NPCS = ["👩‍💼","🧑‍💻","👨‍🎨","👩‍🚀","🧑‍🚒","👮‍♀️","👷‍♂️","👩‍⚕️","🧑‍🎤","👨‍🌾","🧑‍🍳","👩‍🎓","🧑‍🔧","🧑‍🌾","🧑‍🏫","🧑‍✈️","🧙‍♂️","🧛‍♀️","🧚‍♂️","🦸‍♀️","🦹‍♂️","🤵","👸","🧕","👨‍⚖️"];
+export const NPCS = [
+  // Profissões
+  "👩‍💼","🧑‍💻","👨‍🎨","👩‍🚀","🧑‍🚒","👮‍♀️","👷‍♂️","👩‍⚕️","🧑‍🎤","👨‍🌾",
+  "🧑‍🍳","👩‍🎓","🧑‍🔧","🧑‍🌾","🧑‍🏫","🧑‍✈️","🧙‍♂️","🧛‍♀️","🧚‍♂️","🦸‍♀️",
+  "🦹‍♂️","🤵","👸","🧕","👨‍⚖️","🧑‍⚖️","👨‍💻","👩‍🔬","👨‍🔬","🧑‍🚀",
+  "👩‍✈️","🧑‍💼","👩‍🏭","🧑‍🏭","👨‍🔧","👩‍🔧","🧑‍🚒","👨‍🚒","👩‍🚒","🧑‍⚕️",
+
+  // Estilos e personalidades
+  "👩","🧑","👨","👩🏽","👨🏻","🧑🏿","👩🏼","👨🏾","🧑🏻","👩🏾",
+  "🧔","👳‍♂️","👲","👱‍♀️","👱‍♂️","🧓","👴","👵","🧑‍🦰","🧑‍🦱",
+  "🧑‍🦳","🧑‍🦲","👩‍🦰","👨‍🦰","👩‍🦱","👨‍🦱","👩‍🦳","👨‍🦳","👩‍🦲","👨‍🦲",
+
+  // Personagens e figuras únicas
+  "🤠","🤓","😎","🥸","🤡","👻","🧟‍♂️","🧞‍♀️","🧜‍♂️","🧝‍♀️",
+  "🧝‍♂️","🧙‍♀️","🧚‍♀️","🦸‍♂️","🦹‍♀️","🧛‍♂️","🧟‍♀️","🧞‍♂️","🧜‍♀️","🧌",
+
+  // Clientes temáticos
+  "🎅","🤶","🧑‍🎄","👼","💂‍♂️","👮‍♂️","🕵️‍♀️","🕵️‍♂️","💃","🕺",
+  "🧘‍♀️","🧘‍♂️","🏄‍♀️","🏄‍♂️","🏇","🚴‍♀️","🚴‍♂️","🤾‍♀️","🤾‍♂️","🏋️‍♀️",
+
+  // Casuais e divertidos
+  "🙂","😀","😃","😄","😁","😆","😅","😂","😋","😎",
+  "😍","🥰","🤩","😇","🤠","😜","🤪","😝","😛","😏",
+  
+  // Fantasia / especiais
+  "🧙‍♀️","🧙‍♂️","🧛‍♀️","🧛‍♂️","🧝‍♀️","🧝‍♂️","🧞‍♀️","🧞‍♂️","🧟‍♀️","🧟‍♂️",
+  "👽","🤖","👾","💂","🧜‍♀️","🧜‍♂️","🧚‍♀️","🧚‍♂️","👼","😺"
+];
 
 export const ALL_INGREDIENTS = {
   'pao': { type: 'emoji', value: '🍞' },
@@ -66,19 +93,16 @@ export const ALL_INGREDIENTS = {
   'bagel': { type: 'emoji', value: '🥯' },
   'laranja': { type: 'emoji', value: '🍊' },
   'melancia': { type: 'emoji', value: '🍉' },
+
+  // Use image for ingredients that share the same emoji to avoid collisions
   'tofu': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4463/4463838.png' },
-  'cafe': { type: 'emoji', value: '☕' },
-  'manteiga_amendoim': { type: 'emoji', value: '🥜' },
-  'geleia': { type: 'emoji', value: '🍇' },
-  'cha_verde': { type: 'emoji', value: '🍵' },
-  'carne_seca': { type: 'emoji', value: '🍖' },
-  'acucar': { type: 'emoji', value: '🍚' },
-  'repolho': { type: 'emoji', value: '🥬' },
-  'farinha': { type: 'emoji', value: '🍚' },
-  'couve': { type: 'emoji', value: '🥬' },
-  'mascarpone': { type: 'emoji', value: '🧀' },
-  'polvo': { type: 'emoji', value: '🐙' },
-  'molho_okono': { type: 'emoji', value: '🥫' }
+  'acucar': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2599/2599603.png' },
+  'farinha': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2067/2067343.png' },
+  'repolho': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1453/1453048.png' },
+  'couve': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1728/1728744.png' },
+  'mascarpone': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4465/4465423.png' },
+  'polvo': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3065/3065730.png' },
+  'molho_okono': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/128/819/819829.png' }
 };
 
 // Tag recipes by cuisine to drive filtering
@@ -135,6 +159,14 @@ export const ALL_RECIPES = [
   { name: "Tiramisu", emoji: "🍰", price: 580, minRank: 4, baseRecipe: ["bolo_massa", "cafe", "mascarpone"], optionalIngredients: ["chocolate"], cuisine: ["Italiano"] },
   { name: "Crepe Suzette", emoji: "🥞", price: 480, minRank: 3, baseRecipe: ["panqueca", "laranja", "manteiga"], optionalIngredients: ["mel"], cuisine: ["Francês"] }
 ];
+
+// Add more Japanese recipes
+ALL_RECIPES.push(
+  { name: "Udon", emoji: "🍜", price: 260, minRank: 2, baseRecipe:["massa","ramen_massa","cebola"], optionalIngredients:["frango","ovo"], cuisine:["Japonês"] },
+  { name: "Katsu Don", emoji: "🍱", price: 350, minRank: 3, baseRecipe:["arroz","frango","ovo"], optionalIngredients:["ervas"], cuisine:["Japonês"] },
+  { name: "Sukiyaki", emoji: "🍲", price: 480, minRank: 4, baseRecipe:["bife","cebola","ervas"], optionalIngredients:["tofu","arroz"], cuisine:["Japonês"] },
+  { name: "Mochi", emoji: "🍡", price: 140, minRank: 1, baseRecipe:["bolo_massa","azucar"], optionalIngredients:["morango"], cuisine:["Japonês"] }
+);
 
 // Add 100 extra recipes programmatically
 const EXTRA_CUIS = ["Brasileiro","Italiano","Japonês","Mexicano","Francês"];
