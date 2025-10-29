@@ -377,7 +377,9 @@ function updateRankDisplay(){
 function renderUnlockedIngredientBin(){
   ingredientBin.innerHTML = '';
   const ids = [...gameState.unlockedIngredientIds].sort(()=>Math.random()-0.5);
-  ids.forEach(id=>{
+  // Limit visible ingredient pool to max 15 to avoid clutter
+  const visible = ids.slice(0, 15);
+  visible.forEach(id=>{
     const btn = document.createElement('button');
     btn.className = "ingredient-btn rounded-lg p-3 shadow-md";
     btn.dataset.id = id;
@@ -694,6 +696,21 @@ function updateStreakDisplay(){
   } else streakDisplay.textContent = '';
 }
 
+/* Background music support (attempt to load BGmusic.mp3 if present) */
+let bgAudio = null;
+function initBackgroundMusic() {
+  try {
+    bgAudio = new Audio('BGmusic.mp3');
+    bgAudio.loop = true;
+    bgAudio.volume = 0.32;
+    // will attempt to play on user interaction (see setupConfirm and welcomePlay)
+  } catch (e) { bgAudio = null; console.warn('BG music init failed', e); }
+}
+function tryPlayBgMusic() {
+  if (!bgAudio) return;
+  bgAudio.play().catch(()=>{ /* autoplay blocked; will play on next user gesture */ });
+}
+
 /* Ingredient click handling */
 ingredientBin.addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
@@ -765,10 +782,35 @@ setupConfirm.addEventListener('click', ()=>{
   renderMarket();
   renderUnlockedIngredientBin();
   showScreen('welcome-screen');
+  initBackgroundMusic();
+  tryPlayBgMusic();
 });
 
 /* ---------- Navigation & buttons ---------- */
-welcomePlayButton.addEventListener('click', ()=>{ initializeAudio().catch(()=>{}); showScreen('menu-screen'); });
+welcomePlayButton.addEventListener('click', ()=>{
+  initializeAudio().catch(()=>{});
+  tryPlayBgMusic();
+  showScreen('menu-screen');
+});
+
+/* Also ensure first click on ingredient bin triggers audio start and bg music */
+ingredientBin.addEventListener('click', (e)=>{
+  const btn = e.target.closest('button');
+  if (!btn || !session.gameActive || session.isPaused) return;
+  ensureAudioStarted();
+  playSound('click');
+  const id = btn.dataset.id;
+  session.playerSelection.push(id);
+  const span = document.createElement('span'); span.className='text-3xl'; span.innerHTML = getIngredientHTML(id,'inline-block');
+  playerPlate.appendChild(span);
+  playerPlate.scrollTop = playerPlate.scrollHeight;
+  const idx = session.playerSelection.length-1;
+  if (session.playerSelection[idx] !== session.currentOrder.recipe[idx]) { playSound('error'); span.classList.add('text-red-500'); checkOrder(false,'Ingrediente errado!'); return; }
+  const stepEl = document.getElementById(`step-${idx}`);
+  stepEl && stepEl.classList.add('correct');
+  if (session.playerSelection.length === session.currentOrder.recipe.length) checkOrder(true);
+});
+
 playButton.addEventListener('click', ()=>{ renderUnlockedIngredientBin(); startNewOrder(); showScreen('game-screen'); });
 marketButton.addEventListener('click', ()=>{ renderMarket(); updateAllMoneyDisplays(); showScreen('market-screen'); activateTab('buy'); });
 
@@ -812,6 +854,7 @@ tabOwned.addEventListener('click', ()=>{ activateTab('owned'); });
 /* ---------- Init ---------- */
 function init(){
   loadTheme();
+  initBackgroundMusic(); // prepare audio object; playback happens on user actions
   updateAllMoneyDisplays();
   renderUnlockedIngredientBin();
   renderMarket();
