@@ -793,24 +793,6 @@ welcomePlayButton.addEventListener('click', ()=>{
   showScreen('menu-screen');
 });
 
-/* Also ensure first click on ingredient bin triggers audio start and bg music */
-ingredientBin.addEventListener('click', (e)=>{
-  const btn = e.target.closest('button');
-  if (!btn || !session.gameActive || session.isPaused) return;
-  ensureAudioStarted();
-  playSound('click');
-  const id = btn.dataset.id;
-  session.playerSelection.push(id);
-  const span = document.createElement('span'); span.className='text-3xl'; span.innerHTML = getIngredientHTML(id,'inline-block');
-  playerPlate.appendChild(span);
-  playerPlate.scrollTop = playerPlate.scrollHeight;
-  const idx = session.playerSelection.length-1;
-  if (session.playerSelection[idx] !== session.currentOrder.recipe[idx]) { playSound('error'); span.classList.add('text-red-500'); checkOrder(false,'Ingrediente errado!'); return; }
-  const stepEl = document.getElementById(`step-${idx}`);
-  stepEl && stepEl.classList.add('correct');
-  if (session.playerSelection.length === session.currentOrder.recipe.length) checkOrder(true);
-});
-
 playButton.addEventListener('click', ()=>{ renderUnlockedIngredientBin(); startNewOrder(); showScreen('game-screen'); });
 marketButton.addEventListener('click', ()=>{ renderMarket(); updateAllMoneyDisplays(); showScreen('market-screen'); activateTab('buy'); });
 
