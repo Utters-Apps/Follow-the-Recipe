@@ -185,6 +185,17 @@ function buildLayout() {
       <i id="failure-icon" class="fas fa-times-circle text-7xl text-white mb-4"></i>
       <h2 id="failure-message" class="text-3xl font-bold text-white">Errado! -$10</h2>
     </div>
+
+    <div id="auto-offer-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center p-6">
+      <div class="card p-5 rounded-2xl w-full max-w-sm text-center">
+        <h3 class="text-2xl font-bold mb-2" id="offer-title">Novo prato disponível!</h3>
+        <p class="text-sm mb-4" id="offer-desc"></p>
+        <div class="flex gap-2">
+          <button id="offer-skip" class="btn-main w-full bg-gray-400 text-white font-bold py-3 rounded-lg">Depois</button>
+          <button id="offer-buy" class="btn-main w-full bg-purple-600 text-white font-bold py-3 rounded-lg">Comprar</button>
+        </div>
+      </div>
+    </div>
   </div>
   `;
 }
@@ -241,6 +252,8 @@ const confirmResetConfirm = query('confirm-reset-confirm');
 const rankUpClose = query('rank-up-close');
 const themeToggleWelcome = query('theme-toggle-welcome');
 const themeToggleMenu = query('theme-toggle-menu');
+const musicToggleHeader = query('music-toggle');
+let musicToggleSetup, musicToggleWelcomeBtn, musicToggleMenuBtn;
 
 const moneyDisplayGame = query('money-display-game');
 const moneyDisplayMarket = query('money-display-market');
@@ -343,6 +356,7 @@ function filterRecipesByCuisine(recipes){
 /* Helper: starting unlocks per cuisine */
 function getStartingUnlocks(cuisine){
   if (cuisine === 'Japonês') return ["Onigiri","Chá Verde","Sushi"];
+  if (cuisine === 'Halloween') return ["Ramen de Abóbora"];
   return ["Misto Quente","Limonada","Café"];
 }
 
@@ -378,9 +392,17 @@ function updateRankDisplay(){
 
 function renderUnlockedIngredientBin(){
   ingredientBin.innerHTML = '';
-  const ids = [...gameState.unlockedIngredientIds].sort(()=>Math.random()-0.5);
-  // Limit visible ingredient pool to max 15 to avoid clutter
-  const visible = ids.slice(0, 15);
+  const ids = [...gameState.unlockedIngredientIds].sort(()=>Math.random()-0.5); // shuffle base pool
+  let visible = ids.slice(0,15);
+  if (session?.currentOrder?.recipe){
+    session.currentOrder.recipe.forEach(nid=>{
+      if (ids.includes(nid) && !visible.includes(nid)){
+        if (visible.length<15) visible.push(nid);
+        else visible[Math.floor(Math.random()*visible.length)] = nid;
+      }
+    });
+    visible = Array.from(new Set(visible)).slice(0,15).sort(()=>Math.random()-0.5); // ensure include + shuffle
+  }
   visible.forEach(id=>{
     const btn = document.createElement('button');
     btn.className = "ingredient-btn rounded-lg p-3 shadow-md";
@@ -491,9 +513,12 @@ function showMarketMessage(title,text,isSuccess=true){
 }
 function showRankUpModal(){
   playSound('success');
-  const ranks = getActiveRanks();
-  rankUpIconModal.textContent = ranks[gameState.rank].icon;
-  rankUpText.textContent = `Parabéns, você agora é ${ranks[gameState.rank].name}!`;
+  const ranks = getActiveRanks() || RANKS;
+  // Ensure we have a valid index (clamp between 0 and last)
+  const idx = Math.max(0, Math.min(gameState.rank, ranks.length - 1));
+  const rankDef = ranks[idx] || ranks[0];
+  rankUpIconModal.textContent = rankDef.icon || '🏅';
+  rankUpText.textContent = `Parabéns, você agora é ${rankDef.name || 'Chef'}!`;
   rankUpModal.classList.remove('hidden');
 }
 
@@ -648,7 +673,7 @@ function startNewOrder(){
   dishEmoji.textContent = session.currentOrder.emoji + (session.isVIP ? ' ✨' : '');
   dishName.textContent = session.currentOrder.name + (session.isVIP ? ' (CLIENTE VIP)' : '');
 
-  // Ensure the ingredient bin reflects the new order (always include needed ingredients)
+  // Ensure the ingredient bin reflects the new order (always include needed + shuffled)
   renderUnlockedIngredientBin();
 
   startTimer();
@@ -659,7 +684,7 @@ function checkOrder(isSuccess, reason=''){
   session.gameActive = false;
   stopTimer(true);
   if (isSuccess){
-    playSound('success');
+    playOutcomeAudio('success');
     session.currentStreak++;
     
     // Increased base reward calculation to match increased progression difficulty
@@ -676,9 +701,13 @@ function checkOrder(isSuccess, reason=''){
     updateAllMoneyDisplays();
     successMessage.textContent = `Perfeito! +$${total}`;
     successModal.classList.remove('hidden');
-    setTimeout(()=>{ successModal.classList.add('hidden'); startNewOrder(); },SUCCESS_MODAL_DURATION);
+    setTimeout(()=>{
+      successModal.classList.add('hidden');
+      const offer = findAffordableRecipe();
+      if (offer){ showAutoOffer(offer); } else { startNewOrder(); }
+    },SUCCESS_MODAL_DURATION);
   } else {
-    playSound('error');
+    playOutcomeAudio('fail');
     session.currentStreak = 0;
     session.isRushHour = false;
     let penalty = PENALTY_FAILURE + Math.round(gameState.rank * BASE_PENALTY_PER_RANK);
@@ -724,9 +753,9 @@ function tryPlayBgMusic() {
 }
 
 function setBgmIcon(){
-  if (!musicToggle) return;
   const muted = localStorage.getItem(BGM_KEY) === '1';
-  musicToggle.innerHTML = `<i class="fas ${muted ? 'fa-volume-mute text-gray-400' : 'fa-volume-up text-purple-600'}"></i>`;
+  const icon = `<i class="fas ${muted ? 'fa-volume-mute text-gray-400' : 'fa-volume-up text-purple-600'}"></i>`;
+  [musicToggleHeader, musicToggleSetup, musicToggleWelcomeBtn, musicToggleMenuBtn].forEach(btn=>{ if(btn) btn.innerHTML = icon; });
 }
 
 function toggleBgm(){
@@ -740,6 +769,14 @@ function toggleBgm(){
   }
   setBgmIcon();
   playSound('click');
+}
+
+function playOutcomeAudio(type){
+  const src = type==='success' ? 'Correct.mp3' : 'Fail.mp3';
+  try{
+    const a = new Audio(src);
+    a.volume = 0.6; a.play().catch(()=>{ type==='success' ? playSound('success') : playSound('error'); });
+  } catch(e){ type==='success' ? playSound('success') : playSound('error'); }
 }
 
 /* Ingredient click handling */
@@ -813,6 +850,12 @@ setupConfirm.addEventListener('click', ()=>{
   renderMarket();
   renderUnlockedIngredientBin();
   showScreen('welcome-screen');
+  // attach music toggles near theme buttons
+  musicToggleSetup = document.createElement('button');
+  musicToggleSetup.className = 'btn-theme w-12 h-12 rounded-full flex items-center justify-center';
+  themeToggleSetup.parentElement.appendChild(musicToggleSetup);
+  musicToggleSetup.addEventListener('click', toggleBgm);
+  setBgmIcon();
   initBackgroundMusic();
   tryPlayBgMusic();
 });
@@ -896,4 +939,67 @@ function init(){
     }, 500);
   }
 }
+
+/* ---------- Auto-offer logic ---------- */
+const autoOfferModal = document.getElementById('auto-offer-modal');
+const offerTitle = document.getElementById('offer-title');
+const offerDesc = document.getElementById('offer-desc');
+const offerSkip = document.getElementById('offer-skip');
+const offerBuy = document.getElementById('offer-buy');
+let pendingOffer = null;
+
+function findAffordableRecipe() {
+  const ranks = getActiveRanks();
+  const currentRank = ranks[gameState.rank];
+  const pool = filterRecipesByCuisine(ALL_RECIPES)
+    .filter(r=>!gameState.unlockedRecipeNames.includes(r.name) && gameState.rank>=r.minRank);
+  if (currentRank?.recipeToUnlock){
+    const mandatory = pool.find(r=>r.name===currentRank.recipeToUnlock);
+    if (mandatory && gameState.money>=mandatory.price) return mandatory;
+  }
+  const cheapest = pool.sort((a,b)=>a.price-b.price)[0];
+  return (cheapest && gameState.money>=cheapest.price) ? cheapest : null;
+}
+
+function showAutoOffer(recipe){
+  pendingOffer = recipe;
+  offerTitle.textContent = `Você pode comprar: ${recipe.name}`;
+  offerDesc.innerHTML = `<span class="text-4xl mr-2">${recipe.emoji}</span> Preço: $${recipe.price}`;
+  autoOfferModal.classList.remove('hidden');
+}
+
+offerSkip?.addEventListener('click', ()=>{ autoOfferModal.classList.add('hidden'); pendingOffer=null; startNewOrder(); });
+offerBuy?.addEventListener('click', ()=>{
+  if (pendingOffer){ buyRecipe(pendingOffer.name); }
+  autoOfferModal.classList.add('hidden'); pendingOffer=null; startNewOrder();
+});
+
+/* ---------- Background music handling ---------- */
+document.addEventListener('visibilitychange', ()=>{
+  if (document.hidden && bgAudio) { try { bgAudio.pause(); } catch(e){} }
+});
+window.addEventListener('pagehide', ()=>{ if (bgAudio) { try { bgAudio.pause(); } catch(e){} } });
+
+/* ---------- Setup interactions (Halloween button) ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const container = document.getElementById('cuisine-choices');
+  if (container && !container.querySelector('[data-cuisine="Halloween"]')){
+    const sep = document.createElement('div');
+    sep.className = 'col-span-2 mt-2 border-t pt-2';
+    sep.innerHTML = `<button class="cuisine-btn btn-main w-full p-3 rounded-xl border" data-cuisine="Halloween">🎃 Halloween</button>`;
+    container.appendChild(sep);
+  }
+  // place music toggle next to theme toggle on welcome and menu
+  musicToggleWelcomeBtn = document.createElement('button');
+  musicToggleWelcomeBtn.className = 'btn-theme w-12 h-12 rounded-full flex items-center justify-center';
+  themeToggleWelcome?.parentElement?.appendChild(musicToggleWelcomeBtn);
+  musicToggleWelcomeBtn?.addEventListener('click', toggleBgm);
+
+  musicToggleMenuBtn = document.createElement('button');
+  musicToggleMenuBtn.className = 'btn-theme w-12 h-12 rounded-full flex items-center justify-center';
+  themeToggleMenu?.parentElement?.appendChild(musicToggleMenuBtn);
+  musicToggleMenuBtn?.addEventListener('click', toggleBgm);
+  setBgmIcon();
+});
+
 init();
