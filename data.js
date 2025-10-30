@@ -76,7 +76,13 @@ export const ALL_INGREDIENTS = {
   'couve': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1728/1728744.png' },
   'mascarpone': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4465/4465423.png' },
   'polvo': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3065/3065730.png' },
-  'molho_okono': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/128/819/819829.png' }
+  'molho_okono': { type: 'emoji', value: '🥫' },
+  'carne_seca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1046/1046849.png' },
+  'cafe': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/924/924514.png' },
+  'manteiga_amendoim': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3838/3838464.png' },
+  'geleia': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3075/3075903.png' },
+  'cha_verde': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3082/3082024.png' },
+  'abobora': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/137/137366.png' }
 };
 
 // Tag recipes by cuisine to drive filtering
@@ -136,10 +142,44 @@ export const ALL_RECIPES = [
 
 // Add more Japanese recipes (clean push entries)
 ALL_RECIPES.push(
-  { name: "Udon", emoji: "🍜", price: 260, minRank: 2, baseRecipe:["massa","ramen_massa","cebola"], optionalIngredients:["frango","ovo"], cuisine:["Japonês"] },
+  { name: "Udon", emoji: "🍜", price: 260, minRank: 2, baseRecipe: ["massa","ramen_massa","cebola"], optionalIngredients:["frango","ovo"], cuisine:["Japonês"] },
   { name: "Katsu Don", emoji: "🍱", price: 350, minRank: 3, baseRecipe:["arroz","frango","ovo"], optionalIngredients:["ervas"], cuisine:["Japonês"] },
   { name: "Sukiyaki", emoji: "🍲", price: 480, minRank: 4, baseRecipe:["bife","cebola","ervas"], optionalIngredients:["tofu","arroz"], cuisine:["Japonês"] },
   { name: "Mochi", emoji: "🍡", price: 140, minRank: 1, baseRecipe:["bolo_massa","acucar"], optionalIngredients:["morango"], cuisine:["Japonês"] }
+);
+
+// Add Halloween recipes (15+)
+ALL_RECIPES.push(
+  { name:"Ramen de Abóbora", emoji:"🎃", price:260, minRank:2, baseRecipe:["ramen_massa","abobora","ervas"], optionalIngredients:["ovo"], cuisine:["Halloween"] },
+  { name:"Onigiri Fantasma", emoji:"👻", price:140, minRank:1, baseRecipe:["arroz","alga"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
+  { name:"Sushi Aranha", emoji:"🕷️", price:320, minRank:2, baseRecipe:["alga","arroz","peixe"], optionalIngredients:["pepino"], cuisine:["Halloween"] },
+  { name:"Guioza Sombria", emoji:"🥟", price:300, minRank:2, baseRecipe:["guioza_massa","frango"], optionalIngredients:["cebola","abobora"], cuisine:["Halloween"] },
+  { name:"Tempurá Assombrado", emoji:"🍤", price:360, minRank:2, baseRecipe:["camarao","farinha"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
+  { name:"Yakitori das Sombras", emoji:"🍢", price:220, minRank:2, baseRecipe:["frango","sal"], optionalIngredients:["ervas","abobora"], cuisine:["Halloween"] },
+  { name:"Udon Noturno", emoji:"🍜", price:280, minRank:2, baseRecipe:["ramen_massa","cebola"], optionalIngredients:["abobora","ovo"], cuisine:["Halloween"] },
+  { name:"Takoyaki Tenebroso", emoji:"🐙", price:380, minRank:3, baseRecipe:["polvo","farinha","molho_okono"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
+  { name:"Okonomiyaki Fantasma", emoji:"🥞", price:380, minRank:3, baseRecipe:["farinha","repolho","ovo"], optionalIngredients:["abobora","molho_okono"], cuisine:["Halloween"] },
+  { name:"Sopa Miso Sombria", emoji:"🥣", price:310, minRank:2, baseRecipe:["sopa_base","alga","tofu"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
+  { name:"Temaki Abóbora", emoji:"🍣", price:340, minRank:2, baseRecipe:["alga","arroz","abobora"], optionalIngredients:["pepino","ervas"], cuisine:["Halloween"] },
+  { name:"Chá Verde Assombrado", emoji:"🍵", price:90, minRank:1, baseRecipe:["cha_verde"], optionalIngredients:["gelo","abobora"], cuisine:["Halloween"] },
+  { name:"Onigiri Lua Cheia", emoji:"🌕", price:200, minRank:2, baseRecipe:["arroz","alga","sal"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
+  { name:"Sashimi da Meia-noite", emoji:"🐟", price:420, minRank:3, baseRecipe:["peixe"], optionalIngredients:["limao","ervas"], cuisine:["Halloween"] },
+  { name:"Brigadeiro Sombrio", emoji:"🍬", price:300, minRank:2, baseRecipe:["chocolate","manteiga"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
+  { name:"Panqueca do Terror", emoji:"🥞", price:250, minRank:0, baseRecipe:["panqueca","mel"], optionalIngredients:["abobora","chocolate"], cuisine:["Halloween"] }
+);
+
+// Add five new recipes (one per major cuisine)
+ALL_RECIPES.push(
+  // Brasileiro
+  { name: "Moqueca Simples", emoji: "🍲", price: 420, minRank: 2, baseRecipe: ["peixe","coco","cebola"], optionalIngredients: ["coentro","arroz"], cuisine: ["Brasileiro"] },
+  // Italiano
+  { name: "Panzanella", emoji: "🥗", price: 210, minRank: 1, baseRecipe: ["baguete","tomate","azeitona"], optionalIngredients: ["ervas","queijo"], cuisine: ["Italiano"] },
+  // Japonês
+  { name: "Ochazuke", emoji: "🍵", price: 180, minRank: 1, baseRecipe: ["arroz","cha_verde"], optionalIngredients: ["sal","alga"], cuisine: ["Japonês"] },
+  // Mexicano
+  { name: "Elote", emoji: "🌽", price: 140, minRank: 0, baseRecipe: ["milho","manteiga"], optionalIngredients: ["pimenta","queijo"], cuisine: ["Mexicano"] },
+  // Francês
+  { name: "Ratatouille Salteado", emoji: "🍲", price: 260, minRank: 1, baseRecipe: ["berinjela","pimentao","tomate"], optionalIngredients: ["ervas","alho"], cuisine: ["Francês"] }
 );
 
 // Themed ranks per cuisine
@@ -175,6 +215,12 @@ export const CUISINE_DEFS = {
     { name: "Sous-chef", icon:"🥈", recipeToUnlock:"Salada César", baseReward: 16 },
     { name: "Chef de Cuisine", icon:"🥇", recipeToUnlock:"Crepe Suzette", baseReward: 30 },
     { name: "Patrono Culinário", icon:"🇫🇷", recipeToUnlock:null, baseReward: 50 }
+  ],
+  "Halloween": [
+    { name: "Novato Sombrio", icon:"🎃", recipeToUnlock:"Panqueca do Terror", baseReward: 12 },
+    { name: "Cozinheiro da Meia-noite", icon:"🕯️", recipeToUnlock:"Onigiri Fantasma", baseReward: 20 },
+    { name: "Mestre das Sombras", icon:"👻", recipeToUnlock:"Takoyaki Tenebroso", baseReward: 35 },
+    { name: "Lenda Assombrada", icon:"🦇", recipeToUnlock:"Okonomiyaki Fantasma", baseReward: 60 }
   ]
 };
 
