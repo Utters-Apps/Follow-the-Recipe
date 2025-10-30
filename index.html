@@ -22,13 +22,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
-  <meta name="description" content="Siga a Receita - Deluxe Chef (modular refactor)" />
+  <meta name="description" content="🍳 Siga a Receita é um jogo onde cada segundo conta! Prepare pratos deliciosos para seus clientes o mais rápido possível — mas cuidado, o tempo não está do seu lado! Será que você consegue acompanhar o ritmo da cozinha e se tornar o chef mais ágil de todos?" />
 
   <style>
     /* THEME VARIABLES (expanded ~3x) */
     :root{
       /* Light Theme VIBRANT */
-      --bg-grad:linear-gradient(135deg,#e0f2fe 0%,#f0f9ff 100%); /* Light Blue/Sky */
+      --bg-grad:linear-gradient(135deg,#ffffff 0%,#e0f2ff 100%); /* clean white to blue */
       --glass:rgba(255,255,255,.9);
       --panel-bg:rgba(255,255,255,.98);
       --panel-border:rgba(0,0,0,0.1);
@@ -50,7 +50,7 @@
     }
     html.dark{
       /* Dark Theme VIBRANT */
-      --bg-grad:linear-gradient(135deg,#0c0a09 0%,#1c1917 100%); /* Stone/Black */
+      --bg-grad:linear-gradient(135deg,#0c0a09 0%,#1c1917 50%,#3b0764 100%); /* dark with subtle purple */
       --glass:rgba(25,30,45,.75);
       --panel-bg:rgba(20,20,25,.9);
       --panel-border:rgba(255,255,255,0.1);
@@ -287,7 +287,7 @@
     }
 
     #market-items-grid, #market-owned-grid {
-      max-height: calc(60vh - 120px);
+      max-height: calc(75vh - 120px);
       overflow-y: auto;
       padding-right: 6px;
     }
@@ -298,6 +298,16 @@
       border: 1px solid var(--panel-border) !important;
       box-shadow: var(--shadow);
       transition: transform .12s ease;
+    }
+
+    #rank-up-modal .p-5 {
+      background:var(--panel-bg)!important;
+      color:var(--text-primary)!important;
+      border:1px solid var(--panel-border)!important;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border-radius:1rem;
+      padding:1.25rem;
+      transition:transform .18s ease, box-shadow .18s ease;
     }
   </style>
 </head>
