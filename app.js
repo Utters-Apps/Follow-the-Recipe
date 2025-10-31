@@ -57,6 +57,7 @@ function buildLayout() {
       <button id="welcome-play-button" class="btn-main w-full bg-green-500 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg">
         <i class="fas fa-play mr-2"></i> Jogar
       </button>
+      <div class="mt-2 text-xs opacity-70">Desenvolvido inteiramente por <span class="font-semibold">FerUtter (Gustavo F. P.)</span></div>
       <div class="mt-auto flex justify-between items-center w-full text-gray-500 text-sm">
         <button id="reset-button-welcome" class="hover:text-red-500 hover:underline transition-colors"><i class="fas fa-trash-alt mr-1"></i> Resetar Progresso</button>
         <button id="theme-toggle-welcome" class="btn-theme w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-moon"></i></button>
@@ -68,6 +69,7 @@ function buildLayout() {
       <div id="rank-display" class="text-center mb-4 w-full">
         <div id="rank-icon" class="text-6xl mb-1">🧼</div>
         <h2 id="rank-name" class="text-2xl font-bold">Lava-pratos</h2>
+        <button id="view-upcoming-ranks" class="btn-main mt-2 bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm">Ver próximos ranques</button>
       </div>
       <div id="rank-goal" class="p-3 rounded-xl mb-4 text-center w-full shadow-inner border">
         <h4 class="text-base font-bold">Próximo Nível</h4>
@@ -75,6 +77,9 @@ function buildLayout() {
       </div>
       <button id="play-button" class="btn-main w-full bg-green-500 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg mb-3"><i class="fas fa-play mr-2"></i> Próximo Pedido</button>
       <button id="market-button" class="btn-main w-full bg-blue-500 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg"><i class="fas fa-store mr-2"></i> Mercado</button>
+      <div id="restaurants-button-container" class="mt-2 hidden">
+        <button id="restaurants-button" class="btn-main w-full bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl text-lg"><i class="fas fa-utensils mr-2"></i> Meus Restaurantes</button>
+      </div>
       <div class="mt-auto flex justify-between items-center w-full text-gray-500 text-sm">
         <button id="reset-button-menu" class="hover:text-red-500 hover:underline transition-colors"><i class="fas fa-trash-alt mr-1"></i> Resetar Progresso</button>
         <button id="theme-toggle-menu" class="btn-theme w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-moon"></i></button>
@@ -119,10 +124,13 @@ function buildLayout() {
 
     <!-- Market (tabs) -->
     <div id="market-screen" class="screen flex-col hidden h-full">
-      <header class="border-b p-3 flex justify-between items-center z-10">
-        <button id="menu-button-market" class="text-2xl w-10 h-10 flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
-        <h2 class="text-xl font-bold">Mercado</h2>
-        <div id="money-display-market" class="money-pill font-bold px-5 py-2 rounded-full text-lg shadow-md">$50</div>
+      <header class="border-b p-3 flex items-center justify-center z-10 relative">
+        <button id="menu-button-market" class="absolute left-3 text-2xl w-10 h-10 flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
+        <h2 class="text-xl font-bold text-center">Mercado</h2>
+        <div class="absolute right-3 flex items-center gap-2">
+          <div id="money-display-market" class="money-pill font-bold px-5 py-2 rounded-full text-lg shadow-md">$50</div>
+          <div id="stars-display-market" class="money-pill font-bold px-3 py-2 rounded-full text-lg shadow-md">0.0 ★</div>
+        </div>
       </header>
       <main class="flex-1 p-3 overflow-y-auto w-full space-y-3">
         <div class="tabbar">
@@ -132,6 +140,20 @@ function buildLayout() {
         <div id="market-items-grid" class="space-y-3"></div>
         <div id="market-owned-grid" class="space-y-3 hidden"></div>
       </main>
+    </div>
+
+    <!-- Create Restaurant Screen -->
+    <div id="create-restaurant-screen" class="screen p-6 flex flex-col items-center justify-start text-center h-full hidden">
+      <h2 class="text-2xl font-bold mb-2">Criar Novo Restaurante</h2>
+      <input id="new-resto-name-full" placeholder="Nome do restaurante" class="w-full p-3 rounded-xl border mb-3" maxlength="24">
+      <label class="w-full text-left font-semibold mb-2">Culinária</label>
+      <div id="create-cuisine-choices" class="grid grid-cols-2 gap-2 w-full mb-4">
+        ${[{n:"Brasileiro",e:"🇧🇷"},{n:"Italiano",e:"🇮🇹"},{n:"Japonês",e:"🇯🇵"},{n:"Mexicano",e:"🇲🇽"},{n:"Francês",e:"🇫🇷"}].map(c=>`<button class="create-cuisine-btn btn-main w-full p-3 rounded-xl border" data-cuisine="${c.n}">${c.e} ${c.n}</button>`).join('')}
+      </div>
+      <div class="w-full flex gap-2">
+        <button id="create-resto-confirm" class="btn-main w-full bg-purple-600 text-white font-bold py-3 rounded-lg">Criar Restaurante</button>
+        <button id="create-resto-cancel" class="btn-main w-full bg-gray-300 font-bold py-3 rounded-lg">Cancelar</button>
+      </div>
     </div>
 
     <!-- Modals -->
@@ -196,6 +218,39 @@ function buildLayout() {
         </div>
       </div>
     </div>
+
+    <!-- Restaurants Modal -->
+    <div id="restaurants-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center p-6">
+      <div class="card p-5 rounded-2xl w-full max-w-md text-left">
+        <h3 class="text-2xl font-bold mb-2">Restaurantes</h3>
+        <div id="restaurants-list" class="space-y-2 max-h-64 overflow-y-auto mb-4"></div>
+        <div class="flex gap-2">
+          <input id="new-resto-name" class="flex-1 p-3 rounded-lg border" placeholder="Nome do novo restaurante (máx 6)" maxlength="24">
+          <button id="create-resto" class="btn-main bg-green-500 text-white px-4 py-3 rounded-lg">Criar</button>
+        </div>
+        <div class="mt-3 text-sm text-gray-500">Você pode ter até 6 restaurantes.</div>
+        <div class="mt-4 flex justify-end">
+          <button id="close-restaurants" class="btn-main bg-gray-300 px-4 py-2 rounded-lg">Fechar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Ranks Modal -->
+    <div id="upcoming-ranks-modal" class="hidden absolute inset-0 z-60 flex items-center justify-center p-6">
+      <div class="card modal-card modal-scrim-pane p-0 rounded-2xl w-full max-w-md">
+        <div class="p-4 modal-card" role="dialog" aria-modal="true" aria-labelledby="upcoming-ranks-title">
+          <div class="flex items-center justify-between mb-3">
+            <h3 id="upcoming-ranks-title" class="text-2xl font-bold">Próximos Ranques</h3>
+            <button id="close-upcoming-ranks" aria-label="Fechar próximos ranques" class="btn-main btn-ghost px-3 py-2 rounded-lg">Fechar</button>
+          </div>
+          <div id="upcoming-ranks-list" class="space-y-2 max-h-64 overflow-y-auto mb-4" tabindex="0" aria-live="polite"></div>
+          <div class="modal-actions flex justify-end gap-2">
+            <!-- Footer kept intentionally minimal to avoid duplicated close controls -->
+            <div style="width:0;height:0;overflow:hidden" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   `;
 }
@@ -209,9 +264,16 @@ function setTheme(t){ localStorage.setItem(THEME_KEY, t); }
 
 let gameState = loadFromStorage(SAVE_KEY) || {
   money: 50,
+  // single-restaurant legacy fields kept for migration
   unlockedRecipeNames: ["Misto Quente","Limonada","Café"],
   unlockedIngredientIds: ["pao","manteiga","queijo","tomate","limao","mel","gelo","ervas","cafe","leite"],
-  rank: 0
+  rank: 0,
+  // new restaurants structure
+  restaurants: [
+    // default restaurant (migrated from legacy fields on init if needed)
+    { id: crypto?.randomUUID?.() || 'r0', name: 'Meu Restaurante', cuisine: null, unlockedRecipeNames: ["Misto Quente","Limonada","Café"], unlockedIngredientIds: ["pao","manteiga","queijo","tomate","limao","mel","gelo","ervas","cafe","leite"], rank:0 }
+  ],
+  activeRestaurantIndex: 0
 };
 
 let profile = {
@@ -307,13 +369,14 @@ const pauseModal = query('pause-modal');
 const pauseResume = query('pause-resume');
 const pauseReturnMenu = query('pause-return-menu');
 const musicToggle = query('music-toggle');
+const createRestaurantScreen = query('create-restaurant-screen'); // add ref for create screen
 
 /* NEW: Loading Screen Ref */
 const loadingScreen = document.getElementById('loading-screen'); 
 
 /* ---------- Screen helpers ---------- */
 function showScreen(id){
-  const screens = [setupScreen, welcomeScreen, menuScreen, gameScreen, marketScreen];
+  const screens = [setupScreen, welcomeScreen, menuScreen, gameScreen, marketScreen, createRestaurantScreen];
   screens.forEach(s => {
     if (!s) return;
     if (s.id === id){
@@ -348,17 +411,145 @@ function getActiveRanks(){
   if (profile.cuisine && CUISINE_DEFS[profile.cuisine]) return CUISINE_DEFS[profile.cuisine];
   return RANKS;
 }
-function filterRecipesByCuisine(recipes){
-  if (!profile.cuisine) return recipes;
-  return recipes.filter(r => Array.isArray(r.cuisine) ? r.cuisine.includes(profile.cuisine) : true);
+function filterRecipesByCuisine(recipes, cuisine = null){
+  // allow callers to pass a cuisine (e.g. active restaurant's cuisine); fallback to profile.cuisine
+  const c = cuisine || profile.cuisine;
+  if (!c) return recipes;
+  return recipes.filter(r => Array.isArray(r.cuisine) ? r.cuisine.includes(c) : true);
 }
 
-/* Helper: starting unlocks per cuisine */
-function getStartingUnlocks(cuisine){
-  if (cuisine === 'Japonês') return ["Onigiri","Chá Verde","Sushi"];
-  if (cuisine === 'Halloween') return ["Ramen de Abóbora"];
-  return ["Misto Quente","Limonada","Café"];
+// helper: current restaurant accessor & migration
+function getActiveRestaurant(){
+  if (!gameState.restaurants || !Array.isArray(gameState.restaurants) || gameState.restaurants.length===0){
+    gameState.restaurants = [{ id: 'r0', name:'Meu Restaurante', cuisine: profile.cuisine || null, unlockedRecipeNames: gameState.unlockedRecipeNames || [], unlockedIngredientIds: gameState.unlockedIngredientIds || [], rank: gameState.rank || 0 }];
+    gameState.activeRestaurantIndex = 0;
+    saveGame();
+  }
+  // migrate legacy top-level lists into first restaurant if legacy fields exist
+  const r = gameState.restaurants[gameState.activeRestaurantIndex || 0];
+  if (!r.unlockedRecipeNames && gameState.unlockedRecipeNames) r.unlockedRecipeNames = gameState.unlockedRecipeNames;
+  return gameState.restaurants[gameState.activeRestaurantIndex || 0];
 }
+
+// New: produce exactly 2 starter recipes and ensure starters do NOT include any future rank-up recipe names
+function getStartingUnlocks(cuisine){
+  // cuisine-specific guaranteed starters
+  const cuisineStarters = {
+    "Brasileiro": ["Misto Quente","Limonada","Pão de Queijo"],
+    "Italiano": ["Salada Caprese","Gelato","Panna Cotta"],
+    "Japonês": ["Mochi","Tamagoyaki","Yakitori"],
+    "Mexicano": ["Churros","Salsa Fresca","Água Fresca"],
+    "Francês": ["Croissant Recheado","Macarons","Pain Perdu"],
+    "Halloween": ["Café Preto (Espresso)","Biscoitos Fantasma"]
+  };
+  if (cuisine && cuisineStarters[cuisine]) {
+    // prefer to provide exactly the requested three (or two for Halloween)
+    const available = filterRecipesByCuisine(ALL_RECIPES).map(r=>r.name);
+    const starters = cuisineStarters[cuisine].filter(n => available.includes(n));
+    // ensure at least two starters; if less, fallback to previous behavior
+    if (starters.length >= 2) return starters.slice(0,3);
+  }
+
+  const pool = (cuisine ? filterRecipesByCuisine(ALL_RECIPES) : ALL_RECIPES)
+    .filter(r => r.minRank <= 1)
+    .sort((a,b)=>a.price - b.price);
+
+  // gather all dynamic rank-up recipe names for the cuisine to exclude from starters
+  const ranks = (cuisine ? CUISINE_DEFS[cuisine] : RANKS);
+  const forbidden = new Set();
+  for (let i=0;i<ranks.length-1;i++){
+    const name = getRankUnlockRecipeName(i, cuisine) || ranks[i+1]?.recipeToUnlock;
+    if (name) forbidden.add(name);
+  }
+
+  // prefer a couple of safe favorites but skip forbidden
+  const prefer = ["Misto Quente","Onigiri","Torrada","Limonada","Panqueca Doce","Bagel","Suco de Laranja"];
+  const starters = [];
+  prefer.forEach(name=>{
+    if (starters.length >= 2) return;
+    const found = pool.find(p=>p.name===name && !forbidden.has(p.name));
+    if (found) starters.push(found.name);
+  });
+  for (const r of pool){
+    if (starters.length >= 2) break;
+    if (!starters.includes(r.name) && !forbidden.has(r.name)) starters.push(r.name);
+  }
+  // final safety: if still less than 2, allow cheapest (but avoid exact match of forbidden)
+  if (starters.length < 2){
+    for (const r of pool){
+      if (starters.length>=2) break;
+      if (!starters.includes(r.name)) starters.push(r.name);
+    }
+  }
+  return starters.slice(0,2);
+}
+
+// NEW: ensure unlocked lists never include future rank-up required recipes for the cuisine
+function sanitizeUnlocks(cuisine, unlockedList){
+  if (!Array.isArray(unlockedList)) return [];
+  const ranks = (cuisine ? CUISINE_DEFS[cuisine] : RANKS);
+  // Collect all future required recipe names (all recipeToUnlock values across ranks)
+  const required = new Set();
+  for (let i = 0; i < ranks.length; i++){
+    const name = ranks[i]?.recipeToUnlock;
+    if (name) required.add(name);
+    // also include dynamic names via getRankUnlockRecipeName just in case
+    const dyn = getRankUnlockRecipeName(i, cuisine);
+    if (dyn) required.add(dyn);
+  }
+  // Keep unlocked recipes but remove any that match a future required recipe (they should be earned)
+  return unlockedList.filter(name => !required.has(name));
+}
+
+// ensure rank-up selection chooses a recipe that is purchasable (not already unlocked) and exists for that cuisine
+function getRankUnlockRecipeName(rankIndex, cuisine) {
+  const targetMinRank = rankIndex + 1;
+  // prefer all recipes whose minRank equals the target; if none, fall back to cheapest locked recipe for this cuisine
+  const pool = filterRecipesByCuisine(ALL_RECIPES)
+    .filter(r => r.minRank === targetMinRank && (!cuisine || (Array.isArray(r.cuisine) ? r.cuisine.includes(cuisine) : true)));
+  if (pool.length > 0) {
+    pool.sort((a,b)=>a.price-b.price);
+    return pool[0].name;
+  }
+  // fallback: find cheapest recipe that is not available at lower ranks (locked for this cuisine)
+  const fallback = filterRecipesByCuisine(ALL_RECIPES)
+    .filter(r => r.minRank > rankIndex && (!cuisine || (Array.isArray(r.cuisine) ? r.cuisine.includes(cuisine) : true)))
+    .sort((a,b)=>a.price-b.price)[0];
+  return fallback ? fallback.name : null;
+}
+
+// Show upcoming ranks modal content and handlers
+function showUpcomingRanks(){
+  const active = getActiveRestaurant();
+  const ranks = getActiveRanks();
+  const idx = Number.isInteger(active?.rank) ? active.rank : 0;
+  const listEl = document.getElementById('upcoming-ranks-list');
+  listEl.innerHTML = '';
+  for (let i = idx+1; i < ranks.length; i++){
+    const r = ranks[i];
+    const recipeName = getRankUnlockRecipeName(i-1, active.cuisine || profile.cuisine) || r.recipeToUnlock || '—';
+    const el = document.createElement('div');
+    el.className = 'rank-entry soft-transition';
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;">
+        <div class="rank-icon">${r.icon || '🏅'}</div>
+        <div>
+          <div class="font-bold">${r.name}</div>
+          <div class="rank-meta">Meta: <span class="font-semibold">${recipeName}</span></div>
+        </div>
+      </div>
+      <div class="meta-badge">+${r.baseReward || 0}</div>
+    `;
+    listEl.appendChild(el);
+  }
+  const modal = document.getElementById('upcoming-ranks-modal');
+  modal.classList.remove('hidden');
+  // subtle focus for accessibility
+  setTimeout(()=>{ listEl.focus(); }, 120);
+}
+document.getElementById('view-upcoming-ranks')?.addEventListener('click', ()=>{ playSound('click'); showUpcomingRanks(); });
+document.getElementById('close-upcoming-ranks')?.addEventListener('click', ()=>{ playSound('click'); document.getElementById('upcoming-ranks-modal').classList.add('hidden'); });
+/* removed duplicate footer close listener to avoid two visible/competing close buttons */
 
 /* ---------- Renderers ---------- */
 function updateAllMoneyDisplays(){
@@ -373,26 +564,66 @@ function updateAllMoneyDisplays(){
       setTimeout(()=>d.classList.remove('scale-110'),300); // Adjusted timing for enhanced animation
     } 
   });
-}
 
-function updateRankDisplay(){
-  const ranks = getActiveRanks();
-  const current = ranks[gameState.rank] || ranks[0];
-  rankIcon.textContent = current.icon;
-  rankName.textContent = current.name;
-  const nextRank = ranks[gameState.rank+1];
-  if (nextRank){
-    const goal = current.recipeToUnlock || '—';
-    rankGoal.style.display = 'block';
-    rankGoalText.innerHTML = `Compre a receita <span class="font-bold">${goal}</span> no Mercado para atingir <span class="text-purple-600">${nextRank.name}</span>!`;
-  } else {
-    rankGoal.style.display = 'none';
+  // NEW: show Stars (restaurant rating) next to money displays
+  try {
+    const active = getActiveRestaurant();
+    const starsVal = Number((active && typeof active.stars !== 'undefined') ? active.stars : 0).toFixed(1);
+
+    // helper to ensure a stars element is present adjacent to a money element
+    function ensureStarsElement(moneyEl, id){
+      if (!moneyEl) return null;
+      let starsEl = document.getElementById(id);
+      if (!starsEl){
+        starsEl = document.createElement('div');
+        starsEl.id = id;
+        // use purple stars-pill styling so stars appear consistent and prominent
+        starsEl.className = 'stars-pill';
+        starsEl.style.fontSize = '1rem';
+        // insert right after money element
+        moneyEl.insertAdjacentElement('afterend', starsEl);
+      }
+      return starsEl;
+    }
+
+    const gameStars = ensureStarsElement(moneyDisplayGame, 'stars-display-game');
+    const marketStars = ensureStarsElement(moneyDisplayMarket, 'stars-display-market');
+
+    const starHTML = `${starsVal} ★`;
+    if (gameStars) gameStars.textContent = starHTML;
+    if (marketStars) marketStars.textContent = starHTML;
+  } catch(e){
+    console.warn('Failed to render stars display', e);
   }
 }
 
+function updateRankDisplay(){
+  // Always derive the rank list for the active restaurant (cuisine-specific)
+  const active = getActiveRestaurant();
+  const ranks = getActiveRanks();
+  const idx = Number.isInteger(active?.rank) ? active.rank : 0;
+  const current = ranks[idx] || ranks[0];
+  rankIcon.textContent = current?.icon || '🏅';
+  rankName.textContent = current?.name || 'Chef';
+
+  // Next rank (if any) - compute target dynamically
+  const nextRank = ranks[idx + 1];
+  if (nextRank){
+    const cuisine = (active && (active.cuisine || profile.cuisine)) || null;
+    const goalName = getRankUnlockRecipeName(idx, cuisine) || String(nextRank.recipeToUnlock || '—');
+    if (goalName && goalName !== 'null'){
+      rankGoal.style.display = 'block';
+      rankGoalText.innerHTML = `Compre a receita <span class="font-bold">${goalName}</span> no Mercado para atingir <span class="text-purple-600">${nextRank.name}</span>!`;
+      return;
+    }
+  }
+  rankGoal.style.display = 'none';
+}
+
 function renderUnlockedIngredientBin(){
+  const active = getActiveRestaurant();
   ingredientBin.innerHTML = '';
-  const ids = [...gameState.unlockedIngredientIds].sort(()=>Math.random()-0.5); // shuffle base pool
+  const ids = [...(active.unlockedIngredientIds||[])].sort(()=>Math.random()-0.5);
   let visible = ids.slice(0,15);
   if (session?.currentOrder?.recipe){
     session.currentOrder.recipe.forEach(nid=>{
@@ -401,7 +632,7 @@ function renderUnlockedIngredientBin(){
         else visible[Math.floor(Math.random()*visible.length)] = nid;
       }
     });
-    visible = Array.from(new Set(visible)).slice(0,15).sort(()=>Math.random()-0.5); // ensure include + shuffle
+    visible = Array.from(new Set(visible)).slice(0,15).sort(()=>Math.random()-0.5);
   }
   visible.forEach(id=>{
     const btn = document.createElement('button');
@@ -414,21 +645,25 @@ function renderUnlockedIngredientBin(){
 
 /* Market render with tabs */
 function renderMarket(){
-  const ranks = getActiveRanks();
+  const active = getActiveRestaurant();
   marketItemsGrid.innerHTML = '';
   marketOwnedGrid.innerHTML = '';
 
-  const currentRank = ranks[gameState.rank];
+  const ranks = getActiveRanks();
+  // use active.unlockedRecipeNames and active.rank
+  const currentRank = ranks[active.rank || 0];
   const rankUp = [], buyable = [], locked = [], unlocked = [];
 
+  const cuisine = active.cuisine || profile.cuisine || null;
+  // Determine next rank unlock suggestion (may be dynamic or fallback)
+  const nextRankRecipeName = getRankUnlockRecipeName((active.rank||0), cuisine);
+
   filterRecipesByCuisine(ALL_RECIPES).forEach(recipe=>{
-    const isUnlocked = gameState.unlockedRecipeNames.includes(recipe.name);
-    let isBuyable = gameState.rank >= recipe.minRank;
-    const isRankUpCard = currentRank && currentRank.recipeToUnlock && recipe.name === currentRank.recipeToUnlock && !isUnlocked;
-    
-    if (isRankUpCard) {
-      isBuyable = true; // Override minRank if it's the mandatory rank-up recipe
-    }
+    const isUnlocked = (active.unlockedRecipeNames||[]).includes(recipe.name);
+    let isBuyable = (active.rank || 0) >= recipe.minRank;
+    // if recipe is the dynamic required recipe for next rank, allow purchase (but only if not already unlocked)
+    const isRankUpCard = nextRankRecipeName && recipe.name === nextRankRecipeName && !isUnlocked;
+    if (isRankUpCard) isBuyable = true;
     
     const entry = { recipe, isUnlocked, isBuyable, isRankUpCard };
     if (isRankUpCard) rankUp.push(entry);
@@ -491,16 +726,24 @@ function saveGame(){ saveToStorage(SAVE_KEY, gameState); }
 
 function resetGame(){
   playSound('error');
-  localStorage.removeItem(SAVE_KEY);
-  localStorage.removeItem(RESTO_NAME_KEY);
-  localStorage.removeItem(CUISINE_KEY);
-  gameState = { money:50, unlockedRecipeNames:["Misto Quente","Limonada","Café"], unlockedIngredientIds:["pao","manteiga","queijo","tomate","limao","mel","gelo","ervas","cafe","leite"], rank:0 };
+  try { if (bgAudio) { bgAudio.pause(); bgAudio.currentTime = 0; } } catch(e){}
+  // Ensure any open modals are closed
+  document.getElementById('confirm-reset-modal')?.classList.add('hidden');
+  document.getElementById('market-message-modal')?.classList.add('hidden');
+  document.getElementById('rank-up-modal')?.classList.add('hidden');
+  document.getElementById('pause-modal')?.classList.add('hidden');
+  document.getElementById('auto-offer-modal')?.classList.add('hidden');
+
+  localStorage.clear();
+  gameState = { money:50, restaurants:[{ id:'r0', name:'Meu Restaurante', cuisine:null, unlockedRecipeNames:[], unlockedIngredientIds:[], rank:0 }], activeRestaurantIndex:0 };
   profile = { restoName:null, cuisine:null };
   saveGame();
+  // UI back to first-run
   updateRankDisplay();
-  confirmResetModal.classList.add('hidden');
+  document.getElementById('restaurants-modal')?.classList.add('hidden');
   showScreen('setup-screen');
   renderMarket();
+  renderUnlockedIngredientBin();
   updateAllMoneyDisplays();
 }
 
@@ -510,41 +753,71 @@ function showMarketMessage(title,text,isSuccess=true){
   marketMessageText.textContent = text;
   marketMessageIcon.className = `fas ${isSuccess ? 'fa-check-circle text-green-500' : 'fa-times-circle text-red-500'}`;
   marketMessageModal.classList.remove('hidden');
+  // add scrim class for theme aware background and animate content
+  marketMessageModal.classList.add('modal-scrim-pane');
+  marketMessageContent.classList.add('modal-card', 'soft-transition');
+  // focus OK button
+  setTimeout(()=>{ document.getElementById('market-message-close')?.focus(); }, 180);
 }
 function showRankUpModal(){
   playSound('success');
+  const active = getActiveRestaurant();
   const ranks = getActiveRanks() || RANKS;
-  // Ensure we have a valid index (clamp between 0 and last)
-  const idx = Math.max(0, Math.min(gameState.rank, ranks.length - 1));
+  const idx = Math.max(0, Math.min((active && typeof active.rank==='number')?active.rank:0, ranks.length-1));
   const rankDef = ranks[idx] || ranks[0];
   rankUpIconModal.textContent = rankDef.icon || '🏅';
   rankUpText.textContent = `Parabéns, você agora é ${rankDef.name || 'Chef'}!`;
   rankUpModal.classList.remove('hidden');
+  rankUpModal.classList.add('modal-scrim-pane');
+  // animate inner card
+  const inner = rankUpModal.querySelector('.p-5');
+  inner && inner.classList.add('modal-card','soft-transition');
+  updateRankDisplay();
 }
 
 function buyRecipe(recipeName){
   const recipe = ALL_RECIPES.find(r=>r.name===recipeName);
   if (!recipe) return;
+  const active = getActiveRestaurant();
   if (gameState.money >= recipe.price){
     playSound('buy');
     gameState.money -= recipe.price;
-    gameState.unlockedRecipeNames.push(recipe.name);
-    const s = new Set(gameState.unlockedIngredientIds);
+    active.unlockedRecipeNames = Array.from(new Set([...(active.unlockedRecipeNames||[]), recipe.name]));
+    const s = new Set(active.unlockedIngredientIds || []);
     [...recipe.baseRecipe, ...recipe.optionalIngredients].forEach(id=>s.add(id));
-    gameState.unlockedIngredientIds = Array.from(s);
-
-    // Rank progression by cuisine
+    active.unlockedIngredientIds = Array.from(s);
+    // After purchase check if this purchase satisfies any rank-up(s).
     const ranks = getActiveRanks();
-    if (ranks[gameState.rank] && ranks[gameState.rank].recipeToUnlock === recipe.name){
-      gameState.rank++;
-      updateRankDisplay();
+    let currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+    const cuisine = active.cuisine || profile.cuisine || null;
+    // Only advance a single rank if the purchased recipe exactly matches the next rank goal AND stars requirement is met.
+    let advanced = false;
+    if (currIdx < ranks.length - 1){
+      const nextIdx = currIdx + 1;
+      const nextGoalName = getRankUnlockRecipeName(currIdx, cuisine) || ranks[nextIdx]?.recipeToUnlock;
+      // Use the configured requiredStars from the rank definition (no extraneous +1.0)
+      const requiredStars = Number(ranks[nextIdx]?.requiredStars || 0);
+      const activeStars = Number(active.stars || 0);
+      if (nextGoalName && nextGoalName === recipe.name){
+        if (activeStars >= requiredStars){
+          currIdx = nextIdx;
+          advanced = true;
+        } else {
+          // Inform player they bought the recipe but lack stars to promote
+          showMarketMessage("Comprado — Estrelas insuficientes", `Você aprendeu ${recipe.name}, mas precisa de ★${requiredStars.toFixed(1)} para subir de ranque.`, false);
+        }
+        // Do NOT auto-unlock other recipes here; players should buy them individually.
+      }
+    }
+    if (advanced){
+      active.rank = Math.min(currIdx, Math.max(0, ranks.length - 1));
+      saveGame();
       showRankUpModal();
     } else {
-      showMarketMessage("Receita Comprada!", `Você aprendeu a fazer ${recipe.name}!`, true);
+      // only show generic message if not already shown for star-blocked promotion
+      if (!advanced) showMarketMessage("Receita Comprada!", `Você aprendeu a fazer ${recipe.name}!`, true);
     }
-    saveGame();
-    renderMarket();
-    updateAllMoneyDisplays();
+    saveGame(); renderMarket(); updateAllMoneyDisplays();
   } else {
     playSound('error');
     showMarketMessage("Dinheiro Insuficiente!", `Você precisa de $${recipe.price}.`, false);
@@ -552,14 +825,15 @@ function buyRecipe(recipeName){
 }
 
 function getTimerDuration(){
+  const active = getActiveRestaurant();
   const ranks = getActiveRanks();
-  const base = BASE_TIMER_DURATION; 
-  const maxDifficultyRanks = ranks.length - 1;
-  const difficultyFactor = Math.min(maxDifficultyRanks * 1.5, gameState.rank + (session.isVIP ? 1 : 0)); 
-  
-  let dur = Math.max(MIN_TIMER_DURATION, base - Math.round(difficultyFactor * 1.5)); 
+  const base = BASE_TIMER_DURATION;
+  const maxDifficultyRanks = Math.max(0, ranks.length - 1);
+  const activeRank = (active && typeof active.rank === 'number') ? active.rank : 0;
+  const difficultyFactor = Math.min(maxDifficultyRanks * 1.5, activeRank + (session.isVIP ? 1 : 0));
+  let dur = Math.max(MIN_TIMER_DURATION, base - Math.round(difficultyFactor * 1.5));
   if (session.isRushHour) dur = Math.max(MIN_TIMER_DURATION-2, Math.round(dur * RUSH_HOUR_TIMER_MULTIPLIER));
-  if (dur < 3) dur = 3; // Absolute minimum time to prevent instant loss
+  if (dur < 3) dur = 3;
   return dur;
 }
 
@@ -627,22 +901,22 @@ function startNewOrder(){
   session.isRushHour = Math.random() < Math.min(RUSH_HOUR_CHANCE_BASE + gameState.rank*RUSH_HOUR_CHANCE_PER_RANK, 0.45);
   if (session.isRushHour) rushHourBanner.classList.remove('hidden'); else rushHourBanner.classList.add('hidden');
 
-  // Safe recipe pool selection (prevents undefined currentOrder)
-  const unlockedRecipes = ALL_RECIPES.filter(r => gameState.unlockedRecipeNames.includes(r.name));
+  // Safe recipe pool selection (per-restaurant)
+  const active = getActiveRestaurant();
+  const unlockedRecipes = ALL_RECIPES.filter(r => (active.unlockedRecipeNames||[]).includes(r.name));
   const availableByCuisine = filterRecipesByCuisine(unlockedRecipes);
   const pool = (availableByCuisine.length > 0 ? availableByCuisine : unlockedRecipes);
   if (pool.length === 0){
-    // Fallback: if no unlocked recipes found, unlock a basic one and retry
     const fallback = ALL_RECIPES.find(r => r.name === "Misto Quente") || ALL_RECIPES[0];
-    if (fallback && !gameState.unlockedRecipeNames.includes(fallback.name)){
-      gameState.unlockedRecipeNames.push(fallback.name);
-      const s = new Set(gameState.unlockedIngredientIds);
+    if (fallback && !(active.unlockedRecipeNames||[]).includes(fallback.name)){
+      active.unlockedRecipeNames = [...(active.unlockedRecipeNames||[]), fallback.name];
+      const s = new Set(active.unlockedIngredientIds||[]);
       [...fallback.baseRecipe, ...fallback.optionalIngredients].forEach(i=>s.add(i));
-      gameState.unlockedIngredientIds = Array.from(s);
+      active.unlockedIngredientIds = Array.from(s);
       saveGame();
     }
   }
-  const finalPool = (pool.length > 0 ? pool : ALL_RECIPES.filter(r => gameState.unlockedRecipeNames.includes(r.name)));
+  const finalPool = (pool.length > 0 ? pool : ALL_RECIPES.filter(r => (active.unlockedRecipeNames||[]).includes(r.name)));
   session.currentOrder = finalPool[Math.floor(Math.random()*finalPool.length)];
   if (!session.currentOrder || !Array.isArray(session.currentOrder.baseRecipe)){
     // Last guard: show menu and prompt user to buy recipes
@@ -683,20 +957,29 @@ function checkOrder(isSuccess, reason=''){
   if (!session.gameActive) return;
   session.gameActive = false;
   stopTimer(true);
+  const active = getActiveRestaurant();
   if (isSuccess){
     playOutcomeAudio('success');
     session.currentStreak++;
-    
-    // Increased base reward calculation to match increased progression difficulty
+    // Every time the player completes 2 correct orders in a row, award +0.1 stars (clamped to 5.0)
+    const active = getActiveRestaurant(); // ensure single active binding used
+    if (session.currentStreak > 0 && session.currentStreak % 2 === 0){
+      active.stars = Math.min(5.0, Number((Number(active.stars || 0) + 0.1).toFixed(1)));
+    }
+
     const ranks = getActiveRanks();
-    const currentRankDef = ranks[gameState.rank] || ranks[0];
-    const baseReward = currentRankDef.baseReward || 12; // Use defined base reward
-    
+    const activeIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+    const baseReward = (ranks[activeIdx]?.baseReward) ?? 12;
     const streakBonus = Math.max(3, Math.round(baseReward*0.2));
     const streakExtra = (session.currentStreak-1)*streakBonus;
     let total = baseReward + streakExtra;
     if (session.isRushHour){ total = (baseReward*2)+(streakExtra*2); session.isRushHour = false; }
     if (session.isVIP){ total = Math.round(total * VIP_REWARD_MULTIPLIER); }
+
+    // Scale reward by stars: stars in [0..5] map to multiplier roughly 0.8..1.4
+    const starsVal = Number(active.stars || 0);
+    const starMultiplier = 0.8 + (Math.max(0, Math.min(5, starsVal)) / 5) * 0.6;
+    total = Math.round(total * starMultiplier);
     gameState.money += total;
     updateAllMoneyDisplays();
     successMessage.textContent = `Perfeito! +$${total}`;
@@ -710,7 +993,11 @@ function checkOrder(isSuccess, reason=''){
     playOutcomeAudio('fail');
     session.currentStreak = 0;
     session.isRushHour = false;
-    let penalty = PENALTY_FAILURE + Math.round(gameState.rank * BASE_PENALTY_PER_RANK);
+    // on failure lose 0.1 stars (clamped to 0.0)
+    const active = getActiveRestaurant(); // use same active here
+    active.stars = Math.max(0.0, Number((Number(active.stars || 0) - 0.1).toFixed(1)));
+    const activeRank = (active && typeof active.rank === 'number') ? active.rank : 0;
+    let penalty = PENALTY_FAILURE + Math.round(activeRank * BASE_PENALTY_PER_RANK);
     if (session.isVIP) penalty += VIP_PENALTY_BONUS;
     if (gameState.money < penalty) penalty = gameState.money;
     gameState.money -= penalty;
@@ -836,9 +1123,13 @@ setupConfirm.addEventListener('click', ()=>{
     const r = ALL_RECIPES.find(r=>r.name===rn);
     if (r){ [...r.baseRecipe, ...(r.optionalIngredients||[])].forEach(i=>ingSet.add(i)); }
   });
+
+  // sanitize starting recipe list to ensure no future required-rank recipe is pre-unlocked
+  const sanitizedStarters = sanitizeUnlocks(selectedCuisine, startRecipes);
+
   gameState = {
     money: 50,
-    unlockedRecipeNames: startRecipes,
+    unlockedRecipeNames: sanitizedStarters,
     unlockedIngredientIds: Array.from(ingSet),
     rank: 0
   };
@@ -864,6 +1155,24 @@ setupConfirm.addEventListener('click', ()=>{
 welcomePlayButton.addEventListener('click', ()=>{
   initializeAudio().catch(()=>{});
   tryPlayBgMusic();
+
+  // Show a short tutorial the first time the player clicks Play
+  const TKEY = 'recipeGameSeenTutorial_v1';
+  const seen = localStorage.getItem(TKEY) === '1';
+  if (!seen){
+    showMarketMessage("Bem-vindo! Como jogar","Clique em 'Próximo Pedido' para receber um pedido, selecione os ingredientes exibidos na ordem mostrada e complete a receita antes do tempo acabar. Acertar 2 pedidos seguidos aumenta sua avaliação (★) — boas avaliações aumentam seus ganhos. Visite o Mercado para comprar novas receitas.", true);
+    localStorage.setItem(TKEY,'1');
+    // after player closes the modal they'll enter menu; ensure modal close returns them to menu
+    const originalHandler = marketMessageClose.onclick;
+    marketMessageClose.onclick = function(e){
+      originalHandler && originalHandler(e);
+      showScreen('menu-screen');
+      // restore handler
+      setTimeout(()=>{ marketMessageClose.onclick = originalHandler; },200);
+    };
+    return;
+  }
+
   showScreen('menu-screen');
 });
 
@@ -902,7 +1211,11 @@ marketMessageClose.addEventListener('click', ()=>{ playSound('click'); marketMes
 resetButtonWelcome.addEventListener('click', showConfirmResetModal);
 resetButtonMenu.addEventListener('click', showConfirmResetModal);
 confirmResetCancel.addEventListener('click', ()=>{ playSound('click'); confirmResetModal.classList.add('hidden'); });
-confirmResetConfirm.addEventListener('click', resetGame);
+confirmResetConfirm.addEventListener('click', ()=>{
+  // Close modal before resetting to avoid lingering overlay
+  confirmResetModal.classList.add('hidden');
+  resetGame();
+});
 rankUpClose.addEventListener('click', ()=>{ rankUpModal.classList.add('hidden'); });
 themeToggleWelcome && themeToggleWelcome.addEventListener('click', toggleTheme);
 themeToggleMenu && themeToggleMenu.addEventListener('click', toggleTheme);
@@ -913,13 +1226,25 @@ tabOwned.addEventListener('click', ()=>{ activateTab('owned'); });
 
 /* ---------- Init ---------- */
 function init(){
+  // migrate legacy top-level fields into restaurants if needed
+  if (!gameState.restaurants || !Array.isArray(gameState.restaurants)){
+    const migrated = { id: 'r0', name:'Meu Restaurante', cuisine: profile.cuisine || null, unlockedRecipeNames: gameState.unlockedRecipeNames || [], unlockedIngredientIds: gameState.unlockedIngredientIds || [], rank: gameState.rank || 0 };
+    // sanitize migrated unlocked recipes so required rank recipes are not pre-bought
+    migrated.unlockedRecipeNames = sanitizeUnlocks(migrated.cuisine, migrated.unlockedRecipeNames || []);
+    gameState.restaurants = [migrated];
+    gameState.activeRestaurantIndex = 0;
+    // remove legacy top-level lists (kept but not used)
+    delete gameState.unlockedRecipeNames; delete gameState.unlockedIngredientIds; delete gameState.rank;
+    saveGame();
+  }
+
   loadTheme();
   initBackgroundMusic(); // prepare audio object; playback happens on user actions
   updateAllMoneyDisplays();
   renderUnlockedIngredientBin();
   renderMarket();
+  renderRestaurantsButtonIfEligible();
 
-  // First-run setup
   if (!profile.restoName || !profile.cuisine){
     showScreen('setup-screen');
   } else {
@@ -949,28 +1274,105 @@ const offerBuy = document.getElementById('offer-buy');
 let pendingOffer = null;
 
 function findAffordableRecipe() {
+  const active = getActiveRestaurant();
   const ranks = getActiveRanks();
-  const currentRank = ranks[gameState.rank];
-  const pool = filterRecipesByCuisine(ALL_RECIPES)
-    .filter(r=>!gameState.unlockedRecipeNames.includes(r.name) && gameState.rank>=r.minRank);
-  if (currentRank?.recipeToUnlock){
-    const mandatory = pool.find(r=>r.name===currentRank.recipeToUnlock);
-    if (mandatory && gameState.money>=mandatory.price) return mandatory;
+  const activeIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+  const currentRank = ranks[activeIdx];
+
+  // Consider all not-yet-unlocked recipes of the active cuisine
+  let notUnlockedAll = filterRecipesByCuisine(ALL_RECIPES)
+    .filter(r => !(active.unlockedRecipeNames||[]).includes(r.name));
+
+  // If the mandatory recipe for the next rank exists but has been already purchased, treat as not available.
+  if (currentRank?.recipeToUnlock) {
+    const mandatory = notUnlockedAll.find(r => r.name === currentRank.recipeToUnlock);
+    // Only return mandatory if it's truly not yet unlocked and affordable
+    if (mandatory && gameState.money >= mandatory.price) return mandatory;
   }
-  const cheapest = pool.sort((a,b)=>a.price-b.price)[0];
-  return (cheapest && gameState.money>=cheapest.price) ? cheapest : null;
+
+  // Otherwise pick the cheapest allowed by current rank but ensure it's not already unlocked and within cuisine
+  const pool = notUnlockedAll.filter(r => activeIdx >= r.minRank);
+  // if pool is empty try to fallback to any notUnlocked regardless of minRank (but must be affordable)
+  let candidate = pool.sort((a,b)=>a.price-b.price)[0];
+  if (!candidate) candidate = notUnlockedAll.sort((a,b)=>a.price-b.price)[0];
+  return (candidate && gameState.money>=candidate.price) ? candidate : null;
 }
 
 function showAutoOffer(recipe){
+  // validate recipe is still not unlocked and affordable (race safety)
+  const active = getActiveRestaurant();
+  if (!recipe || (active.unlockedRecipeNames||[]).includes(recipe.name) || gameState.money < recipe.price){
+    // try to find another valid offer; if none, just start next order
+    const alt = findAffordableRecipe();
+    if (!alt) { startNewOrder(); return; }
+    recipe = alt;
+  }
   pendingOffer = recipe;
+
+  // Determine next-rank requirement if this recipe is the rank-up recipe
+  const ranks = getActiveRanks();
+  const currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+  const nextIdx = Math.min(ranks.length - 1, currIdx + 1);
+  const nextDef = ranks[nextIdx] || null;
+  let starsNeeded = null;
+  if (nextDef){
+    // use configured requiredStars (no additional +1.0)
+    const baseReq = Number(nextDef.requiredStars || 0);
+    starsNeeded = Number((baseReq).toFixed(1));
+  }
+
+  // Build modal content with clearer presentation
   offerTitle.textContent = `Você pode comprar: ${recipe.name}`;
-  offerDesc.innerHTML = `<span class="text-4xl mr-2">${recipe.emoji}</span> Preço: $${recipe.price}`;
+  let starsInfo = '';
+  if (starsNeeded !== null){
+    const have = Number(active.stars || 0);
+    const meets = have >= starsNeeded;
+    starsInfo = `<div style="margin-top:.5rem; color:${meets ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">Requer: ${starsNeeded} ★ — Você: ${have.toFixed(1)} ★ ${meets ? '✓' : '✕'}</div>`;
+  }
+  offerDesc.innerHTML = `<div style="display:flex;align-items:center;gap:.6rem;justify-content:center">
+      <span style="font-size:2.2rem">${recipe.emoji}</span>
+      <div style="text-align:left">
+        <div style="font-weight:800;font-size:1.05rem">${recipe.name}</div>
+        <div style="opacity:.85">Preço: <span style="font-weight:700">$${recipe.price}</span></div>
+        ${starsInfo}
+      </div>
+    </div>`;
   autoOfferModal.classList.remove('hidden');
+  // ensure it's shown as modal-wrap for consistent scrim behavior
+  autoOfferModal.classList.add('modal-wrap','show','modal-scrim-pane');
+  const inner = autoOfferModal.querySelector('.card, .p-5');
+  if (inner) inner.classList.add('modal-card','fade');
 }
 
 offerSkip?.addEventListener('click', ()=>{ autoOfferModal.classList.add('hidden'); pendingOffer=null; startNewOrder(); });
 offerBuy?.addEventListener('click', ()=>{
-  if (pendingOffer){ buyRecipe(pendingOffer.name); }
+  const active = getActiveRestaurant();
+  if (!pendingOffer){ autoOfferModal.classList.add('hidden'); pendingOffer=null; startNewOrder(); return; }
+
+  // Before attempting to buy, compute rank-up requirement and whether purchase would trigger rank advancement
+  const recipe = pendingOffer;
+  const ranks = getActiveRanks();
+  let currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+  const cuisine = active.cuisine || profile.cuisine || null;
+  const nextIdx = currIdx + 1;
+  const nextDef = ranks[nextIdx] || null;
+  const nextGoalName = nextDef ? (getRankUnlockRecipeName(currIdx, cuisine) || nextDef.recipeToUnlock) : null;
+  const baseRequiredStars = nextDef ? Number(nextDef.requiredStars || 0) : 0;
+  const starsNeeded = Number((baseRequiredStars).toFixed(1)); // use exact requiredStars
+
+  // Perform purchase normally (will deduct money and unlock)
+  buyRecipe(recipe.name);
+
+  // if this purchase is the rank-up recipe attempt, check stars to decide whether we advanced or just bought it
+  if (nextGoalName && recipe.name === nextGoalName){
+    const haveStars = Number(active.stars || 0);
+    if (haveStars < starsNeeded){
+      showMarketMessage("Comprado — Estrelas insuficientes", `Você comprou ${recipe.name}, mas precisa de ★${starsNeeded.toFixed(1)} para subir de ranque (você tem ${haveStars.toFixed(1)}).`, false);
+    } else {
+      updateRankDisplay();
+    }
+  }
+
   autoOfferModal.classList.add('hidden'); pendingOffer=null; startNewOrder();
 });
 
@@ -1000,6 +1402,236 @@ document.addEventListener('DOMContentLoaded', ()=>{
   themeToggleMenu?.parentElement?.appendChild(musicToggleMenuBtn);
   musicToggleMenuBtn?.addEventListener('click', toggleBgm);
   setBgmIcon();
+
+  // Restaurants logic
+  renderRestaurantsButtonIfEligible();
+  renderRestaurantsModal();
+});
+
+// New modal helpers: use .modal-wrap and .modal-card.fade for consistent show/hide with fade
+function showModalById(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('hidden');
+  el.classList.add('modal-wrap','show');
+  const inner = el.querySelector('.p-5, .card, .modal-card');
+  if (inner) inner.classList.add('modal-card','fade');
+  // focus first button
+  setTimeout(()=>{ const b = el.querySelector('button, [role="button"]'); if(b) b.focus(); }, 160);
+}
+function hideModalById(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('show');
+  const inner = el.querySelector('.p-5, .card, .modal-card');
+  if (inner) inner.classList.remove('modal-card','fade');
+  // wait transition then hide
+  setTimeout(()=>{ el.classList.add('hidden'); }, 300);
+}
+
+/* Replace direct .classList.remove/add('hidden') usages for restaurants modal only to avoid wide changes.
+   Wire restaurants button to open restaurants modal; when closing restaurants modal, keep restaurants-button visible. */
+document.addEventListener('click', (e)=>{
+  if (e.target && e.target.id === 'restaurants-button'){
+    renderRestaurantsModal();
+    showModalById('restaurants-modal');
+  }
+});
+
+/* Replace create-resto flow: open create screen instead of inline small input, and make sure create button on modal opens this screen */
+const closeRestaurantsBtn = document.getElementById('close-restaurants');
+closeRestaurantsBtn && closeRestaurantsBtn.addEventListener('click', ()=>{
+  hideModalById('restaurants-modal');
+  // ensure restaurants-button remains visible after closing
+  document.getElementById('restaurants-button-container')?.classList.remove('hidden');
+});
+
+/* Hook create button to open full creation screen */
+const createRestoBtn = document.getElementById('create-resto');
+createRestoBtn && createRestoBtn.addEventListener('click', ()=>{
+  // Close restaurants modal and open full create screen
+  hideModalById('restaurants-modal');
+  showScreen('create-restaurant-screen');
+  return;
+});
+
+/* New handlers for full create screen */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const createConfirm = document.getElementById('create-resto-confirm');
+  const createCancel = document.getElementById('create-resto-cancel');
+  const nameInputFull = document.getElementById('new-resto-name-full');
+  let chosenCuisine = null;
+  document.getElementById('create-cuisine-choices')?.addEventListener('click', (e)=>{
+    const b = e.target.closest('.create-cuisine-btn');
+    if (!b) return;
+    document.querySelectorAll('.create-cuisine-btn').forEach(x=>x.classList.remove('bg-green-500','text-white'));
+    b.classList.add('bg-green-500','text-white');
+    chosenCuisine = b.dataset.cuisine;
+  });
+  createCancel && createCancel.addEventListener('click', ()=>{
+    showScreen('menu-screen');
+    renderRestaurantsButtonIfEligible();
+  });
+  createConfirm && createConfirm.addEventListener('click', ()=>{
+    const rawName = (nameInputFull && nameInputFull.value.trim()) || '';
+    const defaultName = `Restaurante ${ (gameState.restaurants||[]).length + 1 }`;
+    const name = rawName.length > 0 ? rawName.slice(0,24) : defaultName;
+
+    if ((gameState.restaurants||[]).length >= 6){
+      showMarketMessage('Limite atingido','Você não pode ter mais que 6 restaurantes.', false);
+      return;
+    }
+
+    if (!chosenCuisine){
+      showMarketMessage('Escolha uma culinária','Selecione a culinária para o novo restaurante.', false);
+      return;
+    }
+
+    const chosen = chosenCuisine || profile.cuisine || null;
+    // compute starting unlocks robustly and sanitize them against rank-required recipes
+    const starters = getStartingUnlocks(chosen);
+    const sanitizedStarters = sanitizeUnlocks(chosen, starters);
+    const ingSet = new Set();
+    sanitizedStarters.forEach(rn=>{
+      const rec = ALL_RECIPES.find(x=>x.name===rn);
+      if (rec){
+        [...rec.baseRecipe, ...(rec.optionalIngredients||[])].forEach(i=>ingSet.add(i));
+      }
+    });
+
+    const newR = { 
+      id: crypto?.randomUUID?.() || `r${Date.now()}`, 
+      name, 
+      cuisine: chosen, 
+      unlockedRecipeNames: Array.from(new Set(sanitizedStarters)), 
+      unlockedIngredientIds: Array.from(ingSet), 
+      rank: 0 
+    };
+
+    // final sanitize: remove any accidental rank unlocks and ensure arrays exist
+    newR.unlockedRecipeNames = sanitizeUnlocks(newR.cuisine, newR.unlockedRecipeNames || []);
+    newR.unlockedIngredientIds = Array.from(new Set(newR.unlockedIngredientIds || []));
+
+    gameState.restaurants = gameState.restaurants || [];
+    gameState.restaurants.push(newR);
+    gameState.activeRestaurantIndex = gameState.restaurants.length - 1;
+    saveGame();
+
+    // reset UI inputs and states
+    if (nameInputFull) nameInputFull.value = '';
+    chosenCuisine = null;
+    document.querySelectorAll('.create-cuisine-btn').forEach(x=>x.classList.remove('bg-green-500','text-white'));
+
+    // Re-render everything consistently
+    renderRestaurantsModal();
+    renderMarket();
+    renderUnlockedIngredientBin();
+    renderRestaurantsButtonIfEligible();
+
+    // return to menu screen and show confirmation
+    showScreen('menu-screen');
+    showMarketMessage('Restaurante criado', `${newR.name} • ${newR.cuisine || '—'} criado com sucesso!`, true);
+  });
+});
+
+// Restaurants logic
+function renderRestaurantsButtonIfEligible(){
+  const active = getActiveRestaurant();
+  // cuisine may be null for new restaurants; find cuisine-specific pool
+  const cuisine = active.cuisine || profile.cuisine;
+  const pool = ALL_RECIPES.filter(r => !cuisine || (Array.isArray(r.cuisine)? r.cuisine.includes(cuisine): true));
+  const allNames = pool.map(r=>r.name);
+  const unlocked = new Set(active.unlockedRecipeNames || []);
+  const allBought = allNames.every(n=>unlocked.has(n));
+  const container = document.getElementById('restaurants-button-container');
+  if (allBought) container.classList.remove('hidden'); else container.classList.add('hidden');
+}
+
+function renderRestaurantsModal(){
+  const list = document.getElementById('restaurants-list');
+  list.innerHTML = '';
+  (gameState.restaurants || []).forEach((r, idx)=>{
+    const total = ALL_RECIPES.filter(rec => !r.cuisine || (Array.isArray(rec.cuisine)? rec.cuisine.includes(r.cuisine): true)).length || 1;
+    const completed = (r.unlockedRecipeNames||[]).length;
+    const pct = Math.round((completed/total)*100);
+    const el = document.createElement('div');
+    el.className = 'flex items-center justify-between p-2 border rounded-lg';
+    el.innerHTML = `<div>
+                      <div class="font-bold">${r.name} ${idx===gameState.activeRestaurantIndex?'<span class="text-sm text-green-600"> (Ativo)</span>':''}</div>
+                      <div class="text-sm text-gray-500">${r.cuisine || '—'} • ${pct}% concluído (${completed}/${total})</div>
+                    </div>
+                    <div class="flex gap-2">
+                      <button class="switch-resto btn-main px-3 py-1 rounded" data-idx="${idx}">Abrir</button>
+                      <button class="delete-resto btn-main px-3 py-1 rounded">Apagar</button>
+                    </div>`;
+    list.appendChild(el);
+  });
+  // attach handlers
+  list.querySelectorAll('.switch-resto').forEach(b=>b.addEventListener('click', (e)=>{
+    const i = Number(e.currentTarget.dataset.idx);
+    gameState.activeRestaurantIndex = i;
+    saveGame();
+    renderMarket();
+    renderUnlockedIngredientBin();
+    updateAllMoneyDisplays();
+    renderRestaurantsModal();
+    renderRestaurantsButtonIfEligible();
+  }));
+  list.querySelectorAll('.delete-resto').forEach(b=>b.addEventListener('click', (e)=>{
+    const i = Number(e.currentTarget.dataset.idx);
+    // If deleting the last restaurant, treat as full reset (start fresh first-run)
+    gameState.restaurants.splice(i,1);
+    if ((gameState.restaurants||[]).length === 0) {
+      // Clear storage and reinitialize as first-run
+      localStorage.clear();
+      // Recreate minimal gameState so UI can respond while resetGame handles full reset
+      gameState = { money:50, restaurants: [{ id:'r0', name:'Meu Restaurante', cuisine:null, unlockedRecipeNames:[], unlockedIngredientIds:[], rank:0 }], activeRestaurantIndex:0 };
+      saveGame();
+      // perform full reset flow to ensure UI returns to setup
+      resetGame();
+      return;
+    }
+    if (gameState.activeRestaurantIndex >= gameState.restaurants.length) gameState.activeRestaurantIndex = 0;
+    saveGame();
+    renderRestaurantsModal();
+    renderRestaurantsButtonIfEligible();
+  }));
+}
+
+document.addEventListener('click', (e)=>{
+  if (e.target && e.target.id === 'restaurants-button'){
+    renderRestaurantsModal();
+    showModalById('restaurants-modal');
+  }
+});
+
+document.getElementById && document.addEventListener('DOMContentLoaded', ()=>{
+  const closeBtn = document.getElementById('close-restaurants');
+  const createBtn = document.getElementById('create-resto');
+  closeBtn?.addEventListener('click', ()=>{ 
+    hideModalById('restaurants-modal');
+    // ensure restaurants-button remains visible after closing
+    document.getElementById('restaurants-button-container')?.classList.remove('hidden');
+  });
+  createBtn?.addEventListener('click', ()=>{
+    // Close restaurants modal and open full create screen
+    hideModalById('restaurants-modal');
+    showScreen('create-restaurant-screen');
+    return;
+  });
 });
 
 init();
+
+// Global unhandled rejection handler to prevent audio/device issues from crashing the app
+window.addEventListener('unhandledrejection', (event) => {
+  try {
+    console.warn('Unhandled promise rejection caught:', event.reason);
+    // If it's an audio device/start failure, consume it silently to avoid UI freeze
+    if (event.reason && typeof event.reason === 'object' && /audio|device|start/i.test(String(event.reason.message || event.reason))) {
+      event.preventDefault && event.preventDefault();
+    }
+  } catch (e) {
+    console.warn('Error in unhandledrejection handler', e);
+  }
+});
