@@ -16,6 +16,10 @@ export async function initializeAudio() {
     playSound('click');
   } catch (e) {
     console.warn('Audio init failed', e);
+    // Gracefully mark audio as unavailable so callers can continue without throwing
+    hasAudioStarted = false;
+    // Avoid rethrowing to prevent unhandledRejection
+    return;
   }
 }
 
@@ -33,4 +37,3 @@ export function playSound(name) {
 
 // allow UI to optionally force-enable audio upon first interaction
 export function ensureAudioStarted() { initializeAudio().catch(()=>{}); }
-
