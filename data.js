@@ -134,7 +134,7 @@ export const ALL_RECIPES = [
   { name: "Milho Assado (Elote)", emoji: "🌽", price: 140, minRank: 0, baseRecipe: ["milho","manteiga"], optionalIngredients: ["pimenta","queijo"], cuisine:["Mexicano"] },
 
   // Rank 1 offerings
-  { name: "Suco de Laranja", emoji: "🍊", price: 90, minRank: 1, baseRecipe: ["laranja","gelo"], optionalIngredients:[], cuisine:["Mexicano","Brasileiro"] },
+  { name: "Suco de Laranja", emoji: "🍊", price: 190, minRank: 1, baseRecipe: ["laranja","gelo"], optionalIngredients:[], cuisine:["Mexicano","Brasileiro"] },
   { name: "Sanduíche Simples", emoji: "🥪", price: 130, minRank: 1, baseRecipe: ["pao","alface","tomate"], optionalIngredients:["queijo","bacon"], cuisine:["Italiano","Brasileiro","Francês"] },
   { name: "Panqueca Doce", emoji: "🥞", price: 170, minRank: 1, baseRecipe:["panqueca","mel"], optionalIngredients:["morango","mirtilo","chocolate"], cuisine:["Americano","Francês","Brasileiro"] },
   { name: "Bagel", emoji: "🥯", price: 140, minRank: 1, baseRecipe:["bagel","manteiga"], optionalIngredients:["manteiga_amendoim","geleia"], cuisine:["Americano"] },
@@ -273,12 +273,12 @@ export const ALL_RECIPES = [
   { name: "Calzone", emoji: "🥟", price: 280, minRank: 2, baseRecipe:["pizza_massa","queijo","molho_tomate"], optionalIngredients:["prosciutto"], cuisine:["Italiano"] },
   { name: "Panna Cotta com Frutas", emoji: "🍮", price: 220, minRank: 1, baseRecipe:["creme","morango"], optionalIngredients:["mel"], cuisine:["Italiano"] },
   { name: "Polpettone (mini)", emoji: "🍖", price: 360, minRank: 3, baseRecipe:["bife","farinha","molho_tomate"], optionalIngredients:["queijo"], cuisine:["Italiano"] },
-  { name: "Panzerotti", emoji: "🥟", price: 260, minRank: 2, baseRecipe:["massa","queijo","molho_tomate"], optionalIngredients:["manjericao"], cuisine:["Italiano"] },
+  { name: "Panzerotti", emoji: "🥟", price: 1100, minRank: 4, baseRecipe:["massa","queijo","molho_tomate"], optionalIngredients:["manjericao"], cuisine:["Italiano"] },
 
    // ======= 15 JAPONÊS =======
   { name: "Donburi de Porco", emoji: "🍚", price: 300, minRank: 2, baseRecipe:["arroz","bife","molho_soja"], optionalIngredients:["ovo"], cuisine:["Japonês"] },
   { name: "Karaage", emoji: "🍗", price: 260, minRank: 1, baseRecipe:["frango","farinha","ovo"], optionalIngredients:["gengibre"], cuisine:["Japonês"] },
-  { name: "Temaki", emoji: "🍣", price: 220, minRank: 1, baseRecipe:["nori","arroz","peixe"], optionalIngredients:["abacate"], cuisine:["Japonês"] },
+  { name: "Temaki", emoji: "🍣", price: 1100, minRank: 4, baseRecipe:["nori","arroz","peixe"], optionalIngredients:["abacate"], cuisine:["Japonês"] },
   { name: "Ikura Bowl", emoji: "🍣", price: 420, minRank: 3, baseRecipe:["arroz","ikura","nori"], optionalIngredients:["wasabi"], cuisine:["Japonês"] },
   { name: "Unagi no Kabayaki (mini)", emoji: "🐟", price: 420, minRank: 3, baseRecipe:["peixe","molho_soja"], optionalIngredients:["arroz"], cuisine:["Japonês"] },
   { name: "Yakisoba", emoji: "🍜", price: 240, minRank: 1, baseRecipe:["ramen_massa","legumes","molho_soja"], optionalIngredients:["frango"], cuisine:["Japonês"] },
@@ -294,7 +294,7 @@ export const ALL_RECIPES = [
 
   // ======= 15 MEXICANO =======
   { name: "Tostada", emoji: "🌮", price: 200, minRank: 1, baseRecipe:["taco_shell","feijao","alface"], optionalIngredients:["salsa"], cuisine:["Mexicano"] },
-  { name: "Queso Fundido", emoji: "🧀", price: 220, minRank: 1, baseRecipe:["queijo","chorizo"], optionalIngredients:["tortilla"], cuisine:["Mexicano"] },
+  { name: "Queso Fundido", emoji: "🧀", price: 1100, minRank: 3, baseRecipe:["queijo","chorizo"], optionalIngredients:["tortilla"], cuisine:["Mexicano"] },
   { name: "Pozole Verde (mini)", emoji: "🍲", price: 300, minRank: 2, baseRecipe:["milho","frango","limao"], optionalIngredients:[], cuisine:["Mexicano"] },
   { name: "Tinga de Frango", emoji: "🍗", price: 260, minRank: 2, baseRecipe:["frango","molho_tomate","chipotle"], optionalIngredients:["queijo"], cuisine:["Mexicano"] },
   { name: "Gorditas", emoji: "🥟", price: 220, minRank: 1, baseRecipe:["masa","feijao","queijo"], optionalIngredients:["alface"], cuisine:["Mexicano"] },
@@ -311,7 +311,7 @@ export const ALL_RECIPES = [
 
   // ======= 15 FRANCÊS =======
   { name: "Tartelette de Frutas", emoji: "🥧", price: 240, minRank: 1, baseRecipe:["bolo_massa","maca"], optionalIngredients:["gelatina"], cuisine:["Francês"] },
-  { name: "Ratatouille Provençal", emoji: "🍲", price: 320, minRank: 2, baseRecipe:["berinjela","pimentao","tomate"], optionalIngredients:["ervas"], cuisine:["Francês"] },
+  { name: "Ratatouille Provençal", emoji: "🍲", price: 1100, minRank: 3, baseRecipe:["berinjela","pimentao","tomate"], optionalIngredients:["ervas"], cuisine:["Francês"] },
   { name: "Magret (mini)", emoji: "🥩", price: 480, minRank: 3, baseRecipe:["bife","vinho"], optionalIngredients:["manteiga"], cuisine:["Francês"] },
   { name: "Galette de Legumes", emoji: "🥞", price: 220, minRank: 1, baseRecipe:["farinha","legumes"], optionalIngredients:["queijo"], cuisine:["Francês"] },
   { name: "Creme de Cenoura", emoji: "🥣", price: 180, minRank: 1, baseRecipe:["cenoura","creme"], optionalIngredients:["canela"], cuisine:["Francês"] },
@@ -327,7 +327,7 @@ export const ALL_RECIPES = [
   { name: "Madeleine", emoji: "🍪", price: 140, minRank: 1, baseRecipe:["farinha","acucar","manteiga"], optionalIngredients:["canela"], cuisine:["Francês"] },
 
   // ======= 15 HALLOWEEN (colocado primeiro conforme pedido) =======
-  { name: "Poção Efervescente", emoji: "🧪", price: 180, minRank: 1, baseRecipe:["cha_verde","gelo","mirtilo"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Poção Efervescente", emoji: "🧪", price: 1100, minRank: 3, baseRecipe:["cha_verde","gelo","mirtilo"], optionalIngredients:[], cuisine:["Halloween"] },
   { name: "Abóbora Assada com Mel", emoji: "🎃", price: 220, minRank: 1, baseRecipe:["abobora","mel","canela"], optionalIngredients:[], cuisine:["Halloween"] },
   { name: "Dedos de Bruxa (mini)", emoji: "🥐", price: 160, minRank: 0, baseRecipe:["croissant_massa","amêndoa"], optionalIngredients:[], cuisine:["Halloween"] },
   { name: "Coração Gelatinoso", emoji: "🍮", price: 160, minRank: 0, baseRecipe:["gelatina","mora"], optionalIngredients:[], cuisine:["Halloween"] },
@@ -363,32 +363,32 @@ export const CUISINE_DEFS = {
     { name: "Pizzaiolo em Treino", icon:"🍕", recipeToUnlock:"Pizza Margherita", baseReward: 18 },
     { name: "Maestro della Pasta", icon:"🍝", recipeToUnlock:"Carbonara", baseReward: 30 },
     { name: "Chef Rinomato", icon:"🏆", recipeToUnlock:"Tiramisù", baseReward: 48 },
-    { name: "Lendário Culinário", icon:"🌟", recipeToUnlock:"Arancini", baseReward: 70 } // preenchido (antes null)
+    { name: "Lendário Culinário", icon:"🌟", recipeToUnlock:"Panzerotti", baseReward: 70 } // preenchido (antes null)
   ],
   "Japonês": [
     { name: "Iniciando no Itamae", icon:"🍣", recipeToUnlock:"Onigiri", baseReward: 10 },
     { name: "Sushiman Júnior", icon:"🔪", recipeToUnlock:"Sushi", baseReward: 18 },
     { name: "Especialista em Ramen", icon:"🍜", recipeToUnlock:"Ramen", baseReward: 28 },
     { name: "Mestre do Izakaya", icon:"🐙", recipeToUnlock:"Takoyaki", baseReward: 45 },
-    { name: "Itamae Lendário", icon:"⛩️", recipeToUnlock:"Unagi Bowl", baseReward: 70 } // preenchido (antes null)
+    { name: "Itamae Lendário", icon:"⛩️", recipeToUnlock:"Temaki", baseReward: 70 } // preenchido (antes null)
   ],
   "Mexicano": [
     { name: "Taquero Iniciante", icon:"🌮", recipeToUnlock:"Milho Assado (Elote)", baseReward: 11 },
     { name: "Mestre do Sabor", icon:"🌶️", recipeToUnlock:"Guacamole", baseReward: 18 },
     { name: "Chef de Sazón", icon:"🏵️", recipeToUnlock:"Taco", baseReward: 30 },
-    { name: "Lenda da Cozinha", icon:"🇲🇽", recipeToUnlock:"Enchiladas", baseReward: 55 } // preenchido (antes null)
+    { name: "Lenda da Cozinha", icon:"🇲🇽", recipeToUnlock:"Queso Fundido", baseReward: 55 } // preenchido (antes null)
   ],
   "Francês": [
     { name: "Commis Talentoso", icon:"🥖", recipeToUnlock:"Torrada", baseReward: 11 },
     { name: "Sous-chef", icon:"🥈", recipeToUnlock:"Salada César", baseReward: 18 },
     { name: "Chef de Cuisine", icon:"🥇", recipeToUnlock:"Crepe Suzette", baseReward: 32 },
-    { name: "Patrono Culinário", icon:"🇫🇷", recipeToUnlock:"Bouillabaisse", baseReward: 55 } // preenchido (antes null)
+    { name: "Patrono Culinário", icon:"🇫🇷", recipeToUnlock:"Ratatouille Provençal", baseReward: 55 } // preenchido (antes null)
   ],
   "Halloween": [
     { name: "Trickster Cook", icon:"🎃", recipeToUnlock:"Panqueca do Terror", baseReward: 12 },
     { name: "Cozinheiro Sombrio", icon:"🕯️", recipeToUnlock:"Onigiri Fantasma", baseReward: 20 },
     { name: "Mestre das Sombras", icon:"👻", recipeToUnlock:"Takoyaki Tenebroso", baseReward: 38 },
-    { name: "Lenda Assombrada", icon:"🦇", recipeToUnlock:"Takoyaki Assustador (especial)", baseReward: 65 } // preenchido (antes null)
+    { name: "Lenda Assombrada", icon:"🦇", recipeToUnlock:"Poção Efervescente", baseReward: 65 } // preenchido (antes null)
   ]
 };
 
