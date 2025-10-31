@@ -77,12 +77,12 @@ export const ALL_INGREDIENTS = {
   'couve': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1728/1728744.png' },
   'mascarpone': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4465/4465423.png' },
   'polvo': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3065/3065730.png' },
-  'carne_seca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4177/4177665.png' },
+  'carne_seca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1046/1046849.png' },
   'cafe': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/924/924514.png' },
-  'manteiga_amendoim': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1398/1398540.png' },
-  'geleia': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2515/2515286.png' },
-  'cha_verde': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/5303/5303997.png' },
-  'abobora': { type: 'image', value: 'https://cdn-icons-png.freepik.com/512/5702/5702244.png' },
+  'manteiga_amendoim': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3838/3838464.png' },
+  'geleia': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3075/3075903.png' },
+  'cha_verde': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3082/3082024.png' },
+  'abobora': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/137/137366.png' },
 
   // Newly added ingredients for the expanded recipes
   'cachaca': { type: 'image', value: 'https://cdn-icons-png.freepik.com/512/8692/8692223.png' },
@@ -120,6 +120,7 @@ export const ALL_INGREDIENTS = {
   'truta': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1728/1728780.png' },
   'mandioquinha': { type: 'image', value: 'https://pbs.twimg.com/media/G4jGTecW8AE5h2V?format=png&name=small' },
   'molho_barbecue': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4594/4594902.png' },
+  'palmito': { type: 'image', value: 'https://pbs.twimg.com/media/G4mnmouXsAAgRv6?format=png&name=small' },
   'iogurte': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2592/2592587.png' } // reutilizável para molhos/sobremesas
 };
 
@@ -181,14 +182,14 @@ export const ALL_RECIPES = [
   // ============================
   { name: "Caipirinha", emoji: "🍹", price: 160, minRank: 1, baseRecipe: ["limao","acucar","gelo","cachaca"], optionalIngredients: [], cuisine: ["Brasileiro"] },
   { name: "Coxinha", emoji: "🍗", price: 180, minRank: 1, baseRecipe: ["frango","farinha","manteiga"], optionalIngredients: ["cebola"], cuisine: ["Brasileiro"] },
-  { name: "Brigadeiro", emoji: "🍫", price: 120, minRank: 1, baseRecipe: ["chocolate","leite","manteiga","acucar"], optionalIngredients: [], cuisine: ["Brasileiro"] },
+  { name: "Brigadeiro", image: "https://cdn-icons-png.flaticon.com/512/4646/4646462.png", price: 120, minRank: 1, baseRecipe: ["chocolate","leite","manteiga","acucar"], optionalIngredients: [], cuisine: ["Brasileiro"] },
   { name: "Pão de Queijo", emoji: "🧀", price: 140, minRank: 1, baseRecipe: ["queijo","farinha","ovo"], optionalIngredients: [], cuisine: ["Brasileiro"] },
   { name: "Pastel de Feira", emoji: "🥟", price: 150, minRank: 1, baseRecipe: ["guioza_massa","frango","queijo"], optionalIngredients: [], cuisine: ["Brasileiro"] },
   { name: "Tapioca Doce", emoji: "🥞", price: 130, minRank: 1, baseRecipe: ["tapioca","geleia"], optionalIngredients: ["manteiga"], cuisine: ["Brasileiro"] },
   { name: "Bolo de Cenoura", emoji: "🎂", price: 200, minRank: 2, baseRecipe: ["bolo_massa","cenoura"], optionalIngredients: ["chocolate","manteiga"], cuisine: ["Brasileiro"] },
-  { name: "Empadão de Frango", emoji: "🥧", price: 300, minRank: 2, baseRecipe: ["bolo_massa","frango","milho"], optionalIngredients: ["ervas"], cuisine: ["Brasileiro"] },
-  { name: "Acarajé (Mini)", emoji: "🟤", price: 220, minRank: 2, baseRecipe: ["feijao","farinha","manteiga"], optionalIngredients: ["pimenta"], cuisine: ["Brasileiro"] },
-  { name: "Doce de Leite", emoji: "🍯", price: 1100, minRank: 4, baseRecipe: ["leite","acucar"], optionalIngredients: ["canela"], cuisine: ["Brasileiro"] },
+  { name: "Empadão de Frango", image: "https://png.pngtree.com/png-clipart/20241108/original/pngtree-chicken-pot-pie-vectors-illustration-isolated-on-white-background-png-image_16777504.png", price: 300, minRank: 2, baseRecipe: ["bolo_massa","frango","milho"], optionalIngredients: ["ervas"], cuisine: ["Brasileiro"] },
+  { name: "Acarajé", image: "https://cdn-icons-png.flaticon.com/512/12505/12505638.png", price: 220, minRank: 2, baseRecipe: ["feijao","farinha","manteiga"], optionalIngredients: ["pimenta"], cuisine: ["Brasileiro"] },
+  { name: "Doce de Leite", image: "https://cdn-icons-png.flaticon.com/512/442/442487.png", price: 1100, minRank: 4, baseRecipe: ["leite","acucar"], optionalIngredients: ["canela"], cuisine: ["Brasileiro"] },
 
   // ============================
   // MUITO MAIS pratos por cozinha (adicionados agora)
@@ -407,3 +408,26 @@ export const SAVE_KEY = 'recipeGameData_v6';
 export const THEME_KEY = 'recipeGameTheme_v6';
 export const RESTO_NAME_KEY = 'recipeGameRestoName_v6';
 export const CUISINE_KEY = 'recipeGameCuisine_v6';
+
+// Compute a sensible requiredStars for each recipe using minRank and price.
+// This ensures late-game / higher-priced recipes need more stars while early simple recipes require very little.
+for (const r of ALL_RECIPES) {
+    if (typeof r.requiredStars === 'undefined' || r.requiredStars === null) {
+        // Base from minRank: each rank contributes a baseline requirement
+        const rankBase = (typeof r.minRank === 'number' ? r.minRank : 0) * 0.6;
+        // Price factor normalizes typical prices to a 0..3.5 range (so very expensive dishes require noticeably more stars)
+        const priceFactor = Math.min(3.5, (r.price || 0) / 300);
+        // Small random jitter (deterministic-ish) to avoid many identical exact values
+        const jitter = 0.0; // keep deterministic; set small nonzero if desired like ( (r.name.length % 3) * 0.05 )
+        // Combined value
+        let computed = rankBase + priceFactor + jitter;
+        // Clamp between 0.0 and 5.0 and round to one decimal place
+        computed = Math.max(0, Math.min(5, Number(computed.toFixed(1))));
+        // Make sure very early dishes still show a small non-zero requirement (0.0 -> 0.1) if minRank > 0 or price > 0
+        if (computed === 0 && (r.minRank > 0 || (r.price || 0) > 0)) computed = 0.1;
+        r.requiredStars = computed;
+    } else {
+        // normalize any previously present values to one decimal and clamp
+        r.requiredStars = Math.max(0, Math.min(5, Number(Number(r.requiredStars).toFixed(1))));
+    }
+}
