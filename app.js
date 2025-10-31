@@ -1629,6 +1629,22 @@ document.addEventListener('DOMContentLoaded', ()=>{
 function showLanguageModalIfNeeded(){
   try {
     const saved = localStorage.getItem(LANG_KEY);
+    // If the current page already is one of the language-target pages, do not perform any redirects
+    const currentNormalized = (u => u ? u.replace(/\/+$/, '') : '')(window.location.href);
+    const noRedirectList = [
+      'https://utters-apps.github.io/Follow-the-Recipe/index-spanish.html',
+      'https://utters-apps.github.io/Follow-the-Recipe/index-english.html',
+      'https://utters-apps.github.io/Follow-the-Recipe/index-german.html',
+      // note: user provided a .htm for russian; include both .htm and .html just in case
+      'https://utters-apps.github.io/Follow-the-Recipe/index-russian.htm',
+      'https://utters-apps.github.io/Follow-the-Recipe/index-russian.html'
+    ].map(u => u.replace(/\/+$/, ''));
+
+    if (noRedirectList.includes(currentNormalized)) {
+      // We're already on a language-specific page; do not open modal or redirect.
+      return;
+    }
+
     if (saved) {
       // If language saved and is not Portuguese, redirect immediately to language page
       const parsed = JSON.parse(saved);
@@ -1674,12 +1690,27 @@ function showLanguageModalIfNeeded(){
       // hide modal
       modal.classList.remove('show');
       setTimeout(()=> modal.classList.add('hidden'), 260);
-      // If non-Portuguese and href provided, redirect (only if it's not the same URL)
+      // If non-Portuguese and href provided, redirect (only if it's not the same URL and not in noRedirectList)
       if (lang !== 'Portuguese' && href) {
         try {
           const normalize = (u) => u ? u.replace(/\/+$/, '') : u;
           const current = normalize(window.location.href);
           const target = normalize(href);
+          // ensure target is not one of the pages that should never trigger redirects from this tab
+          const blocked = [
+            'https://utters-apps.github.io/Follow-the-Recipe/index-spanish.html',
+            'https://utters-apps.github.io/Follow-the-Recipe/index-english.html',
+            'https://utters-apps.github.io/Follow-the-Recipe/index-german.html',
+            'https://utters-apps.github.io/Follow-the-Recipe/index-russian.htm',
+            'https://utters-apps.github.io/Follow-the-Recipe/index-russian.html'
+          ].map(u=>u.replace(/\/+$/, ''));
+
+          if (blocked.includes(current)) {
+            // current page is a blocked language page — do nothing (stay)
+            playSound('success');
+            return;
+          }
+
           if (target && current !== target) {
             playSound('click');
             setTimeout(()=> window.location.href = href, 140);
