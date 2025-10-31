@@ -7,15 +7,16 @@ const appRoot = document.getElementById('app');
 /* --- GAME CONSTANTS --- */
 const PENALTY_FAILURE = 10;
 const BASE_PENALTY_PER_RANK = 4;
+// make VIPs and Rush Hour scale more aggressively with rank so higher ranks feel frantic
 const VIP_PENALTY_BONUS = 10;
-const VIP_CHANCE_BASE = 0.05;
-const VIP_CHANCE_PER_RANK = 0.06;
-const RUSH_HOUR_CHANCE_BASE = 0.08;
-const RUSH_HOUR_CHANCE_PER_RANK = 0.07;
+const VIP_CHANCE_BASE = 0.06;
+const VIP_CHANCE_PER_RANK = 0.1; // increased from 0.06 -> 0.1
+const RUSH_HOUR_CHANCE_BASE = 0.12; // increased baseline
+const RUSH_HOUR_CHANCE_PER_RANK = 0.12; // increased per-rank scaling
 const BASE_TIMER_DURATION = 15;
-const MIN_TIMER_DURATION = 5;
-const RUSH_HOUR_TIMER_MULTIPLIER = 0.7;
-const VIP_REWARD_MULTIPLIER = 1.8;
+const MIN_TIMER_DURATION = 3; // allow shorter minimum
+const RUSH_HOUR_TIMER_MULTIPLIER = 0.6; // faster during rush
+const VIP_REWARD_MULTIPLIER = 1.9; // slightly bigger VIP reward
 const SUCCESS_MODAL_DURATION = 1600;
 const FAILURE_MODAL_DURATION = 2000;
 const BGM_KEY = 'recipeGameBGMMuted_v6';
@@ -23,7 +24,7 @@ const BGM_KEY = 'recipeGameBGMMuted_v6';
 
 function buildLayout() {
   appRoot.innerHTML = `
-  <div id="game-container" class="w-full max-w-md h-full md:h-[95vh] md:max-h-[800px] shadow-xl rounded-2xl flex flex-col overflow-hidden relative bg-white/80 backdrop-blur-sm border border-white/30">
+  <div id="game-container" class="w-full max-w-md h-full md:h-[100vh] md:max-h-[100vh] shadow-xl rounded-2xl flex flex-col overflow-hidden relative bg-white/80 backdrop-blur-sm border border-white/30">
     <!-- Setup (first run) -->
     <div id="setup-screen" class="screen active p-6 flex flex-col items-center justify-start text-center h-full">
       <h1 class="text-3xl font-black mb-1">Bem-vindo ao seu Restaurante</h1>
@@ -56,6 +57,10 @@ function buildLayout() {
       <p id="resto-name-display" class="text-base opacity-80 mb-4"></p>
       <button id="welcome-play-button" class="btn-main w-full bg-green-500 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg">
         <i class="fas fa-play mr-2"></i> Jogar
+      </button>
+      <!-- PWA install button (hidden by default, shown when browser supports beforeinstallprompt) -->
+      <button id="install-pwa-button" class="btn-main w-full mt-3 bg-indigo-600 text-white font-bold px-10 py-3 rounded-xl text-lg hidden">
+        <i class="fas fa-download mr-2"></i> Instalar jogo
       </button>
       <div class="mt-2 text-xs opacity-70">Desenvolvido inteiramente por <span class="font-semibold">FerUtter (Gustavo F. P.)</span></div>
       <div class="mt-auto flex justify-between items-center w-full text-gray-500 text-sm">
@@ -124,35 +129,60 @@ function buildLayout() {
 
     <!-- Market (tabs) -->
     <div id="market-screen" class="screen flex-col hidden h-full">
-      <header class="border-b p-3 flex items-center justify-center z-10 relative">
-        <button id="menu-button-market" class="absolute left-3 text-2xl w-10 h-10 flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
-        <h2 class="text-xl font-bold text-center">Mercado</h2>
-        <div class="absolute right-3 flex items-center gap-2">
-          <div id="money-display-market" class="money-pill font-bold px-5 py-2 rounded-full text-lg shadow-md">$50</div>
-          <div id="stars-display-market" class="money-pill font-bold px-3 py-2 rounded-full text-lg shadow-md">0.0 ★</div>
+      <header class="border-b p-3 z-10">
+        <div class="flex items-center justify-between">
+          <button id="menu-button-market" class="text-2xl w-10 h-10 flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
+          <h2 class="text-xl font-bold flex-1 text-center m-0 title-wrap">Mercado</h2>
+          <div class="header-right flex items-center gap-2">
+            <div id="money-display-market" class="money-pill font-bold px-4 py-2 rounded-full text-base shadow-md">$50</div>
+            <div id="stars-display-market" class="stars-pill font-bold text-base">0.0 ★</div>
+          </div>
         </div>
       </header>
-      <main class="flex-1 p-3 overflow-y-auto w-full space-y-3">
-        <div class="tabbar">
+      <main class="flex-1 p-3 w-full space-y-3">
+        <div class="tabbar sticky top-0 z-10">
           <button id="tab-buy" class="tab active"><i class="fas fa-coins mr-2"></i>Comprar Pratos</button>
           <button id="tab-owned" class="tab"><i class="fas fa-utensils mr-2"></i>Meus Pratos</button>
         </div>
-        <div id="market-items-grid" class="space-y-3"></div>
-        <div id="market-owned-grid" class="space-y-3 hidden"></div>
+        <div id="market-scroll" class="relative">
+          <div id="market-items-grid" class="space-y-3"></div>
+          <div id="market-owned-grid" class="space-y-3 hidden"></div>
+        </div>
       </main>
     </div>
 
     <!-- Create Restaurant Screen -->
-    <div id="create-restaurant-screen" class="screen p-6 flex flex-col items-center justify-start text-center h-full hidden">
-      <h2 class="text-2xl font-bold mb-2">Criar Novo Restaurante</h2>
-      <input id="new-resto-name-full" placeholder="Nome do restaurante" class="w-full p-3 rounded-xl border mb-3" maxlength="24">
-      <label class="w-full text-left font-semibold mb-2">Culinária</label>
-      <div id="create-cuisine-choices" class="grid grid-cols-2 gap-2 w-full mb-4">
-        ${[{n:"Brasileiro",e:"🇧🇷"},{n:"Italiano",e:"🇮🇹"},{n:"Japonês",e:"🇯🇵"},{n:"Mexicano",e:"🇲🇽"},{n:"Francês",e:"🇫🇷"}].map(c=>`<button class="create-cuisine-btn btn-main w-full p-3 rounded-xl border" data-cuisine="${c.n}">${c.e} ${c.n}</button>`).join('')}
+    <div id="create-restaurant-screen" class="screen p-4 flex flex-col items-stretch justify-start h-full hidden">
+      <h2 class="text-2xl font-black mb-3 text-center">Novo Restaurante</h2>
+      <div class="rounded-xl border p-3 mb-3">
+        <label class="block text-left text-sm font-semibold mb-1">Nome</label>
+        <input id="new-resto-name-full" class="w-full p-3 rounded-xl border" placeholder="Ex: Casa do Sabor" maxlength="24">
       </div>
-      <div class="w-full flex gap-2">
-        <button id="create-resto-confirm" class="btn-main w-full bg-purple-600 text-white font-bold py-3 rounded-lg">Criar Restaurante</button>
-        <button id="create-resto-cancel" class="btn-main w-full bg-gray-300 font-bold py-3 rounded-lg">Cancelar</button>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div class="rounded-xl border p-3">
+          <div class="text-sm font-semibold mb-2 text-left">Culinária</div>
+          <div id="create-cuisine-choices" class="grid grid-cols-2 gap-2"></div>
+        </div>
+        <div class="rounded-xl border p-3">
+          <div class="text-sm font-semibold mb-2 text-left">Ícone</div>
+          <div id="icon-choices" class="grid grid-cols-5 gap-2 text-2xl"></div>
+        </div>
+      </div>
+      <div class="rounded-xl border p-3 mb-3">
+        <div class="text-sm font-semibold mb-2 text-left">Cor do Tema</div>
+        <div id="color-choices" class="flex flex-wrap gap-2"></div>
+      </div>
+      <div class="rounded-xl border p-4 mb-3 flex items-center gap-3">
+        <div id="preview-icon" class="text-3xl">🍽️</div>
+        <div class="flex-1">
+          <div id="preview-name" class="font-bold">Restaurante</div>
+          <div id="preview-meta" class="text-sm opacity-70">— • 0.0 ★</div>
+        </div>
+        <div id="preview-badge" class="px-3 py-1 rounded-full text-white" style="background:#8b5cf6">Novo</div>
+      </div>
+      <div class="w-full flex gap-2 mt-auto">
+        <button id="create-resto-cancel" class="btn-main w-1/2 bg-gray-300 font-bold py-3 rounded-lg">Cancelar</button>
+        <button id="create-resto-confirm" class="btn-main w-1/2 bg-purple-600 text-white font-bold py-3 rounded-lg">Criar</button>
       </div>
     </div>
 
@@ -795,7 +825,7 @@ function buyRecipe(recipeName){
     if (currIdx < ranks.length - 1){
       const nextIdx = currIdx + 1;
       const nextGoalName = getRankUnlockRecipeName(currIdx, cuisine) || ranks[nextIdx]?.recipeToUnlock;
-      // Use the configured requiredStars from the rank definition (no extraneous +1.0)
+      // Use the configured requiredStars from the rank definition (no additional +1.0)
       const requiredStars = Number(ranks[nextIdx]?.requiredStars || 0);
       const activeStars = Number(active.stars || 0);
       if (nextGoalName && nextGoalName === recipe.name){
@@ -830,10 +860,20 @@ function getTimerDuration(){
   const base = BASE_TIMER_DURATION;
   const maxDifficultyRanks = Math.max(0, ranks.length - 1);
   const activeRank = (active && typeof active.rank === 'number') ? active.rank : 0;
-  const difficultyFactor = Math.min(maxDifficultyRanks * 1.5, activeRank + (session.isVIP ? 1 : 0));
-  let dur = Math.max(MIN_TIMER_DURATION, base - Math.round(difficultyFactor * 1.5));
-  if (session.isRushHour) dur = Math.max(MIN_TIMER_DURATION-2, Math.round(dur * RUSH_HOUR_TIMER_MULTIPLIER));
-  if (dur < 3) dur = 3;
+
+  // Aggressive difficulty curve: each rank reduces time progressively (log-ish scaling)
+  const rankFactor = Math.min(maxDifficultyRanks, activeRank);
+  // stronger decay: subtract up to ~50% of base across ranks, clamp to MIN_TIMER_DURATION
+  const decay = Math.round((base * 0.5) * (rankFactor / Math.max(1, maxDifficultyRanks)));
+  let dur = Math.max(MIN_TIMER_DURATION, base - decay - Math.round(rankFactor * 0.6));
+
+  // VIPs make a single order slightly easier (add +1s), but still fast at high ranks
+  if (session.isVIP) dur = Math.min(base, dur + 1);
+
+  if (session.isRushHour) dur = Math.max(1, Math.round(dur * RUSH_HOUR_TIMER_MULTIPLIER));
+
+  // final clamp and ensure at least 1s (very intense late-game)
+  if (dur < 1) dur = 1;
   return dur;
 }
 
@@ -919,7 +959,6 @@ function startNewOrder(){
   const finalPool = (pool.length > 0 ? pool : ALL_RECIPES.filter(r => (active.unlockedRecipeNames||[]).includes(r.name)));
   session.currentOrder = finalPool[Math.floor(Math.random()*finalPool.length)];
   if (!session.currentOrder || !Array.isArray(session.currentOrder.baseRecipe)){
-    // Last guard: show menu and prompt user to buy recipes
     showScreen('menu-screen');
     renderMarket();
     return;
@@ -927,9 +966,8 @@ function startNewOrder(){
 
   let finalRecipe = [...session.currentOrder.baseRecipe];
   const availableOptionals = (Array.isArray(session.currentOrder.optionalIngredients) ? session.currentOrder.optionalIngredients : [])
-    .filter(id=>gameState.unlockedIngredientIds.includes(id));
+    .filter(id => (active.unlockedIngredientIds || []).includes(id)); // FIX: use active restaurant ingredients
 
-  // More optionals with rank; VIP adds 1 extra if possible
   const optionalRate = Math.min(0.5, 0.3 + gameState.rank*0.1);
   const optionalsToAdd = availableOptionals.filter(()=>Math.random() < optionalRate);
   if (session.isVIP && availableOptionals.length > 0) optionalsToAdd.push(availableOptionals[Math.floor(Math.random()*availableOptionals.length)]);
@@ -947,9 +985,7 @@ function startNewOrder(){
   dishEmoji.textContent = session.currentOrder.emoji + (session.isVIP ? ' ✨' : '');
   dishName.textContent = session.currentOrder.name + (session.isVIP ? ' (CLIENTE VIP)' : '');
 
-  // Ensure the ingredient bin reflects the new order (always include needed + shuffled)
   renderUnlockedIngredientBin();
-
   startTimer();
 }
 
@@ -1460,14 +1496,29 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const createConfirm = document.getElementById('create-resto-confirm');
   const createCancel = document.getElementById('create-resto-cancel');
   const nameInputFull = document.getElementById('new-resto-name-full');
+  // Dynamic choices
+  const cuisineWrap = document.getElementById('create-cuisine-choices');
+  const iconWrap = document.getElementById('icon-choices');
+  const colorWrap = document.getElementById('color-choices');
+  const icons = ["🍽️","🍣","🍕","🌮","🥐","🍜","🥗","🍔","🍰","🍛","🍟","🍩"];
+  const colors = ["#8b5cf6","#06b6d4","#10b981","#f59e0b","#ef4444","#3b82f6","#111827","#14b8a6"];
+  cuisineWrap.innerHTML = ["Brasileiro","Italiano","Japonês","Mexicano","Francês","Halloween"].map(c=>`<button class="create-cuisine-btn btn-main p-2 rounded-lg border text-sm" data-cuisine="${c}">${c}</button>`).join('');
+  iconWrap.innerHTML = icons.map(i=>`<button class="icon-btn btn-main p-2 rounded-lg border">${i}</button>`).join('');
+  colorWrap.innerHTML = colors.map(c=>`<button class="color-btn w-8 h-8 rounded-full border" style="background:${c}" data-color="${c}" aria-label="${c}"></button>`).join('');
   let chosenCuisine = null;
+  let chosenIcon = "🍽️";
+  let chosenColor = "#8b5cf6";
   document.getElementById('create-cuisine-choices')?.addEventListener('click', (e)=>{
     const b = e.target.closest('.create-cuisine-btn');
     if (!b) return;
     document.querySelectorAll('.create-cuisine-btn').forEach(x=>x.classList.remove('bg-green-500','text-white'));
     b.classList.add('bg-green-500','text-white');
     chosenCuisine = b.dataset.cuisine;
+    document.getElementById('preview-meta').textContent = `${chosenCuisine} • 0.0 ★`;
   });
+  iconWrap?.addEventListener('click',(e)=>{ const b=e.target.closest('.icon-btn'); if(!b)return; chosenIcon=b.textContent.trim(); document.getElementById('preview-icon').textContent=chosenIcon; });
+  colorWrap?.addEventListener('click',(e)=>{ const b=e.target.closest('.color-btn'); if(!b)return; chosenColor=b.dataset.color; document.getElementById('preview-badge').style.background=chosenColor; });
+  nameInputFull?.addEventListener('input',()=>{ document.getElementById('preview-name').textContent = (nameInputFull.value||'Restaurante').slice(0,24); });
   createCancel && createCancel.addEventListener('click', ()=>{
     showScreen('menu-screen');
     renderRestaurantsButtonIfEligible();
@@ -1505,7 +1556,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
       cuisine: chosen, 
       unlockedRecipeNames: Array.from(new Set(sanitizedStarters)), 
       unlockedIngredientIds: Array.from(ingSet), 
-      rank: 0 
+      rank: 0,
+      icon: chosenIcon,
+      color: chosenColor,
+      stars: 0.0
     };
 
     // final sanitize: remove any accidental rank unlocks and ensure arrays exist
@@ -1554,19 +1608,25 @@ function renderRestaurantsModal(){
     const total = ALL_RECIPES.filter(rec => !r.cuisine || (Array.isArray(rec.cuisine)? rec.cuisine.includes(r.cuisine): true)).length || 1;
     const completed = (r.unlockedRecipeNames||[]).length;
     const pct = Math.round((completed/total)*100);
+    const icon = r.icon || '🍽️'; const color = r.color || 'var(--accent)';
     const el = document.createElement('div');
-    el.className = 'flex items-center justify-between p-2 border rounded-lg';
-    el.innerHTML = `<div>
-                      <div class="font-bold">${r.name} ${idx===gameState.activeRestaurantIndex?'<span class="text-sm text-green-600"> (Ativo)</span>':''}</div>
-                      <div class="text-sm text-gray-500">${r.cuisine || '—'} • ${pct}% concluído (${completed}/${total})</div>
-                    </div>
-                    <div class="flex gap-2">
-                      <button class="switch-resto btn-main px-3 py-1 rounded" data-idx="${idx}">Abrir</button>
-                      <button class="delete-resto btn-main px-3 py-1 rounded">Apagar</button>
-                    </div>`;
+    el.className = 'resto-entry';
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        <div style="width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:${color}22;color:${color};font-size:1.2rem">${icon}</div>
+        <div>
+          <div class="font-bold">${r.name} ${idx===gameState.activeRestaurantIndex?'<span class="text-sm text-green-600"> (Ativo)</span>':''}</div>
+          <div class="text-sm text-gray-500">${r.cuisine || '—'} • ${pct}% concluído (${completed}/${total})</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <button class="switch-resto btn-main px-3 py-1 rounded bg-blue-500 text-white" data-idx="${idx}">Abrir</button>
+        <button class="delete-resto btn-main px-3 py-1 rounded bg-red-500 text-white" data-idx="${idx}">Apagar</button>
+      </div>
+    `;
     list.appendChild(el);
   });
-  // attach handlers
+  // attach handlers (rebind)
   list.querySelectorAll('.switch-resto').forEach(b=>b.addEventListener('click', (e)=>{
     const i = Number(e.currentTarget.dataset.idx);
     gameState.activeRestaurantIndex = i;
@@ -1576,18 +1636,18 @@ function renderRestaurantsModal(){
     updateAllMoneyDisplays();
     renderRestaurantsModal();
     renderRestaurantsButtonIfEligible();
+    playSound('click');
   }));
   list.querySelectorAll('.delete-resto').forEach(b=>b.addEventListener('click', (e)=>{
     const i = Number(e.currentTarget.dataset.idx);
-    // If deleting the last restaurant, treat as full reset (start fresh first-run)
+    // confirmation modal improved (theme-aware)
+    const confirmed = confirm(`Apagar "${gameState.restaurants[i].name}"? Esta ação não pode ser desfeita.`);
+    if (!confirmed) return;
     gameState.restaurants.splice(i,1);
     if ((gameState.restaurants||[]).length === 0) {
-      // Clear storage and reinitialize as first-run
       localStorage.clear();
-      // Recreate minimal gameState so UI can respond while resetGame handles full reset
       gameState = { money:50, restaurants: [{ id:'r0', name:'Meu Restaurante', cuisine:null, unlockedRecipeNames:[], unlockedIngredientIds:[], rank:0 }], activeRestaurantIndex:0 };
       saveGame();
-      // perform full reset flow to ensure UI returns to setup
       resetGame();
       return;
     }
@@ -1595,6 +1655,7 @@ function renderRestaurantsModal(){
     saveGame();
     renderRestaurantsModal();
     renderRestaurantsButtonIfEligible();
+    playSound('error');
   }));
 }
 
@@ -1640,4 +1701,46 @@ window.addEventListener('unhandledrejection', (event) => {
   } catch (e) {
     console.warn('Error in unhandledrejection handler', e);
   }
+});
+
+// Inside buildLayout() — locate the Welcome screen area and add an Install button below the Play button.
+// The edit below replaces the welcome-screen block portion with an added install button with id="install-pwa-button".
+// Add the runtime beforeinstallprompt handling near the end of the file (before the final unhandledrejection handler)
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent the automatic prompt
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const installBtn = document.getElementById('install-pwa-button');
+  if (installBtn) {
+    installBtn.classList.remove('hidden');
+    installBtn.addEventListener('click', async () => {
+      try {
+        installBtn.disabled = true;
+        playSound('click');
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          console.log('Usuário aceitou instalação PWA');
+        } else {
+          console.log('Usuário recusou instalação PWA');
+        }
+      } catch (err) {
+        console.warn('Instalação PWA falhou', err);
+      } finally {
+        installBtn.disabled = false;
+        installBtn.classList.add('hidden');
+        deferredInstallPrompt = null;
+      }
+    });
+  }
+});
+
+// Hide install button after appinstalled
+window.addEventListener('appinstalled', (evt) => {
+  deferredInstallPrompt = null;
+  const installBtn = document.getElementById('install-pwa-button');
+  if (installBtn) installBtn.classList.add('hidden');
+  console.log('PWA instalada');
 });
