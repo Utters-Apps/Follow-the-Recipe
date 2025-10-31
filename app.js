@@ -20,11 +20,29 @@ const VIP_REWARD_MULTIPLIER = 1.9; // slightly bigger VIP reward
 const SUCCESS_MODAL_DURATION = 1600;
 const FAILURE_MODAL_DURATION = 2000;
 const BGM_KEY = 'recipeGameBGMMuted_v6';
+const LANG_KEY = 'recipeGameLang_v1'; // added to enable language redirect checks
 /* ---------------------- */
 
 function buildLayout() {
   appRoot.innerHTML = `
-  <div id="game-container" class="w-full max-w-md h-full md:h-[100vh] md:max-h-[100vh] shadow-xl rounded-2xl flex flex-col overflow-hidden relative bg-white/80 backdrop-blur-sm border border-white/30">
+  <div id="game-container" class="w-full max-w-md h-full md:h-[95vh] md:max-h-[800px] shadow-xl rounded-2xl flex flex-col overflow-hidden relative bg-white/80 backdrop-blur-sm border border-white/30">
+    <!-- Language selection modal (shown at first run) -->
+    <div id="language-modal" class="hidden absolute inset-0 z-60 flex items-center justify-center p-6 modal-scrim-pane">
+      <div class="modal-card p-4 rounded-2xl w-full max-w-sm text-center">
+        <h3 class="text-2xl font-bold mb-2">Escolha o idioma do jogo</h3>
+        <p class="text-sm mb-4">Choose your language / Выберите язык</p>
+        <div class="grid grid-cols-2 gap-2 mb-3">
+          <button id="lang-ru" class="btn-main bg-gray-100 py-3 rounded-lg">Русский</button>
+          <button id="lang-de" class="btn-main bg-gray-100 py-3 rounded-lg">Deutsch</button>
+          <button id="lang-es" class="btn-main bg-gray-100 py-3 rounded-lg">Español</button>
+          <button id="lang-en" class="btn-main bg-gray-100 py-3 rounded-lg">English</button>
+        </div>
+        <div>
+          <button id="lang-pt" class="btn-main bg-purple-500 text-white py-3 rounded-lg w-full">Português (manter)</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Setup (first run) -->
     <div id="setup-screen" class="screen active p-6 flex flex-col items-center justify-start text-center h-full">
       <h1 class="text-3xl font-black mb-1">Bem-vindo ao seu Restaurante</h1>
@@ -654,32 +672,27 @@ function renderUnlockedIngredientBin(){
   const active = getActiveRestaurant();
   ingredientBin.innerHTML = '';
   // base pool is active restaurant's unlocked ingredients (shuffled)
-  const ids = [...(active.unlockedIngredientIds||[])].sort(()=>Math.random()-0.5);
-  // start with first N slots but ensure ALL required recipe ingredients are included and prioritized
+  const ids = [...(active.unlockedIngredientIds||[])];
+
+  // Always include and prioritize current order ingredients, but final visible order should be shuffled
   const MAX_VISIBLE = 15;
   let visible = ids.slice(0, MAX_VISIBLE);
 
-  // Always include current order ingredients (prioritize and ensure presence)
   if (session?.currentOrder?.recipe && Array.isArray(session.currentOrder.recipe)){
-    // ensure required ingredients appear first in visible set
     const required = session.currentOrder.recipe;
-    const set = new Set(required.concat(visible)); // required first, then existing visible
-    // keep original order: required in order, then fill with other ids up to MAX_VISIBLE
+    // ensure required ingredients present
+    const set = new Set(required.concat(visible));
     const final = [];
-    for (const r of required){
-      if (!final.includes(r)) final.push(r);
-    }
-    for (const v of ids){
-      if (final.length >= MAX_VISIBLE) break;
-      if (!final.includes(v)) final.push(v);
-    }
-    // If still under capacity, fill from any unlocked extras
-    for (const v of ids){
+    for (const r of required) if (!final.includes(r)) final.push(r);
+    for (const v of ids) {
       if (final.length >= MAX_VISIBLE) break;
       if (!final.includes(v)) final.push(v);
     }
     visible = final.slice(0, MAX_VISIBLE);
   }
+
+  // Shuffle visible so ingredient buttons appear in random order each time
+  shuffleArray(visible);
 
   // As a last resort, if an ingredient id isn't in ALL_INGREDIENTS it will render a readable pill (handled in ui.getIngredientHTML)
   visible.forEach(id=>{
@@ -729,9 +742,13 @@ function renderMarket(){
   sortedBuy.forEach(({recipe,isUnlocked,isBuyable,isRankUpCard})=>{
     const card = document.createElement('div');
     card.className = `card rounded-xl shadow-lg p-4 flex items-center space-x-4 transition-all relative border`;
+    // Guard against undefined image fields to avoid "undefined" output in templates
+    const imgSrc = (recipe && typeof recipe.image === 'string' && recipe.image.trim().length > 0) ? recipe.image : null;
+    const iconHtml = recipe.emoji ? `<div class="text-5xl">${recipe.emoji}</div>` 
+                      : (imgSrc ? `<div style="width:56px;height:56px"><img src="${imgSrc}" alt="${recipe.name}" class="ing-img" style="width:56px;height:56px;object-fit:contain;border-radius:8px" onerror="this.style.display='none'"></div>` : `<div class="text-5xl">🍽️</div>`);
     card.innerHTML = `
       ${isRankUpCard ? `<span class="absolute top-0 right-0 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">META</span>` : ''}
-      <div class="text-5xl">${recipe.emoji}</div>
+      ${iconHtml}
       <div class="flex-1">
         <h4 class="text-xl font-bold">${recipe.name}</h4>
         <p class="text-sm">${[...new Set([...recipe.baseRecipe,...recipe.optionalIngredients])].map(id=>getIngredientHTML(id,'text-sm')).join(' + ')}</p>
@@ -756,8 +773,11 @@ function renderMarket(){
     sortedOwned.forEach(({recipe})=>{
       const card = document.createElement('div');
       card.className = `card rounded-xl shadow-lg p-4 flex items-center space-x-4 transition-all relative border`;
+      const imgOwned = (recipe && typeof recipe.image === 'string' && recipe.image.trim().length > 0) ? recipe.image : null;
+      const iconHtmlOwned = recipe.emoji ? `<div class="text-5xl">${recipe.emoji}</div>` 
+                          : (imgOwned ? `<div style="width:56px;height:56px"><img src="${imgOwned}" alt="${recipe.name}" class="ing-img" style="width:56px;height:56px;object-fit:contain;border-radius:8px" onerror="this.style.display='none'"></div>` : `<div class="text-5xl">🍽️</div>`);
       card.innerHTML = `
-        <div class="text-5xl">${recipe.emoji}</div>
+        ${iconHtmlOwned}
         <div class="flex-1">
           <h4 class="text-xl font-bold">${recipe.name}</h4>
           <p class="text-sm">${[...new Set([...recipe.baseRecipe,...recipe.optionalIngredients])].map(id=>getIngredientHTML(id,'text-sm')).join(' + ')}</p>
@@ -782,6 +802,9 @@ function resetGame(){
   document.getElementById('pause-modal')?.classList.add('hidden');
   document.getElementById('auto-offer-modal')?.classList.add('hidden');
 
+  // Clear saved language so the player must choose language again after reset
+  try { localStorage.removeItem('recipeGameLang_v1'); } catch(e){}
+
   localStorage.clear();
   gameState = { money:50, restaurants:[{ id:'r0', name:'Meu Restaurante', cuisine:null, unlockedRecipeNames:[], unlockedIngredientIds:[], rank:0 }], activeRestaurantIndex:0 };
   profile = { restoName:null, cuisine:null };
@@ -793,6 +816,13 @@ function resetGame(){
   renderMarket();
   renderUnlockedIngredientBin();
   updateAllMoneyDisplays();
+
+  // Ensure language picker is shown after reset so player must choose language again
+  const langModal = document.getElementById('language-modal');
+  if (langModal) {
+    langModal.classList.remove('hidden');
+    langModal.classList.add('modal-wrap','show');
+  }
 }
 
 function showConfirmResetModal(){ playSound('click'); confirmResetModal.classList.remove('hidden'); }
@@ -1292,6 +1322,19 @@ function init(){
     saveGame();
   }
 
+  // If a language was previously selected and it's not Portuguese, redirect to that language link immediately
+  const savedLang = localStorage.getItem(LANG_KEY);
+  const langMap = {
+    'Русский': 'https://utters-apps.github.io/Follow-the-Recipe/',
+    'Deutsch': 'https://utters-apps.github.io/Follow-the-Recipe/',
+    'Español': 'https://utters-apps.github.io/Follow-the-Recipe/',
+    'English': 'https://utters-apps.github.io/Follow-the-Recipe/'
+  };
+  if (savedLang && savedLang !== 'Português') {
+    const dest = langMap[savedLang] || null;
+    if (dest) { window.location.href = dest; return; }
+  }
+
   loadTheme();
   initBackgroundMusic(); // prepare audio object; playback happens on user actions
   updateAllMoneyDisplays();
@@ -1316,6 +1359,15 @@ function init(){
     setTimeout(() => {
       loadingScreen.style.display = 'none';
     }, 500);
+  }
+  
+  // Show language picker only if no language saved
+  if (!localStorage.getItem(LANG_KEY)) {
+    const langModal = document.getElementById('language-modal');
+    if (langModal) {
+      langModal.classList.remove('hidden');
+      langModal.classList.add('modal-wrap','show');
+    }
   }
 }
 
@@ -1442,7 +1494,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if (container && !container.querySelector('[data-cuisine="Halloween"]')){
     const sep = document.createElement('div');
     sep.className = 'col-span-2 mt-2 border-t pt-2';
-    sep.innerHTML = `<button class="cuisine-btn btn-main w-full p-3 rounded-xl border" data-cuisine="Halloween">🎃 Halloween</button>`;
+    sep.innerHTML = `<button class="cuisine-btn btn-main p-2 rounded-lg border" data-cuisine="Halloween">🎃 Halloween</button>`;
     container.appendChild(sep);
   }
   // place music toggle next to theme toggle on welcome and menu
@@ -1460,6 +1512,29 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // Restaurants logic
   renderRestaurantsButtonIfEligible();
   renderRestaurantsModal();
+
+  // wire language modal buttons
+  const mapBtn = (id, label, redirect=true) => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.setItem(LANG_KEY, label);
+      // Portuguese keeps on current page (no redirect)
+      if (label === 'Português') {
+        const m = document.getElementById('language-modal');
+        if (m) { m.classList.remove('show'); setTimeout(()=> m.classList.add('hidden'), 250); }
+        return;
+      }
+      // redirect out for other languages (for now all same link)
+      window.location.href = 'https://utters-apps.github.io/Follow-the-Recipe/';
+    });
+  };
+  mapBtn('lang-ru','Русский');
+  mapBtn('lang-de','Deutsch');
+  mapBtn('lang-es','Español');
+  mapBtn('lang-en','English');
+  mapBtn('lang-pt','Português');
 });
 
 // New modal helpers: use .modal-wrap and .modal-card.fade for consistent show/hide with fade
@@ -1762,3 +1837,12 @@ window.addEventListener('appinstalled', (evt) => {
   if (installBtn) installBtn.classList.add('hidden');
   console.log('PWA instalada');
 });
+
+// small utility to shuffle arrays (used to randomize ingredient button order)
+function shuffleArray(arr){
+  for (let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
