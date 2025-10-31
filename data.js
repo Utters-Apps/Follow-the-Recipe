@@ -1,5 +1,6 @@
-export const NPCS = 
-["👩‍💼","🧑‍💻","👨‍🎨","👩‍🚀","🧑‍🚒","👮‍♀️","👷‍♂️","👩‍⚕️","🧑‍🎤","👨‍🌾","🧑‍🍳","👩‍🎓","🧑‍🔧","🧑‍🌾","🧑‍🏫","🧑‍✈️","🧙‍♂️","🧛‍♀️","🧚‍♂️","🦸‍♀️","🦹‍♂️","🤵","👸","🧕","👨‍⚖️","🧑‍⚖️","👨‍💻","👩‍🔬","👨‍🔬","🧑‍🚀","👩‍✈️","🧑‍💼","👩‍🏭","🧑‍🏭","👨‍🔧","👩‍🔧","🧑‍🚒","👨‍🚒","👩‍🚒","🧑‍⚕️","👩","🧑","👨","👩🏽","👨🏻","🧑🏿","👩🏼","👨🏾","🧑🏻","👩🏾","🧔","👳‍♂️","👲","👱‍♀️","👱‍♂️","🧓","👴","👵","🧑‍🦰","🧑‍🦱","🧑‍🦳","🧑‍🦲","👩‍🦰","👨‍🦰","👩‍🦱","👨‍🦱","👩‍🦳","👨‍🦳","👩‍🦲","👨‍🦲","🤠","🤓","😎","🥸","🤡","👻","🧟‍♂️","🧞‍♀️","🧜‍♂️","🧝‍♀️","🧝‍♂️","🧙‍♀️","🧚‍♀️","🦸‍♂️","🦹‍♀️","🧛‍♂️","🧟‍♀️","🧞‍♂️","🧜‍♀️","🧌","🎅","🤶","🧑‍🎄","👼","💂‍♂️","👮‍♂️","🕵️‍♀️","🕵️‍♂️","💃","🕺","🧘‍♀️","🧘‍♂️","🏄‍♀️","🏄‍♂️","🏇","🚴‍♀️","🚴‍♂️","🤾‍♀️","🤾‍♂️","🏋️‍♀️","🧙‍♀️","🧙‍♂️","🧛‍♀️","🧛‍♂️","🧝‍♀️","🧝‍♂️","🧞‍♀️","🧞‍♂️","🧟‍♀️","🧟‍♂️","👽","🤖","👾","💂","🧜‍♀️","🧜‍♂️","🧚‍♀️","🧚‍♂️","👼"];
+export const NPCS = [
+  "👩‍💼","🧑‍💻","👨‍🎨","👩‍🚀","🧑‍🚒","👮‍♀️","👷‍♂️","👩‍⚕️","🧑‍🎤","👨‍🌾","🧑‍🍳","👩‍🎓","🧑‍🔧","🧑‍🌾","🧑‍🏫","🧑‍✈️","🧙‍♂️","🧛‍♀️","🧚‍♂️","🦸‍♀️","🦹‍♂️","🤵","👸","🧕","👨‍⚖️","🧑‍⚖️","👨‍💻","👩‍🔬","👨‍🔬","🧑‍🚀","👩‍✈️","🧑‍💼","👩‍🏭","🧑‍🏭","👨‍🔧","👩‍🔧","🧑‍🚒","👨‍🚒","👩‍🚒","🧑‍⚕️","👩","🧑","👨","👩🏽","👨🏻","🧑🏿","👩🏼","👨🏾","🧑🏻","👩🏾","🧔","👳‍♂️","👲","👱‍♀️","👱‍♂️","🧓","👴","👵","🧑‍🦰","🧑‍🦱","🧑‍🦳","🧑‍🦲","👩‍🦰","👨‍🦰","👩‍🦱","👨‍🦱","👩‍🦳","👨‍🦳","👩‍🦲","👨‍🦲","🤠","🤓","😎","🥸","🤡","👻","🧟‍♂️","🧞‍♀️","🧜‍♂️","🧝‍♀️","🧝‍♂️","🧙‍♀️","🧚‍♀️","🦸‍♂️","🦹‍♀️","🧛‍♂️","🧟‍♀️","🧞‍♂️","🧜‍♀️","🧌","🎅","🤶","🧑‍🎄","👼","💂‍♂️","👮‍♂️","🕵️‍♀️","🕵️‍♂️","💃","🕺","🧘‍♀️","🧘‍♂️","🏄‍♀️","🏄‍♂️","🏇","🚴‍♀️","🚴‍♂️","🤾‍♀️","🤾‍♂️","🏋️‍♀️"
+];
 
 export const ALL_INGREDIENTS = {
   'pao': { type: 'emoji', value: '🍞' },
@@ -68,7 +69,7 @@ export const ALL_INGREDIENTS = {
   'laranja': { type: 'emoji', value: '🍊' },
   'melancia': { type: 'emoji', value: '🍉' },
 
-  // Use image for ingredients that share the same emoji to avoid collisions
+  // Use image for ingredients that share the same emoji or need clarity
   'tofu': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4463/4463838.png' },
   'acucar': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2599/2599603.png' },
   'farinha': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2067/2067343.png' },
@@ -76,163 +77,330 @@ export const ALL_INGREDIENTS = {
   'couve': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1728/1728744.png' },
   'mascarpone': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4465/4465423.png' },
   'polvo': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3065/3065730.png' },
-  'molho_okono': { type: 'emoji', value: '🥫' },
   'carne_seca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1046/1046849.png' },
   'cafe': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/924/924514.png' },
   'manteiga_amendoim': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3838/3838464.png' },
   'geleia': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3075/3075903.png' },
   'cha_verde': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3082/3082024.png' },
-  'abobora': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/137/137366.png' }
+  'abobora': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/137/137366.png' },
+
+  // Newly added ingredients for the expanded recipes
+  'cachaca': { type: 'image', value: 'https://cdn-icons-png.freepik.com/512/8692/8692223.png' },
+  'tapioca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2002/2002720.png' },
+  'molho_tomate': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/641/641866.png' },
+  'canela': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3813/3813153.png' },
+  'vinho': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2316/2316543.png' },
+  'caramelo': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/7009/7009546.png' },
+  'molho_okono': { type: 'image', value: 'https://images.vexels.com/media/users/3/256472/isolated/preview/d7b9d0e0dd0c99dffeea48ca55a51ae0-molhos-0.png' },
+
+  // Extra new ingredients for many added dishes
+  'ricotta': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/5621/5621723.png' },
+  'prosciutto': { type: 'image', value: 'https://cdn-icons-png.freepik.com/512/5621/5621958.png' },
+  'trufa': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4080/4080557.png' },
+  'gorgonzola': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2396/2396940.png' },
+  'amêndoa': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/9622/9622174.png' },
+  'mexilhão': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4391/4391731.png' },
+  'ameijoa': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/7591/7591601.png' },
+  'ostra': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/123/123291.png' },
+  'sake': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/5745/5745770.png' },
+  'espresso': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/5621/5621813.png' },
+  'creme': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4034/4034100.png' },
+  'manjericao': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/5621/5621881.png' },
+    'coentro': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4727/4727220.png' },
+  'mandioca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/8884/8884966.png' },
+  'requeijao': { type: 'image', value: 'https://pbs.twimg.com/media/G4jDi3zWcAAo5QY?format=png&name=small' },
+  'wasabi': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/5900/5900352.png' },
+  'nori': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2013/2013968.png' },
+  'ikura': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/5053/5053428.png' },
+  'salsa': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/8770/8770996.png' },
+  'chipotle': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/128/5787/5787071.png' },
+  'masa': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4125/4125887.png' },
+  'ricotta_fresca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/256/7010/7010869.png' },
+  'pinoli': { type: 'image', value: 'https://pbs.twimg.com/media/G4jFjIJW8AAsunL?format=png&name=360x360' },
+  'truta': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1728/1728780.png' },
+  'mandioquinha': { type: 'image', value: 'https://pbs.twimg.com/media/G4jGTecW8AE5h2V?format=png&name=small' },
+  'molho_barbecue': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4594/4594902.png' },
+  'iogurte': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2592/2592587.png' } // reutilizável para molhos/sobremesas
 };
 
-// Tag recipes by cuisine to drive filtering
 export const ALL_RECIPES = [
+  // Starter & common
   { name: "Misto Quente", emoji: "🥪", price: 0, minRank: 0, baseRecipe: ["pao","manteiga","queijo","pao"], optionalIngredients:["tomate"], cuisine:["Brasileiro","Italiano"] },
-  { name: "Limonada", emoji: "🍋", price: 60, minRank: 0, baseRecipe: ["limao","mel","gelo"], optionalIngredients:["ervas"], cuisine:["Brasileiro","Mexicano","Francês"] },
   { name: "Torrada", emoji: "🍞", price: 40, minRank: 0, baseRecipe: ["pao","manteiga"], optionalIngredients:["morango","mel"], cuisine:["Francês","Italiano","Brasileiro"] },
+  { name: "Limonada", emoji: "🍋", price: 60, minRank: 0, baseRecipe: ["limao","mel","gelo"], optionalIngredients:["ervas"], cuisine:["Brasileiro","Mexicano","Francês"] },
   { name: "Café", emoji: "☕", price: 50, minRank: 0, baseRecipe: ["cafe","leite"], optionalIngredients:["mel"], cuisine:["Brasileiro","Italiano","Francês"] },
-  { name: "Salada", emoji: "🥗", price: 100, minRank: 0, baseRecipe: ["alface","tomate","pepino"], optionalIngredients:["cebola","abacate","milho","ovo"], cuisine:["Mexicano","Italiano","Francês","Brasileiro"] },
-  { name: "Sopa de Tomate", emoji: "🥣", price: 110, minRank: 1, baseRecipe: ["tomate","cebola","ervas"], optionalIngredients:["manteiga"], cuisine:["Italiano","Francês"] },
-  { name: "Vitamina de Banana", emoji: "🍌", price: 120, minRank: 1, baseRecipe: ["banana","leite","mel"], optionalIngredients:["morango","abacate"], cuisine:["Brasileiro"] },
-  { name: "Sushi", emoji: "🍣", price: 150, minRank: 1, baseRecipe: ["alga","peixe","pepino"], optionalIngredients:["abacate"], cuisine:["Japonês"] },
-  { name: "Suco de Laranja", emoji: "🍊", price: 90, minRank: 1, baseRecipe: ["laranja","gelo"], optionalIngredients:[], cuisine:["Mexicano","Brasileiro"] },
-  { name: "Sanduíche Simples", emoji: "🥪", price: 130, minRank: 1, baseRecipe: ["pao","alface","tomate"], optionalIngredients:["queijo","bacon"], cuisine:["Italiano","Brasileiro","Francês"] },
-  { name: "Sand. de Geleia", emoji: "🥪", price: 160, minRank: 1, baseRecipe: ["pao","manteiga_amendoim","geleia","pao"], optionalIngredients:["banana"], cuisine:["Francês","Brasileiro"] },
-  { name: "Hambúrguer", emoji: "🍔", price: 200, minRank: 1, baseRecipe: ["pao","bife","alface","pao"], optionalIngredients:["queijo","tomate","bacon","cebola"], cuisine:["Americano","Brasileiro","Mexicano"] },
-
-  /* Expanded selection */
-  { name: "Taco", emoji: "🌮", price: 180, minRank: 1, baseRecipe:["taco_shell","bife","alface"], optionalIngredients:["tomate","cebola","pimenta","milho"], cuisine:["Mexicano"] },
-  { name: "Ramen", emoji: "🍜", price: 220, minRank: 2, baseRecipe:["ramen_massa","cebola","ervas"], optionalIngredients:["ovo","frango"], cuisine:["Japonês"] },
-  { name: "Pizza Margherita", emoji: "🍕", price: 240, minRank: 2, baseRecipe:["pizza_massa","tomate","queijo"], optionalIngredients:["ervas","azeitona"], cuisine:["Italiano"] },
-  { name: "Guioza", emoji: "🥟", price: 210, minRank: 2, baseRecipe:["guioza_massa","frango","ervas"], optionalIngredients:["cebola","alho"], cuisine:["Japonês"] },
-  { name: "Panqueca Doce", emoji: "🥞", price: 170, minRank: 1, baseRecipe:["panqueca","mel"], optionalIngredients:["morango","mirtilo","chocolate"], cuisine:["Americano","Francês","Brasileiro"] },
-  { name: "Waffle", emoji: "🧇", price: 190, minRank: 1, baseRecipe:["waffle","mel"], optionalIngredients:["manteiga","morango","chocolate"], cuisine:["Americano","Francês"] },
-  { name: "Sorvete", emoji: "🍦", price: 160, minRank: 1, baseRecipe:["sorvete_base"], optionalIngredients:["chocolate","morango","banana"], cuisine:["Americano","Italiano"] },
-  { name: "Bolo Simples", emoji: "🎂", price: 260, minRank: 2, baseRecipe:["bolo_massa","manteiga"], optionalIngredients:["morango","chocolate"], cuisine:["Francês","Brasileiro"] },
-  { name: "Sopa Miso", emoji: "🥣", price: 200, minRank: 2, baseRecipe:["sopa_base","alga","tofu","molho_soja"], optionalIngredients:["ervas"], cuisine:["Japonês"] },
-  { name: "Bruschetta", emoji: "🥖", price: 150, minRank: 1, baseRecipe:["baguete","tomate","alho"], optionalIngredients:["ervas","azeitona"], cuisine:["Italiano"] },
-  { name: "Croissant", emoji: "🥐", price: 230, minRank: 2, baseRecipe:["croissant_massa","manteiga"], optionalIngredients:["chocolate"], cuisine:["Francês"] },
-  { name: "Bagel", emoji: "🥯", price: 140, minRank: 1, baseRecipe:["bagel","manteiga"], optionalIngredients:["manteiga_amendoim","geleia"], cuisine:["Americano"] },
-  { name: "Pretzel", emoji: "🥨", price: 160, minRank: 1, baseRecipe:["pretzel","manteiga"], optionalIngredients:["manteiga_amendoim","chocolate"], cuisine:["Alemão"] },
-  { name: "Sashimi", emoji: "🐟", price: 400, minRank: 3, baseRecipe:["peixe"], optionalIngredients:["ervas","limao"], cuisine:["Japonês"] },
-  { name: "Salada César", emoji: "🥗", price: 280, minRank: 2, baseRecipe:["alface","queijo"], optionalIngredients:["frango","ovo","cebola"], cuisine:["Italiano","Francês"] },
-  { name: "Ratatouille", emoji: "🍲", price: 550, minRank: 3, baseRecipe:["berinjela","tomate","pimentao"], optionalIngredients:["cebola","ervas","alho"], cuisine:["Francês"] },
-  { name: "Pasta Alfredo", emoji: "🍝", price: 380, minRank: 2, baseRecipe:["massa","manteiga","queijo"], optionalIngredients:["frango","ervas"], cuisine:["Italiano"] },
-  { name: "Tostada", emoji: "🫔", price: 320, minRank: 2, baseRecipe:["taco_shell","feijao","alface"], optionalIngredients:["milho","tomate","pimenta"], cuisine:["Mexicano"] },
-  { name: "Brigadeiro", emoji: "🍬", price: 280, minRank: 2, baseRecipe:["chocolate","manteiga"], optionalIngredients:["leite"], cuisine:["Brasileiro"] },
-  { name: "Caprese", emoji: "🥗", price: 300, minRank: 2, baseRecipe:["tomate","queijo","ervas"], optionalIngredients:["azeitona"], cuisine:["Italiano"] },
-  { name: "Temaki", emoji: "🍣", price: 340, minRank: 2, baseRecipe:["alga","peixe","arroz"], optionalIngredients:["pepino","abacate"], cuisine:["Japonês"] },
-  { name: "Churros", emoji: "🍩", price: 310, minRank: 2, baseRecipe:["donut_massa","mel"], optionalIngredients:["chocolate"], cuisine:["Mexicano","Espanhol"] },
   { name: "Onigiri", emoji: "🍙", price: 70, minRank: 0, baseRecipe:["arroz","alga","sal"], optionalIngredients:["ervas"], cuisine:["Japonês"] },
   { name: "Chá Verde", emoji: "🍵", price: 40, minRank: 0, baseRecipe:["cha_verde"], optionalIngredients:["gelo"], cuisine:["Japonês"] },
-  { name: "Yakitori", emoji: "🍢", price: 160, minRank: 1, baseRecipe:["frango","ervas","sal"], optionalIngredients:[], cuisine:["Japonês"] },
-  { name: "Tempurá", emoji: "🍤", price: 360, minRank: 2, baseRecipe:["camarao","arroz"], optionalIngredients:["brocolis"], cuisine:["Japonês"] },
+  { name: "Milho Assado (Elote)", emoji: "🌽", price: 140, minRank: 0, baseRecipe: ["milho","manteiga"], optionalIngredients: ["pimenta","queijo"], cuisine:["Mexicano"] },
 
-  /* New Recipes */
-  { name: "Feijoada", emoji: "🍲", price: 650, minRank: 3, baseRecipe: ["feijao", "carne_seca"], optionalIngredients: ["couve", "arroz"], cuisine: ["Brasileiro"] },
-  { name: "Caipirinha", emoji: "🍹", price: 300, minRank: 2, baseRecipe: ["limao", "acucar", "gelo"], optionalIngredients: [], cuisine: ["Brasileiro"] },
-  { name: "Carbonara", emoji: "🍝", price: 450, minRank: 3, baseRecipe: ["massa", "ovo", "bacon"], optionalIngredients: ["queijo"], cuisine: ["Italiano"] },
-  { name: "Guacamole", emoji: "🥑", price: 290, minRank: 2, baseRecipe: ["abacate", "tomate", "cebola", "limao"], optionalIngredients: ["pimenta"], cuisine: ["Mexicano"] },
-  { name: "Sopa Azteca", emoji: "🥣", price: 410, minRank: 3, baseRecipe: ["sopa_base", "frango", "pimenta"], optionalIngredients: ["tomate", "queijo"], cuisine: ["Mexicano"] },
-  { name: "Okonomiyaki", emoji: "🥞", price: 500, minRank: 3, baseRecipe: ["farinha", "repolho", "ovo"], optionalIngredients: ["bacon", "molho_okono"], cuisine: ["Japonês"] },
-  { name: "Takoyaki", emoji: "🐙", price: 520, minRank: 3, baseRecipe: ["polvo", "farinha", "molho_okono"], optionalIngredients: ["ervas"], cuisine: ["Japonês"] },
-  { name: "Tiramisu", emoji: "🍰", price: 580, minRank: 4, baseRecipe: ["bolo_massa", "cafe", "mascarpone"], optionalIngredients: ["chocolate"], cuisine: ["Italiano"] },
-  { name: "Crepe Suzette", emoji: "🥞", price: 480, minRank: 3, baseRecipe: ["panqueca", "laranja", "manteiga"], optionalIngredients: ["mel"], cuisine: ["Francês"] }
+  // Rank 1 offerings
+  { name: "Suco de Laranja", emoji: "🍊", price: 90, minRank: 1, baseRecipe: ["laranja","gelo"], optionalIngredients:[], cuisine:["Mexicano","Brasileiro"] },
+  { name: "Sanduíche Simples", emoji: "🥪", price: 130, minRank: 1, baseRecipe: ["pao","alface","tomate"], optionalIngredients:["queijo","bacon"], cuisine:["Italiano","Brasileiro","Francês"] },
+  { name: "Panqueca Doce", emoji: "🥞", price: 170, minRank: 1, baseRecipe:["panqueca","mel"], optionalIngredients:["morango","mirtilo","chocolate"], cuisine:["Americano","Francês","Brasileiro"] },
+  { name: "Bagel", emoji: "🥯", price: 140, minRank: 1, baseRecipe:["bagel","manteiga"], optionalIngredients:["manteiga_amendoim","geleia"], cuisine:["Americano"] },
+  { name: "Mochi", emoji: "🍡", price: 140, minRank: 1, baseRecipe:["bolo_massa","acucar"], optionalIngredients:["morango"], cuisine:["Japonês"] },
+  { name: "Bruschetta", emoji: "🥖", price: 150, minRank: 1, baseRecipe:["baguete","tomate","alho"], optionalIngredients:["ervas","azeitona"], cuisine:["Italiano"] },
+  { name: "Vitamina de Banana", emoji: "🍌", price: 120, minRank: 1, baseRecipe: ["banana","leite","mel"], optionalIngredients:["morango","abacate"], cuisine:["Brasileiro"] },
+
+  // Rank 2 offerings
+  { name: "Sopa de Tomate", emoji: "🥣", price: 110, minRank: 1, baseRecipe: ["tomate","cebola","ervas"], optionalIngredients:["manteiga"], cuisine:["Italiano","Francês"] },
+  { name: "Sushi", emoji: "🍣", price: 150, minRank: 1, baseRecipe: ["alga","peixe","pepino"], optionalIngredients:["abacate"], cuisine:["Japonês"] },
+  { name: "Guioza", emoji: "🥟", price: 210, minRank: 2, baseRecipe:["guioza_massa","frango","ervas"], optionalIngredients:["cebola","alho"], cuisine:["Japonês"] },
+  { name: "Waffle", emoji: "🧇", price: 190, minRank: 1, baseRecipe:["waffle","mel"], optionalIngredients:["manteiga","morango","chocolate"], cuisine:["Americano","Francês"] },
+  { name: "Pizza Margherita", emoji: "🍕", price: 240, minRank: 2, baseRecipe:["pizza_massa","tomate","queijo"], optionalIngredients:["ervas","azeitona"], cuisine:["Italiano"] },
+  { name: "Sanduíche de Geleia", emoji: "🥪", price: 160, minRank: 1, baseRecipe:["pao","manteiga_amendoim","geleia","pao"], optionalIngredients:["banana"], cuisine:["Francês","Brasileiro"] },
+
+  // Mid-high tier
+  { name: "Hambúrguer", emoji: "🍔", price: 200, minRank: 1, baseRecipe: ["pao","bife","alface","pao"], optionalIngredients:["queijo","tomate","bacon","cebola"], cuisine:["Americano","Brasileiro","Mexicano"] },
+  { name: "Taco", emoji: "🌮", price: 180, minRank: 1, baseRecipe:["taco_shell","bife","alface"], optionalIngredients:["tomate","cebola","pimenta","milho"], cuisine:["Mexicano"] },
+  { name: "Ramen", emoji: "🍜", price: 220, minRank: 2, baseRecipe:["ramen_massa","cebola","ervas"], optionalIngredients:["ovo","frango"], cuisine:["Japonês"] },
+  { name: "Pasta Alfredo", emoji: "🍝", price: 380, minRank: 2, baseRecipe:["massa","manteiga","queijo"], optionalIngredients:["frango","ervas"], cuisine:["Italiano"] },
+
+  // High tier / late game
+  { name: "Bolo Simples", emoji: "🎂", price: 260, minRank: 2, baseRecipe:["bolo_massa","manteiga"], optionalIngredients:["morango","chocolate"], cuisine:["Francês","Brasileiro"] },
+  { name: "Sashimi", emoji: "🐟", price: 400, minRank: 3, baseRecipe:["peixe"], optionalIngredients:["ervas","limao"], cuisine:["Japonês"] },
+  { name: "Carbonara", emoji: "🍝", price: 450, minRank: 3, baseRecipe:["massa","ovo","bacon"], optionalIngredients:["queijo"], cuisine:["Italiano"] },
+  { name: "Feijoada", emoji: "🍲", price: 650, minRank: 3, baseRecipe:["feijao","carne_seca"], optionalIngredients:["couve","arroz"], cuisine:["Brasileiro"] },
+  { name: "Ratatouille", emoji: "🍲", price: 550, minRank: 3, baseRecipe:["berinjela","tomate","pimentao"], optionalIngredients:["cebola","ervas","alho"], cuisine:["Francês"] },
+  { name: "Takoyaki", emoji: "🐙", price: 520, minRank: 3, baseRecipe:["polvo","farinha","molho_okono"], optionalIngredients:["ervas"], cuisine:["Japonês"] },
+
+  // Specialty & seasonal (Halloween)
+  { name:"Panqueca do Terror", emoji:"🥞", price:250, minRank:0, baseRecipe:["panqueca","mel"], optionalIngredients:["abobora","chocolate"], cuisine:["Halloween"] },
+  { name:"Onigiri Fantasma", emoji:"👻", price:140, minRank:1, baseRecipe:["arroz","alga"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
+  { name:"Takoyaki Tenebroso", emoji:"🐙", price:380, minRank:3, baseRecipe:["polvo","farinha","molho_okono"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
+
+  // Additional variety (small selection to enrich gameplay)
+  { name: "Moqueca Simples", emoji: "🍲", price: 420, minRank: 2, baseRecipe: ["peixe","coco","cebola"], optionalIngredients: ["coentro","arroz"], cuisine: ["Brasileiro"] },
+  { name: "Panzanella", emoji: "🥗", price: 210, minRank: 1, baseRecipe: ["baguete","tomate","azeitona"], optionalIngredients: ["ervas","queijo"], cuisine: ["Italiano"] },
+  { name: "Ochazuke", emoji: "🍵", price: 180, minRank: 1, baseRecipe: ["arroz","cha_verde"], optionalIngredients: ["sal","alga"], cuisine: ["Japonês"] },
+  { name: "Guacamole", emoji: "🥑", price: 290, minRank: 2, baseRecipe: ["abacate","tomate","cebola","limao"], optionalIngredients: ["pimenta"], cuisine: ["Mexicano"] },
+  { name: "Crepe Suzette", emoji: "🥞", price: 480, minRank: 3, baseRecipe: ["panqueca","laranja","manteiga"], optionalIngredients: ["mel"], cuisine: ["Francês"] },
+
+  // ============================
+  // +10 receitas BRASILEIRO (já adicionadas anteriormente)
+  // ============================
+  { name: "Caipirinha", emoji: "🍹", price: 160, minRank: 1, baseRecipe: ["limao","acucar","gelo","cachaca"], optionalIngredients: [], cuisine: ["Brasileiro"] },
+  { name: "Coxinha", emoji: "🍗", price: 180, minRank: 1, baseRecipe: ["frango","farinha","manteiga"], optionalIngredients: ["cebola"], cuisine: ["Brasileiro"] },
+  { name: "Brigadeiro", emoji: "🍫", price: 120, minRank: 1, baseRecipe: ["chocolate","leite","manteiga","acucar"], optionalIngredients: [], cuisine: ["Brasileiro"] },
+  { name: "Pão de Queijo", emoji: "🧀", price: 140, minRank: 1, baseRecipe: ["queijo","farinha","ovo"], optionalIngredients: [], cuisine: ["Brasileiro"] },
+  { name: "Pastel de Feira", emoji: "🥟", price: 150, minRank: 1, baseRecipe: ["guioza_massa","frango","queijo"], optionalIngredients: [], cuisine: ["Brasileiro"] },
+  { name: "Tapioca Doce", emoji: "🥞", price: 130, minRank: 1, baseRecipe: ["tapioca","geleia"], optionalIngredients: ["manteiga"], cuisine: ["Brasileiro"] },
+  { name: "Bolo de Cenoura", emoji: "🎂", price: 200, minRank: 2, baseRecipe: ["bolo_massa","cenoura"], optionalIngredients: ["chocolate","manteiga"], cuisine: ["Brasileiro"] },
+  { name: "Empadão de Frango", emoji: "🥧", price: 300, minRank: 2, baseRecipe: ["bolo_massa","frango","milho"], optionalIngredients: ["ervas"], cuisine: ["Brasileiro"] },
+  { name: "Acarajé (Mini)", emoji: "🟤", price: 220, minRank: 2, baseRecipe: ["feijao","farinha","manteiga"], optionalIngredients: ["pimenta"], cuisine: ["Brasileiro"] },
+  { name: "Doce de Leite", emoji: "🍯", price: 110, minRank: 1, baseRecipe: ["leite","acucar"], optionalIngredients: ["canela"], cuisine: ["Brasileiro"] },
+
+  // ============================
+  // MUITO MAIS pratos por cozinha (adicionados agora)
+  // ============================
+  // Mais BRASILEIRO
+  { name: "Escondidinho", emoji: "🥧", price: 330, minRank: 2, baseRecipe: ["batata","carne_seca","manteiga"], optionalIngredients:["queijo"], cuisine:["Brasileiro"] },
+  { name: "Moela ao Molho", emoji: "🍗", price: 240, minRank: 2, baseRecipe: ["frango","molho_tomate"], optionalIngredients:["ervas"], cuisine:["Brasileiro"] },
+  { name: "Bobó de Camarão", emoji: "🍤", price: 480, minRank: 3, baseRecipe: ["camarao","coco","leite"], optionalIngredients:["arroz"], cuisine:["Brasileiro"] },
+  { name: "Pavê", emoji: "🍰", price: 200, minRank: 1, baseRecipe: ["bolo_massa","creme"], optionalIngredients:["chocolate"], cuisine:["Brasileiro"] },
+  { name: "Quindim", emoji: "🍮", price: 160, minRank: 1, baseRecipe: ["ovo","acucar","manteiga"], optionalIngredients:[], cuisine:["Brasileiro"] },
+  { name: "Caldo de Cana (mini)", emoji: "🧃", price: 90, minRank: 1, baseRecipe: ["abacaxi","acucar"], optionalIngredients:[], cuisine:["Brasileiro"] },
+
+  // Mais ITALIANO
+  { name: "Salada Caprese", emoji: "🥗", price: 220, minRank: 1, baseRecipe: ["tomate","queijo","manjericao"], optionalIngredients:["azeitona"], cuisine:["Italiano"] },
+  { name: "Pasta ao Pesto", emoji: "🍝", price: 300, minRank: 2, baseRecipe: ["massa","manjericao","queijo"], optionalIngredients:["pinoli"], cuisine:["Italiano"] },
+  { name: "Presunto e Melão", emoji: "🍈", price: 260, minRank: 1, baseRecipe: ["prosciutto","mel"], optionalIngredients:[], cuisine:["Italiano"] },
+  { name: "Torta Salgada", emoji: "🥧", price: 280, minRank: 2, baseRecipe: ["bolo_massa","ricotta","espinafre"], optionalIngredients:[], cuisine:["Italiano"] },
+  { name: "Frittata", emoji: "🍳", price: 200, minRank: 1, baseRecipe: ["ovo","queijo","ervas"], optionalIngredients:["batata"], cuisine:["Italiano"] },
+  { name: "Bruschetta com Pesto", emoji: "🥖", price: 210, minRank: 1, baseRecipe: ["baguete","manjericao","queijo"], optionalIngredients:[], cuisine:["Italiano"] },
+
+  // Mais JAPONÊS
+  { name: "Katsu", emoji: "🍗", price: 280, minRank: 2, baseRecipe: ["frango","farinha","ovo"], optionalIngredients:["molho_soja"], cuisine:["Japonês"] },
+  { name: "Somen", emoji: "🍜", price: 200, minRank: 1, baseRecipe: ["ramen_massa","gelo"], optionalIngredients:["cebola"], cuisine:["Japonês"] },
+  { name: "Ikura Don", emoji: "🍣", price: 380, minRank: 3, baseRecipe: ["arroz","peixe","sal"], optionalIngredients:["alga"], cuisine:["Japonês"] },
+  { name: "Chawanmushi", emoji: "🍮", price: 240, minRank: 2, baseRecipe: ["ovo","creme"], optionalIngredients:["camarao"], cuisine:["Japonês"] },
+  { name: "Yaki Udon", emoji: "🍜", price: 260, minRank: 2, baseRecipe: ["ramen_massa","frango","molho_soja"], optionalIngredients:["cebola"], cuisine:["Japonês"] },
+  { name: "Parfait de Matcha", emoji: "🍨", price: 200, minRank: 1, baseRecipe: ["cha_verde","sorvete_base"], optionalIngredients:["mirtilo"], cuisine:["Japonês"] },
+
+  // Mais MEXICANO
+  { name: "Chilaquiles", emoji: "🍽️", price: 320, minRank: 2, baseRecipe: ["taco_shell","queijo","salsa"], optionalIngredients:["frango"], cuisine:["Mexicano"] },
+  { name: "Água Fresca", emoji: "🧃", price: 120, minRank: 1, baseRecipe: ["laranja","gelo"], optionalIngredients:["mel"], cuisine:["Mexicano"] },
+  { name: "Mole Poblano (mini)", emoji: "🍗", price: 420, minRank: 3, baseRecipe: ["frango","chocolate","pimenta"], optionalIngredients:["arroz"], cuisine:["Mexicano"] },
+  { name: "Coquetel de Camarão", emoji: "🦐", price: 380, minRank: 2, baseRecipe: ["camarao","limao","sal"], optionalIngredients:["abacate"], cuisine:["Mexicano"] },
+  { name: "Sopes", emoji: "🥟", price: 240, minRank: 1, baseRecipe: ["massa","feijao","queijo"], optionalIngredients:["alface"], cuisine:["Mexicano"] },
+  { name: "Carne Asada (mini)", emoji: "🥩", price: 360, minRank: 3, baseRecipe: ["bife","sal","ervas"], optionalIngredients:["pimenta"], cuisine:["Mexicano"] },
+
+  // Mais FRANCÊS
+  { name: "Rillettes", emoji: "🥖", price: 220, minRank: 1, baseRecipe: ["carne_seca","manteiga"], optionalIngredients:["baguete"], cuisine:["Francês"] },
+  { name: "Soufflé (mini)", emoji: "🍮", price: 300, minRank: 2, baseRecipe: ["ovo","creme","queijo"], optionalIngredients:["canela"], cuisine:["Francês"] },
+  { name: "Salada Niçoise", emoji: "🥗", price: 260, minRank: 2, baseRecipe: ["ameijoa","ovo","batata"], optionalIngredients:["azeitona"], cuisine:["Francês"] },
+  { name: "Pain Perdu", emoji: "🍞", price: 180, minRank: 1, baseRecipe: ["pao","ovo","leite"], optionalIngredients:["mel"], cuisine:["Francês"] },
+  { name: "Clam Chowder (mini)", emoji: "🥣", price: 340, minRank: 2, baseRecipe: ["ameijoa","sopa_base","creme"], optionalIngredients:["batata"], cuisine:["Francês"] },
+  { name: "Tartelette", emoji: "🥧", price: 220, minRank: 1, baseRecipe: ["bolo_massa","maca"], optionalIngredients:["canela"], cuisine:["Francês"] },
+
+  // Mais HALLOWEEN / Seasonal
+  { name: "Café Preto (Espresso)", emoji: "☕", price: 90, minRank: 0, baseRecipe: ["espresso"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Ponche Sangrento", emoji: "🧃", price: 160, minRank: 1, baseRecipe: ["laranja","morango"], optionalIngredients:["gelo"], cuisine:["Halloween"] },
+  { name: "Ensopado Assombrado", emoji: "🥣", price: 300, minRank: 2, baseRecipe: ["feijao","carne_seca"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
+  { name: "Croissant Amaldiçoado", emoji: "🥐", price: 190, minRank: 1, baseRecipe: ["croissant_massa","chocolate"], optionalIngredients:["geleia"], cuisine:["Halloween"] },
+  { name: "Biscoitos Fantasma", emoji: "🍪", price: 140, minRank: 0, baseRecipe: ["cookie_massa","chocolate"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Tarte Pesadelo", emoji: "🥧", price: 340, minRank: 3, baseRecipe: ["maca","trufa","caramelo"], optionalIngredients:[], cuisine:["Halloween"] },
+
+    // ======= 15 BRASILEIRO =======
+  { name: "Virado à Paulista", emoji: "🍛", price: 320, minRank: 2, baseRecipe:["feijao","arroz","couve","bacon"], optionalIngredients:["ovo"], cuisine:["Brasileiro"] },
+  { name: "Carne de Sol com Mandioca", emoji: "🥩", price: 380, minRank: 2, baseRecipe:["carne_seca","mandioca","manteiga"], optionalIngredients:["coentro"], cuisine:["Brasileiro"] },
+  { name: "Escondidinho de Carne-Seca", emoji: "🥧", price: 340, minRank: 2, baseRecipe:["mandioca","carne_seca","queijo"], optionalIngredients:[], cuisine:["Brasileiro"] },
+  { name: "Baião de Dois", emoji: "🍚", price: 300, minRank: 2, baseRecipe:["feijao","arroz","queijo"], optionalIngredients:["coentro"], cuisine:["Brasileiro"] },
+  { name: "Dobradinha (mini)", emoji: "🥣", price: 280, minRank: 2, baseRecipe:["feijao","cebola","ervas"], optionalIngredients:["pimenta"], cuisine:["Brasileiro"] },
+  { name: "Bolinho de Bacalhau", emoji: "🍤", price: 240, minRank: 1, baseRecipe:["peixe","batata","cebola"], optionalIngredients:[], cuisine:["Brasileiro"] },
+  { name: "Pirão de Peixe", emoji: "🍲", price: 260, minRank: 2, baseRecipe:["peixe","farinha","coentro"], optionalIngredients:["arroz"], cuisine:["Brasileiro"] },
+  { name: "Polenta com Ragu", emoji: "🍝", price: 320, minRank: 2, baseRecipe:["milho","bife","molho_tomate"], optionalIngredients:["queijo"], cuisine:["Brasileiro"] },
+  { name: "Risoto de Mandioquinha", emoji: "🍚", price: 360, minRank: 3, baseRecipe:["arroz","mandioquinha","creme"], optionalIngredients:["queijo"], cuisine:["Brasileiro"] },
+  { name: "Costela Assada (mini)", emoji: "🍖", price: 420, minRank: 3, baseRecipe:["bife","molho_barbecue"], optionalIngredients:["batata"], cuisine:["Brasileiro"] },
+  { name: "Moqueca de Palmito (veg)", emoji: "🍲", price: 280, minRank: 1, baseRecipe:["coco","palmito"], optionalIngredients:["coentro"], cuisine:["Brasileiro"] },
+  { name: "Tutu à Mineira (mini)", emoji: "🥣", price: 240, minRank: 2, baseRecipe:["feijao","farinha"], optionalIngredients:["torresmo"], cuisine:["Brasileiro"] },
+  { name: "Caruru (mini)", emoji: "🥣", price: 300, minRank: 2, baseRecipe:["okra","camarao"], optionalIngredients:["coentro"], cuisine:["Brasileiro"] },
+  { name: "Risoles Recheado", emoji: "🥟", price: 160, minRank: 1, baseRecipe:["farinha","frango","queijo"], optionalIngredients:[], cuisine:["Brasileiro"] },
+  { name: "Doce de Abóbora", emoji: "🍮", price: 120, minRank: 1, baseRecipe:["abobora","acucar","canela"], optionalIngredients:[], cuisine:["Brasileiro"] },
+
+    // ======= 15 ITALIANO =======
+  { name: "Tagliatelle ao Ragu", emoji: "🍝", price: 360, minRank: 2, baseRecipe:["massa","bife","molho_tomate"], optionalIngredients:["manjericao"], cuisine:["Italiano"] },
+  { name: "Gnocchi ao molho de Queijo", emoji: "🥔", price: 300, minRank: 2, baseRecipe:["batata","queijo","creme"], optionalIngredients:["trufa"], cuisine:["Italiano"] },
+  { name: "Pizzeta de Prosciutto", emoji: "🍕", price: 320, minRank: 2, baseRecipe:["pizza_massa","prosciutto","queijo"], optionalIngredients:["manjericao"], cuisine:["Italiano"] },
+  { name: "Carpaccio", emoji: "🥩", price: 420, minRank: 3, baseRecipe:["bife","azeitona","ervas"], optionalIngredients:["pinoli"], cuisine:["Italiano"] },
+  { name: "Farfalle ao Pesto", emoji: "🍝", price: 300, minRank: 2, baseRecipe:["massa","manjericao","pinoli"], optionalIngredients:["ricotta_fresca"], cuisine:["Italiano"] },
+  { name: "Saltimbocca", emoji: "🥩", price: 440, minRank: 3, baseRecipe:["bife","prosciutto","manteiga"], optionalIngredients:["manjericao"], cuisine:["Italiano"] },
+  { name: "Polenta Cremosa", emoji: "🍚", price: 260, minRank: 1, baseRecipe:["mandioca","manteiga"], optionalIngredients:["queijo"], cuisine:["Italiano"] },
+  { name: "Pizzaiolo Especial", emoji: "🍕", price: 380, minRank: 3, baseRecipe:["pizza_massa","molho_tomate","queijo"], optionalIngredients:["trufa"], cuisine:["Italiano"] },
+  { name: "Torta de Ricota", emoji: "🥧", price: 240, minRank: 1, baseRecipe:["bolo_massa","ricotta_fresca"], optionalIngredients:["manteiga"], cuisine:["Italiano"] },
+  { name: "Bruschetta Variada", emoji: "🥖", price: 200, minRank: 1, baseRecipe:["baguete","tomate","manjericao"], optionalIngredients:["azeitona"], cuisine:["Italiano"] },
+  { name: "Risoto de Truta", emoji: "🍚", price: 400, minRank: 3, baseRecipe:["arroz","truta","creme"], optionalIngredients:["ervas"], cuisine:["Italiano"] },
+  { name: "Calzone", emoji: "🥟", price: 280, minRank: 2, baseRecipe:["pizza_massa","queijo","molho_tomate"], optionalIngredients:["prosciutto"], cuisine:["Italiano"] },
+  { name: "Panna Cotta com Frutas", emoji: "🍮", price: 220, minRank: 1, baseRecipe:["creme","morango"], optionalIngredients:["mel"], cuisine:["Italiano"] },
+  { name: "Polpettone (mini)", emoji: "🍖", price: 360, minRank: 3, baseRecipe:["bife","farinha","molho_tomate"], optionalIngredients:["queijo"], cuisine:["Italiano"] },
+  { name: "Panzerotti", emoji: "🥟", price: 260, minRank: 2, baseRecipe:["massa","queijo","molho_tomate"], optionalIngredients:["manjericao"], cuisine:["Italiano"] },
+
+   // ======= 15 JAPONÊS =======
+  { name: "Donburi de Porco", emoji: "🍚", price: 300, minRank: 2, baseRecipe:["arroz","bife","molho_soja"], optionalIngredients:["ovo"], cuisine:["Japonês"] },
+  { name: "Karaage", emoji: "🍗", price: 260, minRank: 1, baseRecipe:["frango","farinha","ovo"], optionalIngredients:["gengibre"], cuisine:["Japonês"] },
+  { name: "Temaki", emoji: "🍣", price: 220, minRank: 1, baseRecipe:["nori","arroz","peixe"], optionalIngredients:["abacate"], cuisine:["Japonês"] },
+  { name: "Ikura Bowl", emoji: "🍣", price: 420, minRank: 3, baseRecipe:["arroz","ikura","nori"], optionalIngredients:["wasabi"], cuisine:["Japonês"] },
+  { name: "Unagi no Kabayaki (mini)", emoji: "🐟", price: 420, minRank: 3, baseRecipe:["peixe","molho_soja"], optionalIngredients:["arroz"], cuisine:["Japonês"] },
+  { name: "Yakisoba", emoji: "🍜", price: 240, minRank: 1, baseRecipe:["ramen_massa","legumes","molho_soja"], optionalIngredients:["frango"], cuisine:["Japonês"] },
+  { name: "Onsen Tamago", emoji: "🍳", price: 120, minRank: 1, baseRecipe:["ovo","sal"], optionalIngredients:[], cuisine:["Japonês"] },
+  { name: "Takosen (snack)", emoji: "🍙", price: 160, minRank: 1, baseRecipe:["taco_shell","takoyaki"], optionalIngredients:[], cuisine:["Japonês"] },
+  { name: "Sukiyaki (mini)", emoji: "🍲", price: 420, minRank: 3, baseRecipe:["bife","cebola","molho_soja"], optionalIngredients:["ovo"], cuisine:["Japonês"] },
+  { name: "Nabe Vegetal", emoji: "🥣", price: 220, minRank: 1, baseRecipe:["sopa_base","repolho","tofu"], optionalIngredients:["cebola"], cuisine:["Japonês"] },
+  { name: "Korokke", emoji: "🥔", price: 180, minRank: 1, baseRecipe:["batata","farinha","ovo"], optionalIngredients:[], cuisine:["Japonês"] },
+  { name: "Mentaiko Pasta", emoji: "🍝", price: 320, minRank: 2, baseRecipe:["massa","peixe","creme"], optionalIngredients:["ervas"], cuisine:["Japonês"] },
+  { name: "Sakura Mochi", emoji: "🍡", price: 140, minRank: 1, baseRecipe:["bolo_massa","acucar"], optionalIngredients:["morango"], cuisine:["Japonês"] },
+  { name: "Oden", emoji: "🍢", price: 260, minRank: 2, baseRecipe:["sopa_base","ovo","tofu"], optionalIngredients:["nori"], cuisine:["Japonês"] },
+  { name: "Tempura Mista", emoji: "🍤", price: 280, minRank: 2, baseRecipe:["camarao","legumes","farinha"], optionalIngredients:[], cuisine:["Japonês"] }, 
+
+  // ======= 15 MEXICANO =======
+  { name: "Tostada", emoji: "🌮", price: 200, minRank: 1, baseRecipe:["taco_shell","feijao","alface"], optionalIngredients:["salsa"], cuisine:["Mexicano"] },
+  { name: "Queso Fundido", emoji: "🧀", price: 220, minRank: 1, baseRecipe:["queijo","chorizo"], optionalIngredients:["tortilla"], cuisine:["Mexicano"] },
+  { name: "Pozole Verde (mini)", emoji: "🍲", price: 300, minRank: 2, baseRecipe:["milho","frango","limao"], optionalIngredients:[], cuisine:["Mexicano"] },
+  { name: "Tinga de Frango", emoji: "🍗", price: 260, minRank: 2, baseRecipe:["frango","molho_tomate","chipotle"], optionalIngredients:["queijo"], cuisine:["Mexicano"] },
+  { name: "Gorditas", emoji: "🥟", price: 220, minRank: 1, baseRecipe:["masa","feijao","queijo"], optionalIngredients:["alface"], cuisine:["Mexicano"] },
+  { name: "Sopa Azteca (mini)", emoji: "🥣", price: 240, minRank: 2, baseRecipe:["sopa_base","tomate","tortilla"], optionalIngredients:["avocado"], cuisine:["Mexicano"] },
+  { name: "Flautas", emoji: "🌯", price: 220, minRank: 1, baseRecipe:["taco_shell","frango","queijo"], optionalIngredients:[], cuisine:["Mexicano"] },
+  { name: "Carnitas (mini)", emoji: "🥩", price: 360, minRank: 3, baseRecipe:["bife","sal","ervas"], optionalIngredients:["limao"], cuisine:["Mexicano"] },
+  { name: "Elote Cremoso", emoji: "🌽", price: 180, minRank: 1, baseRecipe:["milho","manteiga","queijo"], optionalIngredients:["pimenta"], cuisine:["Mexicano"] },
+  { name: "Taco de Pescado", emoji: "🌮", price: 240, minRank: 1, baseRecipe:["taco_shell","peixe","repolho"], optionalIngredients:["salsa"], cuisine:["Mexicano"] },
+  { name: "Chiles Rellenos (mini)", emoji: "🌶️", price: 300, minRank: 2, baseRecipe:["pimentao","queijo","molho_tomate"], optionalIngredients:[], cuisine:["Mexicano"] },
+  { name: "Sopa de Tortilla", emoji: "🥣", price: 200, minRank: 1, baseRecipe:["sopa_base","tortilla","tomate"], optionalIngredients:["abacate"], cuisine:["Mexicano"] },
+  { name: "Esquites", emoji: "🌽", price: 160, minRank: 1, baseRecipe:["milho","manteiga","queijo"], optionalIngredients:["pimenta"], cuisine:["Mexicano"] },
+  { name: "Flan de Cajeta", emoji: "🍮", price: 180, minRank: 1, baseRecipe:["leite","ovo","acucar"], optionalIngredients:["caramelo"], cuisine:["Mexicano"] },
+  { name: "Molcajete", emoji: "🍲", price: 480, minRank: 3, baseRecipe:["bife","camarao","salsa"], optionalIngredients:["queijo"], cuisine:["Mexicano"] },
+
+  // ======= 15 FRANCÊS =======
+  { name: "Tartelette de Frutas", emoji: "🥧", price: 240, minRank: 1, baseRecipe:["bolo_massa","maca"], optionalIngredients:["gelatina"], cuisine:["Francês"] },
+  { name: "Ratatouille Provençal", emoji: "🍲", price: 320, minRank: 2, baseRecipe:["berinjela","pimentao","tomate"], optionalIngredients:["ervas"], cuisine:["Francês"] },
+  { name: "Magret (mini)", emoji: "🥩", price: 480, minRank: 3, baseRecipe:["bife","vinho"], optionalIngredients:["manteiga"], cuisine:["Francês"] },
+  { name: "Galette de Legumes", emoji: "🥞", price: 220, minRank: 1, baseRecipe:["farinha","legumes"], optionalIngredients:["queijo"], cuisine:["Francês"] },
+  { name: "Creme de Cenoura", emoji: "🥣", price: 180, minRank: 1, baseRecipe:["cenoura","creme"], optionalIngredients:["canela"], cuisine:["Francês"] },
+  { name: "Terrine (mini)", emoji: "🥖", price: 340, minRank: 2, baseRecipe:["carne_seca","manteiga"], optionalIngredients:["baguete"], cuisine:["Francês"] },
+  { name: "Moules Frites (mini)", emoji: "🐟", price: 380, minRank: 2, baseRecipe:["mexilhão","batata"], optionalIngredients:["creme"], cuisine:["Francês"] },
+  { name: "Gallette de Maçã", emoji: "🥧", price: 200, minRank: 1, baseRecipe:["maca","manteiga","acucar"], optionalIngredients:["canela"], cuisine:["Francês"] },
+  { name: "Confit de Canard (mini)", emoji: "🍗", price: 460, minRank: 3, baseRecipe:["frango","manteiga"], optionalIngredients:["vinho"], cuisine:["Francês"] },
+  { name: "Salada de Endívias", emoji: "🥗", price: 220, minRank: 1, baseRecipe:["endivia","nozes"], optionalIngredients:["queijo"], cuisine:["Francês"] },
+  { name: "Clafoutis (mini)", emoji: "🥧", price: 200, minRank: 1, baseRecipe:["bolo_massa","maca"], optionalIngredients:["creme"], cuisine:["Francês"] },
+  { name: "Pain au Chocolat (mini)", emoji: "🥐", price: 180, minRank: 1, baseRecipe:["croissant_massa","chocolate"], optionalIngredients:[], cuisine:["Francês"] },
+  { name: "Soupe à l'Oignon Gratinee", emoji: "🥣", price: 260, minRank: 2, baseRecipe:["cebola","caldo","queijo"], optionalIngredients:["baguete"], cuisine:["Francês"] },
+  { name: "Tournedos (mini)", emoji: "🥩", price: 520, minRank: 4, baseRecipe:["bife","trufa"], optionalIngredients:["vinho"], cuisine:["Francês"] },
+  { name: "Madeleine", emoji: "🍪", price: 140, minRank: 1, baseRecipe:["farinha","acucar","manteiga"], optionalIngredients:["canela"], cuisine:["Francês"] },
+
+  // ======= 15 HALLOWEEN (colocado primeiro conforme pedido) =======
+  { name: "Poção Efervescente", emoji: "🧪", price: 180, minRank: 1, baseRecipe:["cha_verde","gelo","mirtilo"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Abóbora Assada com Mel", emoji: "🎃", price: 220, minRank: 1, baseRecipe:["abobora","mel","canela"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Dedos de Bruxa (mini)", emoji: "🥐", price: 160, minRank: 0, baseRecipe:["croissant_massa","amêndoa"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Coração Gelatinoso", emoji: "🍮", price: 160, minRank: 0, baseRecipe:["gelatina","mora"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Sopa de Abóbora Assombrada", emoji: "🥣", price: 240, minRank: 1, baseRecipe:["abobora","sopa_base"], optionalIngredients:["creme"], cuisine:["Halloween"] },
+  { name: "Cupcake Vampiro", emoji: "🧁", price: 140, minRank: 0, baseRecipe:["bolo_massa","chocolate"], optionalIngredients:["geleia"], cuisine:["Halloween"] },
+  { name: "Coxinha Zumbi (mini)", emoji: "🍗", price: 180, minRank: 1, baseRecipe:["frango","farinha","manteiga"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Bolo de Sangue (Ruby)", emoji: "🎂", price: 260, minRank: 2, baseRecipe:["bolo_massa","mora"], optionalIngredients:["caramelo"], cuisine:["Halloween"] },
+  { name: "Chili Assombrado", emoji: "🥣", price: 300, minRank: 2, baseRecipe:["feijao","bife","pimenta"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Abóbora Recheada (mini)", emoji: "🥘", price: 260, minRank: 1, baseRecipe:["abobora","arroz","carne_seca"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Pimenta Maldita", emoji: "🌶️", price: 160, minRank: 1, baseRecipe:["pimenta","molho_tomate"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Doces da Noite", emoji: "🍬", price: 120, minRank: 0, baseRecipe:["acucar","chocolate"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Caldeirão de Doces", emoji: "🧙‍♀️", price: 200, minRank: 1, baseRecipe:["donut_massa","geleia"], optionalIngredients:["chocolate"], cuisine:["Halloween"] },
+  { name: "Pé de Feiticeiro (doce)", emoji: "🍪", price: 140, minRank: 0, baseRecipe:["cookie_massa","amêndoa"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Torta de Meia-Noite", emoji: "🥧", price: 320, minRank: 3, baseRecipe:["bolo_massa","trufa","abobora"], optionalIngredients:[], cuisine:["Halloween"] },
+  
+  // Fusion / bonus global dishes
+  { name: "Surf & Turf Mini", emoji: "🍽️", price: 520, minRank: 3, baseRecipe: ["bife","camarao"], optionalIngredients:["ervas"], cuisine:["Brasileiro","Francês"] },
+  { name: "Risoto de Frutos do Mar", emoji: "🍚", price: 460, minRank: 3, baseRecipe: ["arroz","mexilhão","camarao"], optionalIngredients:["ervas"], cuisine:["Italiano","Francês"] },
+  { name: "Pasta de Trufa", emoji: "🍝", price: 600, minRank: 4, baseRecipe: ["massa","trufa","queijo"], optionalIngredients:["creme"], cuisine:["Italiano"] }
 ];
 
-// Add more Japanese recipes (clean push entries)
-ALL_RECIPES.push(
-  { name: "Udon", emoji: "🍜", price: 260, minRank: 2, baseRecipe: ["massa","ramen_massa","cebola"], optionalIngredients:["frango","ovo"], cuisine:["Japonês"] },
-  { name: "Katsu Don", emoji: "🍱", price: 350, minRank: 3, baseRecipe:["arroz","frango","ovo"], optionalIngredients:["ervas"], cuisine:["Japonês"] },
-  { name: "Sukiyaki", emoji: "🍲", price: 480, minRank: 4, baseRecipe:["bife","cebola","ervas"], optionalIngredients:["tofu","arroz"], cuisine:["Japonês"] },
-  { name: "Mochi", emoji: "🍡", price: 140, minRank: 1, baseRecipe:["bolo_massa","acucar"], optionalIngredients:["morango"], cuisine:["Japonês"] }
-);
-
-// Add Halloween recipes (15+)
-ALL_RECIPES.push(
-  { name:"Ramen de Abóbora", emoji:"🎃", price:260, minRank:2, baseRecipe:["ramen_massa","abobora","ervas"], optionalIngredients:["ovo"], cuisine:["Halloween"] },
-  { name:"Onigiri Fantasma", emoji:"👻", price:140, minRank:1, baseRecipe:["arroz","alga"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
-  { name:"Sushi Aranha", emoji:"🕷️", price:320, minRank:2, baseRecipe:["alga","arroz","peixe"], optionalIngredients:["pepino"], cuisine:["Halloween"] },
-  { name:"Guioza Sombria", emoji:"🥟", price:300, minRank:2, baseRecipe:["guioza_massa","frango"], optionalIngredients:["cebola","abobora"], cuisine:["Halloween"] },
-  { name:"Tempurá Assombrado", emoji:"🍤", price:360, minRank:2, baseRecipe:["camarao","farinha"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
-  { name:"Yakitori das Sombras", emoji:"🍢", price:220, minRank:2, baseRecipe:["frango","sal"], optionalIngredients:["ervas","abobora"], cuisine:["Halloween"] },
-  { name:"Udon Noturno", emoji:"🍜", price:280, minRank:2, baseRecipe:["ramen_massa","cebola"], optionalIngredients:["abobora","ovo"], cuisine:["Halloween"] },
-  { name:"Takoyaki Tenebroso", emoji:"🐙", price:380, minRank:3, baseRecipe:["polvo","farinha","molho_okono"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
-  { name:"Okonomiyaki Fantasma", emoji:"🥞", price:380, minRank:3, baseRecipe:["farinha","repolho","ovo"], optionalIngredients:["abobora","molho_okono"], cuisine:["Halloween"] },
-  { name:"Sopa Miso Sombria", emoji:"🥣", price:310, minRank:2, baseRecipe:["sopa_base","alga","tofu"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
-  { name:"Temaki Abóbora", emoji:"🍣", price:340, minRank:2, baseRecipe:["alga","arroz","abobora"], optionalIngredients:["pepino","ervas"], cuisine:["Halloween"] },
-  { name:"Chá Verde Assombrado", emoji:"🍵", price:90, minRank:1, baseRecipe:["cha_verde"], optionalIngredients:["gelo","abobora"], cuisine:["Halloween"] },
-  { name:"Onigiri Lua Cheia", emoji:"🌕", price:200, minRank:2, baseRecipe:["arroz","alga","sal"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
-  { name:"Sashimi da Meia-noite", emoji:"🐟", price:420, minRank:3, baseRecipe:["peixe"], optionalIngredients:["limao","ervas"], cuisine:["Halloween"] },
-  { name:"Brigadeiro Sombrio", emoji:"🍬", price:300, minRank:2, baseRecipe:["chocolate","manteiga"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
-  { name:"Panqueca do Terror", emoji:"🥞", price:250, minRank:0, baseRecipe:["panqueca","mel"], optionalIngredients:["abobora","chocolate"], cuisine:["Halloween"] }
-);
-
-// Add five new recipes (one per major cuisine)
-ALL_RECIPES.push(
-  // Brasileiro
-  { name: "Moqueca Simples", emoji: "🍲", price: 420, minRank: 2, baseRecipe: ["peixe","coco","cebola"], optionalIngredients: ["coentro","arroz"], cuisine: ["Brasileiro"] },
-  // Italiano
-  { name: "Panzanella", emoji: "🥗", price: 210, minRank: 1, baseRecipe: ["baguete","tomate","azeitona"], optionalIngredients: ["ervas","queijo"], cuisine: ["Italiano"] },
-  // Japonês
-  { name: "Ochazuke", emoji: "🍵", price: 180, minRank: 1, baseRecipe: ["arroz","cha_verde"], optionalIngredients: ["sal","alga"], cuisine: ["Japonês"] },
-  // Mexicano
-  { name: "Elote", emoji: "🌽", price: 140, minRank: 0, baseRecipe: ["milho","manteiga"], optionalIngredients: ["pimenta","queijo"], cuisine: ["Mexicano"] },
-  // Francês
-  { name: "Ratatouille Salteado", emoji: "🍲", price: 260, minRank: 1, baseRecipe: ["berinjela","pimentao","tomate"], optionalIngredients: ["ervas","alho"], cuisine: ["Francês"] }
-);
-
-// Themed ranks per cuisine
+// Themed ranks per cuisine with improved names and clearer progression hints
 export const CUISINE_DEFS = {
   "Brasileiro": [
-    { name: "Aprendiz de Boteco", icon:"🧼", recipeToUnlock:"Salada", baseReward: 10 },
-    { name: "Cozinheiro Caseiro", icon:"🍳", recipeToUnlock:"Caipirinha", baseReward: 15 },
-    { name: "Chef do Quintal", icon:"🥘", recipeToUnlock:"Feijoada", baseReward: 25 },
-    { name: "Maestro do Sabor", icon:"🥇", recipeToUnlock:null, baseReward: 40 }
+    { name: "Aspirante do Boteco", icon:"🧼", recipeToUnlock:"Suco de Laranja", baseReward: 10 },
+    { name: "Cozinheiro Caseiro", icon:"🧑‍🍳", recipeToUnlock:"Vitamina de Banana", baseReward: 15 },
+    { name: "Cozinheiro de Bairro", icon:"🍳", recipeToUnlock:"Caipirinha", baseReward: 22 },
+    { name: "Mestre do Fogão", icon:"🥘", recipeToUnlock:"Feijoada", baseReward: 35 },
+    { name: "Maestro do Sabor", icon:"🥇", recipeToUnlock:"Doce de Leite", baseReward: 55 } // preenchido (antes null)
   ],
   "Italiano": [
-    { name: "Pizzaiolo Novato", icon:"🍕", recipeToUnlock:"Sopa de Tomate", baseReward: 12 },
-    { name: "Maestro della Pasta", icon:"🍝", recipeToUnlock:"Caprese", baseReward: 20 },
-    { name: "Chef Rinomato", icon:"🥇", recipeToUnlock:"Carbonara", baseReward: 35 },
-    { name: "Grande Chef", icon:"🏆", recipeToUnlock:"Tiramisu", baseReward: 50 },
-    { name: "Lendário Culinário", icon:"🌟", recipeToUnlock:null, baseReward: 70 }
+    { name: "Aprendiz da Massa", icon:"🍞", recipeToUnlock:"Bruschetta", baseReward: 12 },
+    { name: "Pizzaiolo em Treino", icon:"🍕", recipeToUnlock:"Pizza Margherita", baseReward: 18 },
+    { name: "Maestro della Pasta", icon:"🍝", recipeToUnlock:"Carbonara", baseReward: 30 },
+    { name: "Chef Rinomato", icon:"🏆", recipeToUnlock:"Tiramisù", baseReward: 48 },
+    { name: "Lendário Culinário", icon:"🌟", recipeToUnlock:"Arancini", baseReward: 70 } // preenchido (antes null)
   ],
   "Japonês": [
-    { name: "Itamae Iniciante", icon:"🍣", recipeToUnlock:"Yakitori", baseReward: 10 },
-    { name: "Sushiman Pleno", icon:"🔪", recipeToUnlock:"Ramen", baseReward: 18 },
-    { name: "Mestre do Sushi", icon:"🐟", recipeToUnlock:"Okonomiyaki", baseReward: 30 },
-    { name: "Itamae Lendário", icon:"🏆", recipeToUnlock:"Takoyaki", baseReward: 50 },
-    { name: "Shogun do Sabor", icon:"⛩️", recipeToUnlock:null, baseReward: 75 }
+    { name: "Iniciando no Itamae", icon:"🍣", recipeToUnlock:"Onigiri", baseReward: 10 },
+    { name: "Sushiman Júnior", icon:"🔪", recipeToUnlock:"Sushi", baseReward: 18 },
+    { name: "Especialista em Ramen", icon:"🍜", recipeToUnlock:"Ramen", baseReward: 28 },
+    { name: "Mestre do Izakaya", icon:"🐙", recipeToUnlock:"Takoyaki", baseReward: 45 },
+    { name: "Itamae Lendário", icon:"⛩️", recipeToUnlock:"Unagi Bowl", baseReward: 70 } // preenchido (antes null)
   ],
   "Mexicano": [
-    { name: "Taquero Novato", icon:"🌮", recipeToUnlock:"Suco de Laranja", baseReward: 11 },
-    { name: "Maestro de Sazón", icon:"🌶️", recipeToUnlock:"Guacamole", baseReward: 19 },
-    { name: "Chef Leyenda", icon:"🏆", recipeToUnlock:"Sopa Azteca", baseReward: 38 },
-    { name: "Cozinheiro Supremo", icon:"🇲🇽", recipeToUnlock:null, baseReward: 60 }
+    { name: "Taquero Iniciante", icon:"🌮", recipeToUnlock:"Milho Assado (Elote)", baseReward: 11 },
+    { name: "Mestre do Sabor", icon:"🌶️", recipeToUnlock:"Guacamole", baseReward: 18 },
+    { name: "Chef de Sazón", icon:"🏵️", recipeToUnlock:"Taco", baseReward: 30 },
+    { name: "Lenda da Cozinha", icon:"🇲🇽", recipeToUnlock:"Enchiladas", baseReward: 55 } // preenchido (antes null)
   ],
   "Francês": [
-    { name: "Commis de Cuisine", icon:"🥖", recipeToUnlock:"Torrada", baseReward: 10 },
-    { name: "Sous-chef", icon:"🥈", recipeToUnlock:"Salada César", baseReward: 16 },
-    { name: "Chef de Cuisine", icon:"🥇", recipeToUnlock:"Crepe Suzette", baseReward: 30 },
-    { name: "Patrono Culinário", icon:"🇫🇷", recipeToUnlock:null, baseReward: 50 }
+    { name: "Commis Talentoso", icon:"🥖", recipeToUnlock:"Torrada", baseReward: 11 },
+    { name: "Sous-chef", icon:"🥈", recipeToUnlock:"Salada César", baseReward: 18 },
+    { name: "Chef de Cuisine", icon:"🥇", recipeToUnlock:"Crepe Suzette", baseReward: 32 },
+    { name: "Patrono Culinário", icon:"🇫🇷", recipeToUnlock:"Bouillabaisse", baseReward: 55 } // preenchido (antes null)
   ],
   "Halloween": [
-    { name: "Novato Sombrio", icon:"🎃", recipeToUnlock:"Panqueca do Terror", baseReward: 12 },
-    { name: "Cozinheiro da Meia-noite", icon:"🕯️", recipeToUnlock:"Onigiri Fantasma", baseReward: 20 },
-    { name: "Mestre das Sombras", icon:"👻", recipeToUnlock:"Takoyaki Tenebroso", baseReward: 35 },
-    { name: "Lenda Assombrada", icon:"🦇", recipeToUnlock:"Okonomiyaki Fantasma", baseReward: 60 }
+    { name: "Trickster Cook", icon:"🎃", recipeToUnlock:"Panqueca do Terror", baseReward: 12 },
+    { name: "Cozinheiro Sombrio", icon:"🕯️", recipeToUnlock:"Onigiri Fantasma", baseReward: 20 },
+    { name: "Mestre das Sombras", icon:"👻", recipeToUnlock:"Takoyaki Tenebroso", baseReward: 38 },
+    { name: "Lenda Assombrada", icon:"🦇", recipeToUnlock:"Takoyaki Assustador (especial)", baseReward: 65 } // preenchido (antes null)
   ]
 };
 
-// Default ranks fallback (kept for legacy load)
+// Default fallback ranks (polished)
 export const RANKS = [
-  { name: "Lava-pratos", icon: "🧼", recipeToUnlock: "Salada", baseReward: 8 },
+  { name: "Lava-pratos", icon: "🧼", recipeToUnlock: "Suco de Laranja", baseReward: 8 },
   { name: "Ajudante de Cozinha", icon: "🧑‍🍳", recipeToUnlock: "Hambúrguer", baseReward: 12 },
-  { name: "Cozinheiro Júnior", icon: "🔪", recipeToUnlock: "Taco", baseReward: 16 },
-  { name: "Cozinheiro Pleno", icon: "🥘", recipeToUnlock: "Pizza Margherita", baseReward: 22 },
-  { name: "Subchefe", icon: "🥈", recipeToUnlock: "Ramen", baseReward: 30 },
-  { name: "Chefe de Cozinha", icon: "🥇", recipeToUnlock: "Ratatouille", baseReward: 40 },
-  { name: "Mestre Cuca", icon: "🏆", recipeToUnlock: null, baseReward: 60 }
+  { name: "Cozinheiro Júnior", icon: "🔪", recipeToUnlock: "Pizza Margherita", baseReward: 18 },
+  { name: "Cozinheiro Pleno", icon: "🥘", recipeToUnlock: "Ramen", baseReward: 26 },
+  { name: "Subchefe", icon: "🥈", recipeToUnlock: "Sashimi", baseReward: 36 },
+  { name: "Chefe de Cozinha", icon: "🥇", recipeToUnlock: "Ratatouille", baseReward: 50 },
+  { name: "Mestre Cuca", icon: "🏆", recipeToUnlock: "Feijoada", baseReward: 80 } // preenchido (antes null)
 ];
 
 export const SAVE_KEY = 'recipeGameData_v6';
