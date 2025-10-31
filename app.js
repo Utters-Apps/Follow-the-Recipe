@@ -1605,31 +1605,37 @@ document.addEventListener('click', (e)=>{
   }
 });
 
-document.getElementById && document.addEventListener('DOMContentLoaded', ()=>{
+// Executa quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
   const closeBtn = document.getElementById('close-restaurants');
   const createBtn = document.getElementById('create-resto');
-  closeBtn?.addEventListener('click', ()=>{ 
+
+  // Botão de fechar modal de restaurantes
+  closeBtn?.addEventListener('click', () => { 
     hideModalById('restaurants-modal');
-    // ensure restaurants-button remains visible after closing
+    // Garante que o botão de restaurantes continue visível após fechar
     document.getElementById('restaurants-button-container')?.classList.remove('hidden');
   });
-  createBtn?.addEventListener('click', ()=>{
-    // Close restaurants modal and open full create screen
+
+  // Botão de criar novo restaurante
+  createBtn?.addEventListener('click', () => {
     hideModalById('restaurants-modal');
     showScreen('create-restaurant-screen');
-    return;
   });
+
+  // Inicialização geral do app, se a função existir
+  if (typeof init === 'function') init();
 });
 
-init();
-
-// Global unhandled rejection handler to prevent audio/device issues from crashing the app
+// Global unhandled rejection handler para prevenir crashes por áudio ou dispositivos
 window.addEventListener('unhandledrejection', (event) => {
   try {
     console.warn('Unhandled promise rejection caught:', event.reason);
-    // If it's an audio device/start failure, consume it silently to avoid UI freeze
-    if (event.reason && typeof event.reason === 'object' && /audio|device|start/i.test(String(event.reason.message || event.reason))) {
-      event.preventDefault && event.preventDefault();
+
+    // Se for erro relacionado a áudio/dispositivo, previne comportamento padrão
+    if (event.reason && typeof event.reason === 'object' &&
+        /audio|device|start/i.test(String(event.reason.message || event.reason))) {
+      event.preventDefault?.();
     }
   } catch (e) {
     console.warn('Error in unhandledrejection handler', e);
