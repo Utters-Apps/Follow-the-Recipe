@@ -1,7 +1,7 @@
 {
   "name": "Siga a Receita",
   "short_name": "Siga a Receita",
-  "description": "🍳 Siga a Receita é um jogo onde cada segundo conta! Prepare pratos deliciosos para seus clientes o mais rápido possível — mas cuidado, o tempo não está do seu lado! Será que você consegue acompanhar o ritmo da cozinha e se tornar o chef mais ágil de todos?",
+  "description": "🍳 Siga a Receita é um jogo onde cada segundo conta! Prepare pratos deliciosos para seus clientes o mais rápido possível — mas cuidado, o tempo não está do seu lado!",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
@@ -25,3 +25,4 @@
   "categories": ["games", "simulation"],
   "lang": "pt-BR"
 }
+
