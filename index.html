@@ -462,24 +462,24 @@
         <div class="tab">Stats</div>
       </div>
       <div id="restaurants-list" class="space-y-2 max-h-64 overflow-y-auto mb-4"></div>
-    </main>
-  </div>
+    </main> <!-- CORREÇÃO: Tag de fechamento adicionada. -->
+  </div>
 
-  <!-- App modules -->
-  <script type="module" src="./data.js"></script>
-  <script type="module" src="./audio.js"></script>
-  <script type="module" src="./ui.js"></script>
-  <script type="module" src="./app.js"></script>
+  <!-- App modules -->
+  <script type="module" src="./data.js"></script>
+  <script type="module" src="./audio.js"></script>
+  <script type="module" src="./ui.js"></script>
+  <script type="module" src="./app.js"></script>
 
-  <!-- Registro do Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(reg => console.log('Service Worker registrado:', reg.scope))
-          .catch(err => console.warn('Falha ao registrar SW:', err));
-      });
-    }
-  </script>
+  <!-- Registro do Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('Service Worker registrado:', reg.scope))
+          .catch(err => console.warn('Falha ao registrar SW:', err));
+      });
+    }
+  </script>
 </body>
 </html>
