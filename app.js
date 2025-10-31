@@ -289,13 +289,13 @@ function buildLayout() {
         <h3 class="text-2xl font-bold mb-3">Escolha o idioma / Choose the game language</h3>
         <p class="text-sm mb-4 opacity-80">Select a language — most options will redirect to a language page. Portuguese will keep you here.</p>
         <div class="grid grid-cols-1 gap-2 mb-3">
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Russian" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Русский (Russian)</button>
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="German" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Deutsch (German)</button>
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Spanish" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Español (Spanish)</button>
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="English" data-href="https://utters-apps.github.io/Follow-the-Recipe/">English</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Russian" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-russian.html">Русский (Russian)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="German" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-german.html">Deutsch (German)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Spanish" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-spanish.html">Español (Spanish)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="English" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-english.html">English</button>
           <button class="lang-btn btn-main w-full bg-purple-600 text-white py-3 rounded-lg" data-lang="Portuguese" data-href="">Português (stay)</button>
         </div>
-        <div class="text-xs opacity-70">You can change the language later in settings (not yet implemented).</div>
+        <div class="text-xs opacity-70">You can change the language later in settings.</div>
       </div>
     </div>
   </div>
