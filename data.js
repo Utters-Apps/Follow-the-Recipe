@@ -134,7 +134,7 @@ export const ALL_RECIPES = [
   { name: "Milho Assado (Elote)", emoji: "🌽", price: 140, minRank: 0, baseRecipe: ["milho","manteiga"], optionalIngredients: ["pimenta","queijo"], cuisine:["Mexicano"] },
 
   // Rank 1 offerings
-  { name: "Suco de Laranja", emoji: "🍊", price: 190, minRank: 1, baseRecipe: ["laranja","gelo"], optionalIngredients:[], cuisine:["Mexicano","Brasileiro"] },
+  { name: "Suco de Laranja", emoji: "🍊", price: 90, minRank: 1, baseRecipe: ["laranja","gelo"], optionalIngredients:[], cuisine:["Mexicano","Brasileiro"] },
   { name: "Sanduíche Simples", emoji: "🥪", price: 130, minRank: 1, baseRecipe: ["pao","alface","tomate"], optionalIngredients:["queijo","bacon"], cuisine:["Italiano","Brasileiro","Francês"] },
   { name: "Panqueca Doce", emoji: "🥞", price: 170, minRank: 1, baseRecipe:["panqueca","mel"], optionalIngredients:["morango","mirtilo","chocolate"], cuisine:["Americano","Francês","Brasileiro"] },
   { name: "Bagel", emoji: "🥯", price: 140, minRank: 1, baseRecipe:["bagel","manteiga"], optionalIngredients:["manteiga_amendoim","geleia"], cuisine:["Americano"] },
