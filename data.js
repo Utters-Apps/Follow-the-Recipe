@@ -77,12 +77,12 @@ export const ALL_INGREDIENTS = {
   'couve': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1728/1728744.png' },
   'mascarpone': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4465/4465423.png' },
   'polvo': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3065/3065730.png' },
-  'carne_seca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1046/1046849.png' },
+  'carne_seca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4177/4177665.png' },
   'cafe': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/924/924514.png' },
-  'manteiga_amendoim': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3838/3838464.png' },
-  'geleia': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3075/3075903.png' },
-  'cha_verde': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3082/3082024.png' },
-  'abobora': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/137/137366.png' },
+  'manteiga_amendoim': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1398/1398540.png' },
+  'geleia': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2515/2515286.png' },
+  'cha_verde': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/5303/5303997.png' },
+  'abobora': { type: 'image', value: 'https://cdn-icons-png.freepik.com/512/5702/5702244.png' },
 
   // Newly added ingredients for the expanded recipes
   'cachaca': { type: 'image', value: 'https://cdn-icons-png.freepik.com/512/8692/8692223.png' },
