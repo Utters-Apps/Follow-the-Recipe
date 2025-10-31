@@ -497,6 +497,25 @@
       /* ensure market grids can expand to fill the market-scroll area */
       min-height: calc(100vh - 240px);
     }
+    /* Ensure market scroll region fills available space and internal grids scroll */
+    #market-screen main > .tabbar { position: sticky; top: 0; z-index: 25; }
+    #market-scroll {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 140px); /* leave room for header/footer */
+      overflow: hidden;
+    }
+    #market-items-grid, #market-owned-grid {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 8px;
+      box-sizing: border-box;
+      max-height: none;
+    }
+    /* ensure the inner cards don't cause page body scroll when interacting with market lists */
+    #market-items-grid::-webkit-scrollbar, #market-owned-grid::-webkit-scrollbar { width: 8px; height: 8px; }
+    #market-items-grid::-webkit-scrollbar-thumb, #market-owned-grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 6px; }
     /* Compact header pills on small screens */
     @media (max-width: 640px){
       #market-screen .header-right{gap:.4rem; display:flex; align-items:center}
