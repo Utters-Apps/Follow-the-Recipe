@@ -653,17 +653,35 @@ function updateRankDisplay(){
 function renderUnlockedIngredientBin(){
   const active = getActiveRestaurant();
   ingredientBin.innerHTML = '';
+  // base pool is active restaurant's unlocked ingredients (shuffled)
   const ids = [...(active.unlockedIngredientIds||[])].sort(()=>Math.random()-0.5);
-  let visible = ids.slice(0,15);
-  if (session?.currentOrder?.recipe){
-    session.currentOrder.recipe.forEach(nid=>{
-      if (ids.includes(nid) && !visible.includes(nid)){
-        if (visible.length<15) visible.push(nid);
-        else visible[Math.floor(Math.random()*visible.length)] = nid;
-      }
-    });
-    visible = Array.from(new Set(visible)).slice(0,15).sort(()=>Math.random()-0.5);
+  // start with first N slots but ensure ALL required recipe ingredients are included and prioritized
+  const MAX_VISIBLE = 15;
+  let visible = ids.slice(0, MAX_VISIBLE);
+
+  // Always include current order ingredients (prioritize and ensure presence)
+  if (session?.currentOrder?.recipe && Array.isArray(session.currentOrder.recipe)){
+    // ensure required ingredients appear first in visible set
+    const required = session.currentOrder.recipe;
+    const set = new Set(required.concat(visible)); // required first, then existing visible
+    // keep original order: required in order, then fill with other ids up to MAX_VISIBLE
+    const final = [];
+    for (const r of required){
+      if (!final.includes(r)) final.push(r);
+    }
+    for (const v of ids){
+      if (final.length >= MAX_VISIBLE) break;
+      if (!final.includes(v)) final.push(v);
+    }
+    // If still under capacity, fill from any unlocked extras
+    for (const v of ids){
+      if (final.length >= MAX_VISIBLE) break;
+      if (!final.includes(v)) final.push(v);
+    }
+    visible = final.slice(0, MAX_VISIBLE);
   }
+
+  // As a last resort, if an ingredient id isn't in ALL_INGREDIENTS it will render a readable pill (handled in ui.getIngredientHTML)
   visible.forEach(id=>{
     const btn = document.createElement('button');
     btn.className = "ingredient-btn rounded-lg p-3 shadow-md";
