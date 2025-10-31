@@ -188,7 +188,7 @@ export const ALL_RECIPES = [
   { name: "Bolo de Cenoura", emoji: "🎂", price: 200, minRank: 2, baseRecipe: ["bolo_massa","cenoura"], optionalIngredients: ["chocolate","manteiga"], cuisine: ["Brasileiro"] },
   { name: "Empadão de Frango", emoji: "🥧", price: 300, minRank: 2, baseRecipe: ["bolo_massa","frango","milho"], optionalIngredients: ["ervas"], cuisine: ["Brasileiro"] },
   { name: "Acarajé (Mini)", emoji: "🟤", price: 220, minRank: 2, baseRecipe: ["feijao","farinha","manteiga"], optionalIngredients: ["pimenta"], cuisine: ["Brasileiro"] },
-  { name: "Doce de Leite", emoji: "🍯", price: 110, minRank: 1, baseRecipe: ["leite","acucar"], optionalIngredients: ["canela"], cuisine: ["Brasileiro"] },
+  { name: "Doce de Leite", emoji: "🍯", price: 1100, minRank: 4, baseRecipe: ["leite","acucar"], optionalIngredients: ["canela"], cuisine: ["Brasileiro"] },
 
   // ============================
   // MUITO MAIS pratos por cozinha (adicionados agora)
