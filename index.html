@@ -197,8 +197,35 @@
     .soft-transition { transition: transform .25s cubic-bezier(.2,.9,.2,1), opacity .22s ease, box-shadow .22s ease, background .22s ease; will-change: transform, opacity, box-shadow; }
 
     /* Modal scrim improvements */
-    .modal-scrim-pane { background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.5)); backdrop-filter: blur(6px); }
-    html.light .modal-scrim-pane { background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.7)); }
+    .modal-scrim-pane { background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.75)); backdrop-filter: blur(6px); }
+    html.light .modal-scrim-pane { background: linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0.85)); }
+
+    /* Modal card improved (theme aware) */
+    .modal-card {
+      border-radius: 1rem;
+      padding: 1.1rem;
+      box-shadow: 0 22px 60px rgba(2,6,23,0.18);
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      color: var(--text-primary);
+      transform-origin: center center;
+      animation: modalElevate .34s cubic-bezier(.2,.9,.2,1) both;
+    }
+
+    /* Restaurants modal header pill */
+    #restaurants-modal .card .resto-header {
+      display:flex; align-items:center; gap:.8rem; padding:.6rem; border-radius:.8rem; margin-bottom:.6rem;
+      background: linear-gradient(90deg, rgba(139,92,246,0.12), rgba(59,130,246,0.06));
+      border:1px solid rgba(167,139,250,0.08);
+    }
+
+    /* Improved restaurant entry with theme aware accent */
+    #restaurants-list .resto-entry {
+      display:flex; align-items:center; justify-content:space-between; gap:.8rem; padding:.65rem; border-radius:.75rem;
+      background:var(--bubble-bg); border:1px solid var(--bubble-border);
+      transition: transform .14s ease, box-shadow .14s ease;
+    }
+    #restaurants-list .resto-entry:hover{ transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0,0,0,0.06); }
 
     /* Unified modal fade in/out */
     .modal-wrap { opacity:0; pointer-events:none; transition:opacity .28s ease; }
@@ -413,9 +440,17 @@
     }
 
     #market-items-grid, #market-owned-grid {
-      max-height: calc(75vh - 120px);
+      /* fill almost entire available viewport height while leaving room for header/footer */
+      height: 100%;
       overflow-y: auto;
       padding-right: 6px;
+    }
+    /* Make the market scroll area fill the remaining viewport height (header + footer reserved) */
+    #market-scroll {
+      display: block;
+      height: calc(100vh - 140px); /* Adjust 140px to match header/footer total height */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     /* Improve confirm reset modal visual in light mode */
@@ -435,6 +470,32 @@
       padding:1.25rem;
       transition:transform .18s ease, box-shadow .18s ease;
     }
+
+    #game-container{height:100%;max-height:100%;}
+    /* Mobile-safe viewport height + safe areas */
+    @media (max-width: 640px){
+      #game-container{height:calc(100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom)); width:100vw; border-radius:0;}
+      body{padding-bottom:env(safe-area-inset-bottom);}
+    }
+    /* Market layout: no overlap, better scroll */
+    #market-screen header{position:sticky;top:0;z-index:20}
+    #market-screen main{overflow:hidden;display:flex;flex-direction:column;}
+    #market-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:none}
+    /* Expand scroll containers to bottom on mobile for both tabs */
+    #market-items-grid, #market-owned-grid {
+      padding-right: 6px;
+      /* ensure market grids can expand to fill the market-scroll area */
+      min-height: calc(100vh - 240px);
+    }
+    /* Compact header pills on small screens */
+    @media (max-width: 640px){
+      #market-screen .header-right{gap:.4rem; display:flex; align-items:center}
+      #market-screen .money-pill{padding:.35rem .6rem;font-size:.95rem}
+      #market-screen #stars-display-market{padding:.35rem .6rem;font-size:.95rem}
+      #market-screen header .title-wrap{flex:1; text-align:center; margin:0 56px;} /* space for back and pills */
+    }
+    /* Subtle polish for gameplay to match new style */
+    #order-display{max-width:14rem}
   </style>
 </head>
 <body class="no-select">
@@ -445,41 +506,42 @@
   </div>
 
   <div id="app" class="w-full h-full flex items-center justify-center">
-    <main class="flex-1 p-3 overflow-y-auto w-full space-y-3 min-h-0">
-      <header class="border-b p-3 flex justify-between items-center z-10">
-        <button id="pause-button" class="text-2xl w-10 h-10 flex items-center justify-center"><i class="fas fa-pause"></i></button>
-        <button id="music-toggle" class="text-2xl w-10 h-10 flex items-center justify-center" title="Música"><i class="fas fa-volume-up"></i></button>
-        <div class="flex items-center space-x-3">
-          <div id="streak-display" class="text-orange-500 font-bold text-lg"></div>
-          <div id="money-display-game" class="money-pill font-bold px-5 py-2 rounded-full text-lg shadow-md">$50</div>
-        </div>
-      </header>
-      <div id="upcoming-ranks-list" class="space-y-2 max-h-64 overflow-y-auto mb-4" tabindex="0" aria-live="polite"></div>
-      <div class="tabbar">
-        <div class="tab active">Market</div>
-        <div class="tab">Recipes</div>
-        <div class="tab">Inventory</div>
-        <div class="tab">Stats</div>
-      </div>
-      <div id="restaurants-list" class="space-y-2 max-h-64 overflow-y-auto mb-4"></div>
-    </main> <!-- CORREÇÃO: Tag de fechamento adicionada. -->
-  </div>
+    <!-- conteúdo gerado dinamicamente por app.js -->
+  </div>
 
-  <!-- App modules -->
-  <script type="module" src="./data.js"></script>
-  <script type="module" src="./audio.js"></script>
-  <script type="module" src="./ui.js"></script>
-  <script type="module" src="./app.js"></script>
+  <!-- App modules -->
+  <script type="module" src="./data.js"></script>
+  <script type="module" src="./audio.js"></script>
+  <script type="module" src="./ui.js"></script>
+  <script type="module" src="./app.js"></script>
 
-  <!-- Registro do Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(reg => console.log('Service Worker registrado:', reg.scope))
-          .catch(err => console.warn('Falha ao registrar SW:', err));
-      });
-    }
-  </script>
+  <!-- Registro do Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => {
+            console.log('Service Worker registrado:', reg.scope);
+            // Atualização automática e estável
+            reg.addEventListener('updatefound', () => {
+              const newSW = reg.installing;
+              if (!newSW) return;
+              newSW.addEventListener('statechange', () => {
+                if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                  // Pede para ativar imediatamente a nova versão
+                  reg.waiting && reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            });
+            // Quando o SW ativar, recarrega em background para usar a nova versão
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              // Adia um pouco para evitar piscar a tela em certas plataformas
+              setTimeout(() => location.reload(), 100);
+            });
+          })
+          .catch(err => console.warn('Falha ao registrar SW:', err));
+      });
+    }
+  </script>
 </body>
 </html>
