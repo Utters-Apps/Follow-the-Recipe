@@ -1327,8 +1327,8 @@ function init(){
   const langMap = {
     'Русский': 'https://utters-apps.github.io/Follow-the-Recipe/',
     'Deutsch': 'https://utters-apps.github.io/Follow-the-Recipe/',
-    'Español': 'https://utters-apps.github.io/Follow-the-Recipe/',
-    'English': 'https://utters-apps.github.io/Follow-the-Recipe/'
+    'Español': 'https://utters-apps.github.io/Follow-the-Recipe/index-spanish.html',
+    'English': 'https://utters-apps.github.io/Follow-the-Recipe/index-english.html'
   };
   if (savedLang && savedLang !== 'Português') {
     const dest = langMap[savedLang] || null;
