@@ -20,29 +20,12 @@ const VIP_REWARD_MULTIPLIER = 1.9; // slightly bigger VIP reward
 const SUCCESS_MODAL_DURATION = 1600;
 const FAILURE_MODAL_DURATION = 2000;
 const BGM_KEY = 'recipeGameBGMMuted_v6';
-const LANG_KEY = 'recipeGameLang_v1'; // added to enable language redirect checks
+const LANG_KEY = 'recipeGameLanguage_v1'; // added language storage key
 /* ---------------------- */
 
 function buildLayout() {
   appRoot.innerHTML = `
-  <div id="game-container" class="w-full max-w-md h-full md:h-[95vh] md:max-h-[800px] shadow-xl rounded-2xl flex flex-col overflow-hidden relative bg-white/80 backdrop-blur-sm border border-white/30">
-    <!-- Language selection modal (shown at first run) -->
-    <div id="language-modal" class="hidden absolute inset-0 z-60 flex items-center justify-center p-6 modal-scrim-pane">
-      <div class="modal-card p-4 rounded-2xl w-full max-w-sm text-center">
-        <h3 class="text-2xl font-bold mb-2">Escolha o idioma do jogo</h3>
-        <p class="text-sm mb-4">Choose your language / Выберите язык</p>
-        <div class="grid grid-cols-2 gap-2 mb-3">
-          <button id="lang-ru" class="btn-main bg-gray-100 py-3 rounded-lg">Русский</button>
-          <button id="lang-de" class="btn-main bg-gray-100 py-3 rounded-lg">Deutsch</button>
-          <button id="lang-es" class="btn-main bg-gray-100 py-3 rounded-lg">Español</button>
-          <button id="lang-en" class="btn-main bg-gray-100 py-3 rounded-lg">English</button>
-        </div>
-        <div>
-          <button id="lang-pt" class="btn-main bg-purple-500 text-white py-3 rounded-lg w-full">Português (manter)</button>
-        </div>
-      </div>
-    </div>
-
+  <div id="game-container" class="w-full max-w-md h-full md:h-[100vh] md:max-h-[100vh] shadow-xl rounded-2xl flex flex-col overflow-hidden relative bg-white/80 backdrop-blur-sm border border-white/30">
     <!-- Setup (first run) -->
     <div id="setup-screen" class="screen active p-6 flex flex-col items-center justify-start text-center h-full">
       <h1 class="text-3xl font-black mb-1">Bem-vindo ao seu Restaurante</h1>
@@ -297,6 +280,22 @@ function buildLayout() {
             <div style="width:0;height:0;overflow:hidden" aria-hidden="true"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Language Choice Modal (new) -->
+    <div id="language-modal" class="hidden absolute inset-0 z-70 flex items-center justify-center p-6">
+      <div class="card p-5 rounded-2xl w-full max-w-sm text-center">
+        <h3 class="text-2xl font-bold mb-3">Escolha o idioma / Choose the game language</h3>
+        <p class="text-sm mb-4 opacity-80">Select a language — most options will redirect to a language page. Portuguese will keep you here.</p>
+        <div class="grid grid-cols-1 gap-2 mb-3">
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Russian" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Русский (Russian)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="German" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Deutsch (German)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Spanish" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Español (Spanish)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="English" data-href="https://utters-apps.github.io/Follow-the-Recipe/">English</button>
+          <button class="lang-btn btn-main w-full bg-purple-600 text-white py-3 rounded-lg" data-lang="Portuguese" data-href="">Português (stay)</button>
+        </div>
+        <div class="text-xs opacity-70">You can change the language later in settings (not yet implemented).</div>
       </div>
     </div>
   </div>
@@ -742,16 +741,14 @@ function renderMarket(){
   sortedBuy.forEach(({recipe,isUnlocked,isBuyable,isRankUpCard})=>{
     const card = document.createElement('div');
     card.className = `card rounded-xl shadow-lg p-4 flex items-center space-x-4 transition-all relative border`;
-    // Guard against undefined image fields to avoid "undefined" output in templates
-    const imgSrc = (recipe && typeof recipe.image === 'string' && recipe.image.trim().length > 0) ? recipe.image : null;
     const iconHtml = recipe.emoji ? `<div class="text-5xl">${recipe.emoji}</div>` 
-                      : (imgSrc ? `<div style="width:56px;height:56px"><img src="${imgSrc}" alt="${recipe.name}" class="ing-img" style="width:56px;height:56px;object-fit:contain;border-radius:8px" onerror="this.style.display='none'"></div>` : `<div class="text-5xl">🍽️</div>`);
+                      : (recipe.image ? `<div style="width:56px;height:56px"><img src="${recipe.image}" alt="${recipe.name}" class="ing-img" style="width:56px;height:56px;object-fit:contain;border-radius:8px"></div>` : `<div class="text-5xl">🍽️</div>`);
     card.innerHTML = `
       ${isRankUpCard ? `<span class="absolute top-0 right-0 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">META</span>` : ''}
       ${iconHtml}
       <div class="flex-1">
         <h4 class="text-xl font-bold">${recipe.name}</h4>
-        <p class="text-sm">${[...new Set([...recipe.baseRecipe,...recipe.optionalIngredients])].map(id=>getIngredientHTML(id,'text-sm')).join(' + ')}</p>
+        <p class="text-sm">${[...new Set([...(recipe.baseRecipe||[]), ...(recipe.optionalIngredients||[])])].map(id=>getIngredientHTML(id,'text-sm')).join(' + ')}</p>
       </div>
       ${
         isUnlocked ? `<div class="font-bold px-4 py-2 rounded-lg" style="background:var(--muted); color:var(--text-primary)">Comprado</div>` :
@@ -773,14 +770,13 @@ function renderMarket(){
     sortedOwned.forEach(({recipe})=>{
       const card = document.createElement('div');
       card.className = `card rounded-xl shadow-lg p-4 flex items-center space-x-4 transition-all relative border`;
-      const imgOwned = (recipe && typeof recipe.image === 'string' && recipe.image.trim().length > 0) ? recipe.image : null;
       const iconHtmlOwned = recipe.emoji ? `<div class="text-5xl">${recipe.emoji}</div>` 
-                          : (imgOwned ? `<div style="width:56px;height:56px"><img src="${imgOwned}" alt="${recipe.name}" class="ing-img" style="width:56px;height:56px;object-fit:contain;border-radius:8px" onerror="this.style.display='none'"></div>` : `<div class="text-5xl">🍽️</div>`);
+                          : (recipe.image ? `<div style="width:56px;height:56px"><img src="${recipe.image}" alt="${recipe.name}" class="ing-img" style="width:56px;height:56px;object-fit:contain;border-radius:8px"></div>` : `<div class="text-5xl">🍽️</div>`);
       card.innerHTML = `
         ${iconHtmlOwned}
         <div class="flex-1">
           <h4 class="text-xl font-bold">${recipe.name}</h4>
-          <p class="text-sm">${[...new Set([...recipe.baseRecipe,...recipe.optionalIngredients])].map(id=>getIngredientHTML(id,'text-sm')).join(' + ')}</p>
+          <p class="text-sm">${[...new Set([...(recipe.baseRecipe||[]), ...(recipe.optionalIngredients||[])])].map(id=>getIngredientHTML(id,'text-sm')).join(' + ')}</p>
         </div>
         <div class="text-green-500 font-bold px-4 py-2 rounded-lg bg-green-100">Disponível</div>
       `;
@@ -802,9 +798,6 @@ function resetGame(){
   document.getElementById('pause-modal')?.classList.add('hidden');
   document.getElementById('auto-offer-modal')?.classList.add('hidden');
 
-  // Clear saved language so the player must choose language again after reset
-  try { localStorage.removeItem('recipeGameLang_v1'); } catch(e){}
-
   localStorage.clear();
   gameState = { money:50, restaurants:[{ id:'r0', name:'Meu Restaurante', cuisine:null, unlockedRecipeNames:[], unlockedIngredientIds:[], rank:0 }], activeRestaurantIndex:0 };
   profile = { restoName:null, cuisine:null };
@@ -816,13 +809,6 @@ function resetGame(){
   renderMarket();
   renderUnlockedIngredientBin();
   updateAllMoneyDisplays();
-
-  // Ensure language picker is shown after reset so player must choose language again
-  const langModal = document.getElementById('language-modal');
-  if (langModal) {
-    langModal.classList.remove('hidden');
-    langModal.classList.add('modal-wrap','show');
-  }
 }
 
 function showConfirmResetModal(){ playSound('click'); confirmResetModal.classList.remove('hidden'); }
@@ -1322,19 +1308,6 @@ function init(){
     saveGame();
   }
 
-  // If a language was previously selected and it's not Portuguese, redirect to that language link immediately
-  const savedLang = localStorage.getItem(LANG_KEY);
-  const langMap = {
-    'Русский': 'https://utters-apps.github.io/Follow-the-Recipe/',
-    'Deutsch': 'https://utters-apps.github.io/Follow-the-Recipe/',
-    'Español': 'https://utters-apps.github.io/Follow-the-Recipe/index-spanish.html',
-    'English': 'https://utters-apps.github.io/Follow-the-Recipe/index-english.html'
-  };
-  if (savedLang && savedLang !== 'Português') {
-    const dest = langMap[savedLang] || null;
-    if (dest) { window.location.href = dest; return; }
-  }
-
   loadTheme();
   initBackgroundMusic(); // prepare audio object; playback happens on user actions
   updateAllMoneyDisplays();
@@ -1360,15 +1333,9 @@ function init(){
       loadingScreen.style.display = 'none';
     }, 500);
   }
-  
-  // Show language picker only if no language saved
-  if (!localStorage.getItem(LANG_KEY)) {
-    const langModal = document.getElementById('language-modal');
-    if (langModal) {
-      langModal.classList.remove('hidden');
-      langModal.classList.add('modal-wrap','show');
-    }
-  }
+
+  // Show language modal (if needed) after UI built and loading screen hidden
+  setTimeout(()=> showLanguageModalIfNeeded(), 300);
 }
 
 /* ---------- Auto-offer logic ---------- */
@@ -1512,29 +1479,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // Restaurants logic
   renderRestaurantsButtonIfEligible();
   renderRestaurantsModal();
-
-  // wire language modal buttons
-  const mapBtn = (id, label, redirect=true) => {
-    const b = document.getElementById(id);
-    if (!b) return;
-    b.addEventListener('click', (e) => {
-      e.preventDefault();
-      localStorage.setItem(LANG_KEY, label);
-      // Portuguese keeps on current page (no redirect)
-      if (label === 'Português') {
-        const m = document.getElementById('language-modal');
-        if (m) { m.classList.remove('show'); setTimeout(()=> m.classList.add('hidden'), 250); }
-        return;
-      }
-      // redirect out for other languages (for now all same link)
-      window.location.href = 'https://utters-apps.github.io/Follow-the-Recipe/';
-    });
-  };
-  mapBtn('lang-ru','Русский');
-  mapBtn('lang-de','Deutsch');
-  mapBtn('lang-es','Español');
-  mapBtn('lang-en','English');
-  mapBtn('lang-pt','Português');
 });
 
 // New modal helpers: use .modal-wrap and .modal-card.fade for consistent show/hide with fade
@@ -1680,6 +1624,51 @@ document.addEventListener('DOMContentLoaded', ()=>{
     showMarketMessage('Restaurante criado', `${newR.name} • ${newR.cuisine || '—'} criado com sucesso!`, true);
   });
 });
+
+// Helper: open language modal and wire buttons
+function showLanguageModalIfNeeded(){
+  try {
+    const saved = localStorage.getItem(LANG_KEY);
+    if (saved) {
+      // If language saved and is not Portuguese, redirect immediately to language page
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.lang && parsed.href){
+        if (parsed.lang !== 'Portuguese' && parsed.href) {
+          // small delay to allow UI to render then redirect
+          setTimeout(()=> { window.location.href = parsed.href; }, 250);
+          return;
+        }
+      }
+      return;
+    }
+  } catch(e){ /* ignore parse errors and show modal */ }
+
+  const modal = document.getElementById('language-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  modal.classList.add('modal-wrap','show','modal-scrim-pane');
+  const inner = modal.querySelector('.card');
+  if (inner) inner.classList.add('modal-card','fade');
+
+  modal.querySelectorAll('.lang-btn').forEach(btn=>{
+    btn.addEventListener('click', (ev)=>{
+      const lang = btn.dataset.lang;
+      const href = btn.dataset.href || '';
+      // persist choice
+      try { localStorage.setItem(LANG_KEY, JSON.stringify({ lang, href })); } catch(e){}
+      // hide modal
+      modal.classList.remove('show');
+      setTimeout(()=> modal.classList.add('hidden'), 260);
+      // If non-Portuguese and href provided, redirect
+      if (lang !== 'Portuguese' && href) {
+        playSound('click');
+        setTimeout(()=> window.location.href = href, 140);
+      } else {
+        playSound('success');
+      }
+    });
+  });
+}
 
 // Restaurants logic
 function renderRestaurantsButtonIfEligible(){
