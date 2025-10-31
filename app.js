@@ -289,13 +289,13 @@ function buildLayout() {
         <h3 class="text-2xl font-bold mb-3">Escolha o idioma / Choose the game language</h3>
         <p class="text-sm mb-4 opacity-80">Select a language — most options will redirect to a language page. Portuguese will keep you here.</p>
         <div class="grid grid-cols-1 gap-2 mb-3">
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Russian" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-russian.html">Русский (Russian)</button>
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="German" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-german.html">Deutsch (German)</button>
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Spanish" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-spanish.html">Español (Spanish)</button>
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="English" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-english.html">English</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Russian" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Русский (Russian)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="German" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Deutsch (German)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Spanish" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Español (Spanish)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="English" data-href="https://utters-apps.github.io/Follow-the-Recipe/">English</button>
           <button class="lang-btn btn-main w-full bg-purple-600 text-white py-3 rounded-lg" data-lang="Portuguese" data-href="">Português (stay)</button>
         </div>
-        <div class="text-xs opacity-70">You can change the language later in settings.</div>
+        <div class="text-xs opacity-70">You can change the language later in settings (not yet implemented).</div>
       </div>
     </div>
   </div>
@@ -1044,7 +1044,7 @@ function checkOrder(isSuccess, reason=''){
     const streakExtra = (session.currentStreak-1)*streakBonus;
     let total = baseReward + streakExtra;
     if (session.isRushHour){ total = (baseReward*2)+(streakExtra*2); session.isRushHour = false; }
-    if (session.isVIP){ total = Math.round(total * VIP_REWARD_MULTIPLIER); }
+    if (session.isVIP){ total = Math.round(total * VIP_REWARD_BONUS); }
 
     // Scale reward by stars: stars in [0..5] map to multiplier roughly 0.8..1.4
     const starsVal = Number(active.stars || 0);
@@ -1634,9 +1634,24 @@ function showLanguageModalIfNeeded(){
       const parsed = JSON.parse(saved);
       if (parsed && parsed.lang && parsed.href){
         if (parsed.lang !== 'Portuguese' && parsed.href) {
-          // small delay to allow UI to render then redirect
-          setTimeout(()=> { window.location.href = parsed.href; }, 250);
-          return;
+          // Avoid redirect loop: if stored href equals current location, do not redirect
+          try {
+            const normalize = (u) => u ? u.replace(/\/+$/, '') : u;
+            const current = normalize(window.location.href);
+            const target = normalize(parsed.href);
+            if (target && current !== target) {
+              // small delay to allow UI to render then redirect
+              setTimeout(()=> { window.location.href = parsed.href; }, 250);
+              return;
+            } else {
+              // same URL — do not redirect
+              return;
+            }
+          } catch(e){
+            // fallback: perform redirect if no error (defensive)
+            setTimeout(()=> { window.location.href = parsed.href; }, 250);
+            return;
+          }
         }
       }
       return;
@@ -1659,10 +1674,24 @@ function showLanguageModalIfNeeded(){
       // hide modal
       modal.classList.remove('show');
       setTimeout(()=> modal.classList.add('hidden'), 260);
-      // If non-Portuguese and href provided, redirect
+      // If non-Portuguese and href provided, redirect (only if it's not the same URL)
       if (lang !== 'Portuguese' && href) {
-        playSound('click');
-        setTimeout(()=> window.location.href = href, 140);
+        try {
+          const normalize = (u) => u ? u.replace(/\/+$/, '') : u;
+          const current = normalize(window.location.href);
+          const target = normalize(href);
+          if (target && current !== target) {
+            playSound('click');
+            setTimeout(()=> window.location.href = href, 140);
+          } else {
+            // same URL — treat as stay
+            playSound('success');
+          }
+        } catch(e){
+          // fallback: redirect
+          playSound('click');
+          setTimeout(()=> window.location.href = href, 140);
+        }
       } else {
         playSound('success');
       }
