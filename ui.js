@@ -14,9 +14,8 @@ export function getIngredientHTML(id, classes = '') {
     return `<span class="${classes}" style="display:inline-block;padding:.15rem .45rem;border-radius:.45rem;background:rgba(0,0,0,0.06);font-size:0.95em">${label}</span>`;
   }
   if (ingredient.type === 'image') {
-    const fallback = `https://placehold.co/40x40/efefef/111?text=${id.substring(0,1).toUpperCase()}`;
     // normalize image size to emoji with ing-img class
-    return `<img src="${ingredient.value}" class="ing-img ${classes}" alt="${id}" onerror="this.src='${fallback}'">`;
+    return `<img src="${ingredient.value}" class="ing-img ${classes}" alt="${id}" onerror="this.onerror=null;this.src='/icon-192.png';">`;
   }
   return `<span class="${classes}">${ingredient.value}</span>`;
 }
