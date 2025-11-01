@@ -78,11 +78,16 @@ export const ALL_INGREDIENTS = {
   'mascarpone': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4465/4465423.png' },
   'polvo': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3065/3065730.png' },
   'carne_seca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1046/1046849.png' },
+  'carne_seca': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4177/4177665.png' },
   'cafe': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/924/924514.png' },
   'manteiga_amendoim': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3838/3838464.png' },
   'geleia': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3075/3075903.png' },
   'cha_verde': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/3082/3082024.png' },
   'abobora': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/137/137366.png' },
+  'manteiga_amendoim': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1398/1398540.png' },
+  'geleia': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2515/2515286.png' },
+  'cha_verde': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/5303/5303997.png' },
+  'abobora': { type: 'image', value: 'https://cdn-icons-png.freepik.com/512/5702/5702244.png' },
 
   // Newly added ingredients for the expanded recipes
   'cachaca': { type: 'image', value: 'https://cdn-icons-png.freepik.com/512/8692/8692223.png' },
@@ -166,8 +171,8 @@ export const ALL_RECIPES = [
   { name: "Takoyaki", emoji: "🐙", price: 520, minRank: 3, baseRecipe:["polvo","farinha","molho_okono"], optionalIngredients:["ervas"], cuisine:["Japonês"] },
 
   // Specialty & seasonal (Halloween)
-  { name:"Panqueca do Terror", emoji:"🥞", price:250, minRank:0, baseRecipe:["panqueca","mel"], optionalIngredients:["abobora","chocolate"], cuisine:["Halloween"] },
-  { name:"Onigiri Fantasma", emoji:"👻", price:140, minRank:1, baseRecipe:["arroz","alga"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
+  { name:"Panqueca do Terror", image:"https://pbs.twimg.com/media/G4m2yxcXMAAFicy?format=png&name=small", price:250, minRank:0, baseRecipe:["panqueca","mel"], optionalIngredients:["abobora","chocolate"], cuisine:["Halloween"] },
+  { name:"Onigiri Fantasma", image:"https://pbs.twimg.com/media/G4m2gCzXMAAL0_8?format=png&name=small", price:140, minRank:1, baseRecipe:["arroz","alga"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
   { name:"Takoyaki Tenebroso", emoji:"🐙", price:380, minRank:3, baseRecipe:["polvo","farinha","molho_okono"], optionalIngredients:["abobora"], cuisine:["Halloween"] },
 
   // Additional variety (small selection to enrich gameplay)
@@ -257,7 +262,7 @@ export const ALL_RECIPES = [
   { name: "Tutu à Mineira (mini)", emoji: "🥣", price: 240, minRank: 2, baseRecipe:["feijao","farinha"], optionalIngredients:["torresmo"], cuisine:["Brasileiro"] },
   { name: "Caruru (mini)", emoji: "🥣", price: 300, minRank: 2, baseRecipe:["okra","camarao"], optionalIngredients:["coentro"], cuisine:["Brasileiro"] },
   { name: "Risoles Recheado", emoji: "🥟", price: 160, minRank: 1, baseRecipe:["farinha","frango","queijo"], optionalIngredients:[], cuisine:["Brasileiro"] },
-  { name: "Doce de Abóbora", emoji: "🍮", price: 120, minRank: 1, baseRecipe:["abobora","acucar","canela"], optionalIngredients:[], cuisine:["Brasileiro"] },
+  { name: "Doce de Abóbora", image: "https://pbs.twimg.com/media/G4mzDgHXEAA7_mF?format=png&name=small", price: 120, minRank: 1, baseRecipe:["abobora","acucar","canela"], optionalIngredients:[], cuisine:["Brasileiro"] },
 
     // ======= 15 ITALIANO =======
   { name: "Tagliatelle ao Ragu", emoji: "🍝", price: 360, minRank: 2, baseRecipe:["massa","bife","molho_tomate"], optionalIngredients:["manjericao"], cuisine:["Italiano"] },
@@ -330,7 +335,7 @@ export const ALL_RECIPES = [
   // ======= 15 HALLOWEEN (colocado primeiro conforme pedido) =======
   { name: "Poção Efervescente", emoji: "🧪", price: 1100, minRank: 3, baseRecipe:["cha_verde","gelo","mirtilo"], optionalIngredients:[], cuisine:["Halloween"] },
   { name: "Abóbora Assada com Mel", emoji: "🎃", price: 220, minRank: 1, baseRecipe:["abobora","mel","canela"], optionalIngredients:[], cuisine:["Halloween"] },
-  { name: "Dedos de Bruxa (mini)", emoji: "🥐", price: 160, minRank: 0, baseRecipe:["croissant_massa","amêndoa"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Dedos de Bruxa (mini)", image: "https://pbs.twimg.com/media/G4m0DzeWYAA6q2r?format=png&name=small", price: 160, minRank: 0, baseRecipe:["croissant_massa","amêndoa"], optionalIngredients:[], cuisine:["Halloween"] },
   { name: "Coração Gelatinoso", emoji: "🍮", price: 160, minRank: 0, baseRecipe:["gelatina","mora"], optionalIngredients:[], cuisine:["Halloween"] },
   { name: "Sopa de Abóbora Assombrada", emoji: "🥣", price: 240, minRank: 1, baseRecipe:["abobora","sopa_base"], optionalIngredients:["creme"], cuisine:["Halloween"] },
   { name: "Cupcake Vampiro", emoji: "🧁", price: 140, minRank: 0, baseRecipe:["bolo_massa","chocolate"], optionalIngredients:["geleia"], cuisine:["Halloween"] },
@@ -342,7 +347,7 @@ export const ALL_RECIPES = [
   { name: "Doces da Noite", emoji: "🍬", price: 120, minRank: 0, baseRecipe:["acucar","chocolate"], optionalIngredients:[], cuisine:["Halloween"] },
   { name: "Caldeirão de Doces", emoji: "🧙‍♀️", price: 200, minRank: 1, baseRecipe:["donut_massa","geleia"], optionalIngredients:["chocolate"], cuisine:["Halloween"] },
   { name: "Pé de Feiticeiro (doce)", emoji: "🍪", price: 140, minRank: 0, baseRecipe:["cookie_massa","amêndoa"], optionalIngredients:[], cuisine:["Halloween"] },
-  { name: "Torta de Meia-Noite", emoji: "🥧", price: 320, minRank: 3, baseRecipe:["bolo_massa","trufa","abobora"], optionalIngredients:[], cuisine:["Halloween"] },
+  { name: "Torta de Meia-Noite", image: "https://pbs.twimg.com/media/G4m0rs-XgAAOVgz?format=png&name=small", price: 320, minRank: 3, baseRecipe:["bolo_massa","trufa","abobora"], optionalIngredients:[], cuisine:["Halloween"] },
   
   // Fusion / bonus global dishes
   { name: "Surf & Turf Mini", emoji: "🍽️", price: 520, minRank: 3, baseRecipe: ["bife","camarao"], optionalIngredients:["ervas"], cuisine:["Brasileiro","Francês"] },
