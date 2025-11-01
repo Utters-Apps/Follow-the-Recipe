@@ -1046,7 +1046,7 @@ function checkOrder(isSuccess, reason=''){
     const streakExtra = (session.currentStreak-1)*streakBonus;
     let total = baseReward + streakExtra;
     if (session.isRushHour){ total = (baseReward*2)+(streakExtra*2); session.isRushHour = false; }
-    if (session.isVIP){ total = Math.round(total * VIP_REWARD_BONUS); }
+    if (session.isVIP){ total = Math.round(total * VIP_REWARD_MULTIPLIER); }
 
     // Scale reward by stars: stars in [0..5] map to multiplier roughly 0.8..1.4
     const starsVal = Number(active.stars || 0);
@@ -1292,9 +1292,6 @@ rankUpClose.addEventListener('click', ()=>{ rankUpModal.classList.add('hidden');
 themeToggleWelcome && themeToggleWelcome.addEventListener('click', toggleTheme);
 themeToggleMenu && themeToggleMenu.addEventListener('click', toggleTheme);
 themeToggleSetup && themeToggleSetup.addEventListener('click', toggleTheme);
-
-tabBuy.addEventListener('click', ()=>{ activateTab('buy'); });
-tabOwned.addEventListener('click', ()=>{ activateTab('owned'); });
 
 /* ---------- Init ---------- */
 function init(){
