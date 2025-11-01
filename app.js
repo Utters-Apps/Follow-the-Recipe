@@ -47,7 +47,10 @@ function buildLayout() {
         <i class="fas fa-check mr-2"></i> Confirmar
       </button>
       <div class="mt-auto w-full flex justify-between items-center text-gray-500 text-sm pt-4">
-        <button id="theme-toggle-setup" class="btn-theme w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-moon"></i></button>
+        <button id="reset-button-setup" class="hover:text-red-500 hover:underline transition-colors"><i class="fas fa-trash-alt mr-1"></i> Resetar Progresso</button>
+        <div class="flex gap-2">
+          <button id="theme-toggle-setup" class="btn-theme w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-moon"></i></button>
+        </div>
       </div>
     </div>
 
@@ -66,7 +69,10 @@ function buildLayout() {
       <div class="mt-2 text-xs opacity-70">Desenvolvido inteiramente por <span class="font-semibold">FerUtter (Gustavo F. P.)</span></div>
       <div class="mt-auto flex justify-between items-center w-full text-gray-500 text-sm">
         <button id="reset-button-welcome" class="hover:text-red-500 hover:underline transition-colors"><i class="fas fa-trash-alt mr-1"></i> Resetar Progresso</button>
-        <button id="theme-toggle-welcome" class="btn-theme w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-moon"></i></button>
+        <div class="flex gap-2">
+          <button id="lang-toggle-welcome" class="btn-theme w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-language"></i></button>
+          <button id="theme-toggle-welcome" class="btn-theme w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-moon"></i></button>
+        </div>
       </div>
     </div>
 
@@ -88,7 +94,10 @@ function buildLayout() {
       </div>
       <div class="mt-auto flex justify-between items-center w-full text-gray-500 text-sm">
         <button id="reset-button-menu" class="hover:text-red-500 hover:underline transition-colors"><i class="fas fa-trash-alt mr-1"></i> Resetar Progresso</button>
-        <button id="theme-toggle-menu" class="btn-theme w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-moon"></i></button>
+        <div class="flex gap-2">
+          <button id="lang-toggle-menu" class="btn-theme w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-language"></i></button>
+          <button id="theme-toggle-menu" class="btn-theme w-12 h-12 rounded-full flex items-center justify-center"><i class="fas fa-moon"></i></button>
+        </div>
       </div>
     </div>
 
@@ -289,10 +298,10 @@ function buildLayout() {
         <h3 class="text-2xl font-bold mb-3">Escolha o idioma / Choose the game language</h3>
         <p class="text-sm mb-4 opacity-80">Select a language — most options will redirect to a language page. Portuguese will keep you here.</p>
         <div class="grid grid-cols-1 gap-2 mb-3">
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Russian" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Русский (Russian)</button>
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="German" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Deutsch (German)</button>
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Spanish" data-href="https://utters-apps.github.io/Follow-the-Recipe/">Español (Spanish)</button>
-          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="English" data-href="https://utters-apps.github.io/Follow-the-Recipe/">English</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Russian" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-russian.htm">Русский (Russian)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="German" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-german.html">Deutsch (German)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="Spanish" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-spanish.html">Español (Spanish)</button>
+          <button class="lang-btn btn-main w-full bg-gray-200 text-black py-3 rounded-lg" data-lang="English" data-href="https://utters-apps.github.io/Follow-the-Recipe/index-english.html">English</button>
           <button class="lang-btn btn-main w-full bg-purple-600 text-white py-3 rounded-lg" data-lang="Portuguese" data-href="">Português (stay)</button>
         </div>
         <div class="text-xs opacity-70">You can change the language later in settings (not yet implemented).</div>
@@ -361,6 +370,8 @@ const confirmResetConfirm = query('confirm-reset-confirm');
 const rankUpClose = query('rank-up-close');
 const themeToggleWelcome = query('theme-toggle-welcome');
 const themeToggleMenu = query('theme-toggle-menu');
+const langToggleWelcome = query('lang-toggle-welcome');
+const langToggleMenu = query('lang-toggle-menu');
 const musicToggleHeader = query('music-toggle');
 let musicToggleSetup, musicToggleWelcomeBtn, musicToggleMenuBtn;
 
@@ -553,14 +564,14 @@ function getRankUnlockRecipeName(rankIndex, cuisine) {
   const targetMinRank = rankIndex + 1;
   // prefer all recipes whose minRank equals the target; if none, fall back to cheapest locked recipe for this cuisine
   const pool = filterRecipesByCuisine(ALL_RECIPES)
-    .filter(r => r.minRank === targetMinRank && (!cuisine || (Array.isArray(r.cuisine) ? r.cuisine.includes(cuisine) : true)));
+    .filter(r => r.minRank === targetMinRank && (!cuisine || (Array.isArray(r.cuisine)? r.cuisine.includes(cuisine): true)));
   if (pool.length > 0) {
     pool.sort((a,b)=>a.price-b.price);
     return pool[0].name;
   }
   // fallback: find cheapest recipe that is not available at lower ranks (locked for this cuisine)
   const fallback = filterRecipesByCuisine(ALL_RECIPES)
-    .filter(r => r.minRank > rankIndex && (!cuisine || (Array.isArray(r.cuisine) ? r.cuisine.includes(cuisine) : true)))
+    .filter(r => r.minRank > rankIndex && (!cuisine || (Array.isArray(r.cuisine)? r.cuisine.includes(cuisine): true)))
     .sort((a,b)=>a.price-b.price)[0];
   return fallback ? fallback.name : null;
 }
@@ -798,17 +809,17 @@ function resetGame(){
   document.getElementById('pause-modal')?.classList.add('hidden');
   document.getElementById('auto-offer-modal')?.classList.add('hidden');
 
-  localStorage.clear();
-  gameState = { money:50, restaurants:[{ id:'r0', name:'Meu Restaurante', cuisine:null, unlockedRecipeNames:[], unlockedIngredientIds:[], rank:0 }], activeRestaurantIndex:0 };
-  profile = { restoName:null, cuisine:null };
-  saveGame();
-  // UI back to first-run
-  updateRankDisplay();
-  document.getElementById('restaurants-modal')?.classList.add('hidden');
-  showScreen('setup-screen');
-  renderMarket();
-  renderUnlockedIngredientBin();
-  updateAllMoneyDisplays();
+  // Clear all relevant keys, including language setting
+  localStorage.removeItem(SAVE_KEY);
+  localStorage.removeItem(THEME_KEY);
+  localStorage.removeItem(RESTO_NAME_KEY);
+  localStorage.removeItem(CUISINE_KEY);
+  localStorage.removeItem(LANG_KEY);
+  localStorage.removeItem('recipeGameSeenTutorial_v1');
+  localStorage.removeItem(BGM_KEY);
+
+  // Redirect to the main page
+  window.location.href = 'https://utters-apps.github.io/Follow-the-Recipe/';
 }
 
 function showConfirmResetModal(){ playSound('click'); confirmResetModal.classList.remove('hidden'); }
@@ -868,7 +879,7 @@ function buyRecipe(recipeName){
           advanced = true;
         } else {
           // Inform player they bought the recipe but lack stars to promote
-          showMarketMessage("Comprado — Estrelas insuficientes", `Você aprendeu ${recipe.name}, mas precisa de ★${requiredStars.toFixed(1)} para subir de ranque.`, false);
+          showMarketMessage("Comprado — Estrelas insuficientes", `Você comprou ${recipe.name}, mas precisa de ★${requiredStars.toFixed(1)} para subir de ranque.`, false);
         }
         // Do NOT auto-unlock other recipes here; players should buy them individually.
       }
@@ -1214,7 +1225,11 @@ setupConfirm.addEventListener('click', ()=>{
   // attach music toggles near theme buttons
   musicToggleSetup = document.createElement('button');
   musicToggleSetup.className = 'btn-theme w-12 h-12 rounded-full flex items-center justify-center';
-  themeToggleSetup.parentElement.appendChild(musicToggleSetup);
+  // Insert the music toggle before the theme toggle inside the container
+  const setupToggleContainer = themeToggleSetup.parentElement;
+  if (setupToggleContainer) {
+    setupToggleContainer.insertBefore(musicToggleSetup, themeToggleSetup);
+  }
   musicToggleSetup.addEventListener('click', toggleBgm);
   setBgmIcon();
   initBackgroundMusic();
@@ -1280,11 +1295,13 @@ menuButtonMarket.addEventListener('click', ()=>{ showScreen('menu-screen'); });
 marketMessageClose.addEventListener('click', ()=>{ playSound('click'); marketMessageModal.classList.add('hidden'); });
 resetButtonWelcome.addEventListener('click', showConfirmResetModal);
 resetButtonMenu.addEventListener('click', showConfirmResetModal);
+const resetButtonSetup = query('reset-button-setup'); // Fetch reset button for setup screen here
+if (resetButtonSetup) resetButtonSetup.addEventListener('click', showConfirmResetModal); // Add listener
 confirmResetCancel.addEventListener('click', ()=>{ playSound('click'); confirmResetModal.classList.add('hidden'); });
 confirmResetConfirm.addEventListener('click', ()=>{
   // Close modal before resetting to avoid lingering overlay
   confirmResetModal.classList.add('hidden');
-  resetGame();
+  resetGame(); 
 });
 rankUpClose.addEventListener('click', ()=>{ rankUpModal.classList.add('hidden'); });
 themeToggleWelcome && themeToggleWelcome.addEventListener('click', toggleTheme);
@@ -1467,166 +1484,53 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // place music toggle next to theme toggle on welcome and menu
   musicToggleWelcomeBtn = document.createElement('button');
   musicToggleWelcomeBtn.className = 'btn-theme w-12 h-12 rounded-full flex items-center justify-center';
-  themeToggleWelcome?.parentElement?.appendChild(musicToggleWelcomeBtn);
+  
+  // Find the container (parent of themeToggleWelcome, which is the flex div) and insert music toggle before theme toggle
+  const welcomeToggleContainer = themeToggleWelcome?.parentElement;
+  if (welcomeToggleContainer) {
+    welcomeToggleContainer.insertBefore(musicToggleWelcomeBtn, themeToggleWelcome);
+  }
+  
   musicToggleWelcomeBtn?.addEventListener('click', toggleBgm);
 
   musicToggleMenuBtn = document.createElement('button');
   musicToggleMenuBtn.className = 'btn-theme w-12 h-12 rounded-full flex items-center justify-center';
-  themeToggleMenu?.parentElement?.appendChild(musicToggleMenuBtn);
+  
+  // Find the container (parent of themeToggleMenu, which is the flex div) and insert music toggle before theme toggle
+  const menuToggleContainer = themeToggleMenu?.parentElement;
+  if (menuToggleContainer) {
+    menuToggleContainer.insertBefore(musicToggleMenuBtn, themeToggleMenu);
+  }
+  
   musicToggleMenuBtn?.addEventListener('click', toggleBgm);
   setBgmIcon();
 
   // Restaurants logic
   renderRestaurantsButtonIfEligible();
   renderRestaurantsModal();
-});
 
-// New modal helpers: use .modal-wrap and .modal-card.fade for consistent show/hide with fade
-function showModalById(id){
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.remove('hidden');
-  el.classList.add('modal-wrap','show');
-  const inner = el.querySelector('.p-5, .card, .modal-card');
-  if (inner) inner.classList.add('modal-card','fade');
-  // focus first button
-  setTimeout(()=>{ const b = el.querySelector('button, [role="button"]'); if(b) b.focus(); }, 160);
-}
-function hideModalById(id){
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.remove('show');
-  const inner = el.querySelector('.p-5, .card, .modal-card');
-  if (inner) inner.classList.remove('modal-card','fade');
-  // wait transition then hide
-  setTimeout(()=>{ el.classList.add('hidden'); }, 300);
-}
+  const closeBtn = document.getElementById('close-restaurants');
+  const createBtn = document.getElementById('create-resto');
 
-/* Replace direct .classList.remove/add('hidden') usages for restaurants modal only to avoid wide changes.
-   Wire restaurants button to open restaurants modal; when closing restaurants modal, keep restaurants-button visible. */
-document.addEventListener('click', (e)=>{
-  if (e.target && e.target.id === 'restaurants-button'){
-    renderRestaurantsModal();
-    showModalById('restaurants-modal');
-  }
-});
-
-/* Replace create-resto flow: open create screen instead of inline small input, and make sure create button on modal opens this screen */
-const closeRestaurantsBtn = document.getElementById('close-restaurants');
-closeRestaurantsBtn && closeRestaurantsBtn.addEventListener('click', ()=>{
-  hideModalById('restaurants-modal');
-  // ensure restaurants-button remains visible after closing
-  document.getElementById('restaurants-button-container')?.classList.remove('hidden');
-});
-
-/* Hook create button to open full creation screen */
-const createRestoBtn = document.getElementById('create-resto');
-createRestoBtn && createRestoBtn.addEventListener('click', ()=>{
-  // Close restaurants modal and open full create screen
-  hideModalById('restaurants-modal');
-  showScreen('create-restaurant-screen');
-  return;
-});
-
-/* New handlers for full create screen */
-document.addEventListener('DOMContentLoaded', ()=>{
-  const createConfirm = document.getElementById('create-resto-confirm');
-  const createCancel = document.getElementById('create-resto-cancel');
-  const nameInputFull = document.getElementById('new-resto-name-full');
-  // Dynamic choices
-  const cuisineWrap = document.getElementById('create-cuisine-choices');
-  const iconWrap = document.getElementById('icon-choices');
-  const colorWrap = document.getElementById('color-choices');
-  const icons = ["🍽️","🍣","🍕","🌮","🥐","🍜","🥗","🍔","🍰","🍛","🍟","🍩"];
-  const colors = ["#8b5cf6","#06b6d4","#10b981","#f59e0b","#ef4444","#3b82f6","#111827","#14b8a6"];
-  cuisineWrap.innerHTML = ["Brasileiro","Italiano","Japonês","Mexicano","Francês","Halloween"].map(c=>`<button class="create-cuisine-btn btn-main p-2 rounded-lg border text-sm" data-cuisine="${c}">${c}</button>`).join('');
-  iconWrap.innerHTML = icons.map(i=>`<button class="icon-btn btn-main p-2 rounded-lg border">${i}</button>`).join('');
-  colorWrap.innerHTML = colors.map(c=>`<button class="color-btn w-8 h-8 rounded-full border" style="background:${c}" data-color="${c}" aria-label="${c}"></button>`).join('');
-  let chosenCuisine = null;
-  let chosenIcon = "🍽️";
-  let chosenColor = "#8b5cf6";
-  document.getElementById('create-cuisine-choices')?.addEventListener('click', (e)=>{
-    const b = e.target.closest('.create-cuisine-btn');
-    if (!b) return;
-    document.querySelectorAll('.create-cuisine-btn').forEach(x=>x.classList.remove('bg-green-500','text-white'));
-    b.classList.add('bg-green-500','text-white');
-    chosenCuisine = b.dataset.cuisine;
-    document.getElementById('preview-meta').textContent = `${chosenCuisine} • 0.0 ★`;
+  // Botão de fechar modal de restaurantes
+  closeBtn?.addEventListener('click', () => { 
+    hideModalById('restaurants-modal');
+    // Garante que o botão de restaurantes continue visível após fechar
+    document.getElementById('restaurants-button-container')?.classList.remove('hidden');
   });
-  iconWrap?.addEventListener('click',(e)=>{ const b=e.target.closest('.icon-btn'); if(!b)return; chosenIcon=b.textContent.trim(); document.getElementById('preview-icon').textContent=chosenIcon; });
-  colorWrap?.addEventListener('click',(e)=>{ const b=e.target.closest('.color-btn'); if(!b)return; chosenColor=b.dataset.color; document.getElementById('preview-badge').style.background=chosenColor; });
-  nameInputFull?.addEventListener('input',()=>{ document.getElementById('preview-name').textContent = (nameInputFull.value||'Restaurante').slice(0,24); });
-  createCancel && createCancel.addEventListener('click', ()=>{
-    showScreen('menu-screen');
-    renderRestaurantsButtonIfEligible();
+
+  // Botão de criar novo restaurante
+  createBtn?.addEventListener('click', () => {
+    hideModalById('restaurants-modal');
+    showScreen('create-restaurant-screen');
   });
-  createConfirm && createConfirm.addEventListener('click', ()=>{
-    const rawName = (nameInputFull && nameInputFull.value.trim()) || '';
-    const defaultName = `Restaurante ${ (gameState.restaurants||[]).length + 1 }`;
-    const name = rawName.length > 0 ? rawName.slice(0,24) : defaultName;
 
-    if ((gameState.restaurants||[]).length >= 6){
-      showMarketMessage('Limite atingido','Você não pode ter mais que 6 restaurantes.', false);
-      return;
-    }
-
-    if (!chosenCuisine){
-      showMarketMessage('Escolha uma culinária','Selecione a culinária para o novo restaurante.', false);
-      return;
-    }
-
-    const chosen = chosenCuisine || profile.cuisine || null;
-    // compute starting unlocks robustly and sanitize them against rank-required recipes
-    const starters = getStartingUnlocks(chosen);
-    const sanitizedStarters = sanitizeUnlocks(chosen, starters);
-    const ingSet = new Set();
-    sanitizedStarters.forEach(rn=>{
-      const rec = ALL_RECIPES.find(x=>x.name===rn);
-      if (rec){
-        [...rec.baseRecipe, ...(rec.optionalIngredients||[])].forEach(i=>ingSet.add(i));
-      }
-    });
-
-    const newR = { 
-      id: crypto?.randomUUID?.() || `r${Date.now()}`, 
-      name, 
-      cuisine: chosen, 
-      unlockedRecipeNames: Array.from(new Set(sanitizedStarters)), 
-      unlockedIngredientIds: Array.from(ingSet), 
-      rank: 0,
-      icon: chosenIcon,
-      color: chosenColor,
-      stars: 0.0
-    };
-
-    // final sanitize: remove any accidental rank unlocks and ensure arrays exist
-    newR.unlockedRecipeNames = sanitizeUnlocks(newR.cuisine, newR.unlockedRecipeNames || []);
-    newR.unlockedIngredientIds = Array.from(new Set(newR.unlockedIngredientIds || []));
-
-    gameState.restaurants = gameState.restaurants || [];
-    gameState.restaurants.push(newR);
-    gameState.activeRestaurantIndex = gameState.restaurants.length - 1;
-    saveGame();
-
-    // reset UI inputs and states
-    if (nameInputFull) nameInputFull.value = '';
-    chosenCuisine = null;
-    document.querySelectorAll('.create-cuisine-btn').forEach(x=>x.classList.remove('bg-green-500','text-white'));
-
-    // Re-render everything consistently
-    renderRestaurantsModal();
-    renderMarket();
-    renderUnlockedIngredientBin();
-    renderRestaurantsButtonIfEligible();
-
-    // return to menu screen and show confirmation
-    showScreen('menu-screen');
-    showMarketMessage('Restaurante criado', `${newR.name} • ${newR.cuisine || '—'} criado com sucesso!`, true);
-  });
+  // Inicialização geral do app, se a função existir
+  if (typeof init === 'function') init();
 });
 
 // Helper: open language modal and wire buttons
-function showLanguageModalIfNeeded(){
+function showLanguageModalIfNeeded(forceShow = false){
   try {
     const saved = localStorage.getItem(LANG_KEY);
     // If the current page already is one of the language-target pages, do not perform any redirects
@@ -1637,15 +1541,19 @@ function showLanguageModalIfNeeded(){
       'https://utters-apps.github.io/Follow-the-Recipe/index-german.html',
       // note: user provided a .htm for russian; include both .htm and .html just in case
       'https://utters-apps.github.io/Follow-the-Recipe/index-russian.htm',
-      'https://utters-apps.github.io/Follow-the-Recipe/index-russian.html'
+      'https://utters-apps.github.io/Follow-the-Recipe/index-russian.html',
+      // Include the root index as a safe stop, just in case
+      'https://utters-apps.github.io/Follow-the-Recipe/',
+      'https://utters-apps.github.io/Follow-the-Recipe/index.html'
     ].map(u => u.replace(/\/+$/, ''));
 
     if (noRedirectList.includes(currentNormalized)) {
-      // We're already on a language-specific page; do not open modal or redirect.
-      return;
+      // We're already on a language-specific page; do not open modal or redirect automatically.
+      // But if forceShow is true (user clicked the language button), proceed to open the modal.
+      if (!forceShow) return;
     }
 
-    if (saved) {
+    if (saved && !forceShow) {
       // If language saved and is not Portuguese, redirect immediately to language page
       const parsed = JSON.parse(saved);
       if (parsed && parsed.lang && parsed.href){
@@ -1670,7 +1578,7 @@ function showLanguageModalIfNeeded(){
           }
         }
       }
-      return;
+      if (!forceShow) return; // Language saved, no redirect needed, and not forced open
     }
   } catch(e){ /* ignore parse errors and show modal */ }
 
@@ -1702,7 +1610,9 @@ function showLanguageModalIfNeeded(){
             'https://utters-apps.github.io/Follow-the-Recipe/index-english.html',
             'https://utters-apps.github.io/Follow-the-Recipe/index-german.html',
             'https://utters-apps.github.io/Follow-the-Recipe/index-russian.htm',
-            'https://utters-apps.github.io/Follow-the-Recipe/index-russian.html'
+            'https://utters-apps.github.io/Follow-the-Recipe/index-russian.html',
+            'https://utters-apps.github.io/Follow-the-Recipe/',
+            'https://utters-apps.github.io/Follow-the-Recipe/index.html'
           ].map(u=>u.replace(/\/+$/, ''));
 
           if (blocked.includes(current)) {
@@ -1801,15 +1711,42 @@ function renderRestaurantsModal(){
   }));
 }
 
-document.addEventListener('click', (e)=>{
-  if (e.target && e.target.id === 'restaurants-button'){
-    renderRestaurantsModal();
-    showModalById('restaurants-modal');
-  }
-});
-
-// Executa quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('cuisine-choices');
+  if (container && !container.querySelector('[data-cuisine="Halloween"]')){
+    const sep = document.createElement('div');
+    sep.className = 'col-span-2 mt-2 border-t pt-2';
+    sep.innerHTML = `<button class="cuisine-btn btn-main p-2 rounded-lg border" data-cuisine="Halloween">🎃 Halloween</button>`;
+    container.appendChild(sep);
+  }
+  // place music toggle next to theme toggle on welcome and menu
+  musicToggleWelcomeBtn = document.createElement('button');
+  musicToggleWelcomeBtn.className = 'btn-theme w-12 h-12 rounded-full flex items-center justify-center';
+  
+  // Find the container (parent of themeToggleWelcome, which is the flex div) and insert music toggle before theme toggle
+  const welcomeToggleContainer = themeToggleWelcome?.parentElement;
+  if (welcomeToggleContainer) {
+    welcomeToggleContainer.insertBefore(musicToggleWelcomeBtn, themeToggleWelcome);
+  }
+  
+  musicToggleWelcomeBtn?.addEventListener('click', toggleBgm);
+
+  musicToggleMenuBtn = document.createElement('button');
+  musicToggleMenuBtn.className = 'btn-theme w-12 h-12 rounded-full flex items-center justify-center';
+  
+  // Find the container (parent of themeToggleMenu, which is the flex div) and insert music toggle before theme toggle
+  const menuToggleContainer = themeToggleMenu?.parentElement;
+  if (menuToggleContainer) {
+    menuToggleContainer.insertBefore(musicToggleMenuBtn, themeToggleMenu);
+  }
+  
+  musicToggleMenuBtn?.addEventListener('click', toggleBgm);
+  setBgmIcon();
+
+  // Restaurants logic
+  renderRestaurantsButtonIfEligible();
+  renderRestaurantsModal();
+
   const closeBtn = document.getElementById('close-restaurants');
   const createBtn = document.getElementById('create-resto');
 
