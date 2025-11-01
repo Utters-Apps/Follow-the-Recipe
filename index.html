@@ -2,11 +2,34 @@
 <!-- O idioma da tag <html> será definido dinamicamente pelo JS -->
 <html lang="en">
 <head>
+      <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6A0DAD">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seleção de Idioma</title>
     <!-- Carrega o Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+      <!-- Manifest PWA -->
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <!-- Ícones PWA -->
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+
+<!-- PWA Manifest - Updated with provided icon. For production, convert to Data URL with multiple sizes. -->
+<link rel="manifest" href="data:application/json;base64,eyJpY29ucyI6W3sic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyIsInNyYyI6Imh0dHBzOi8vcGJzLnR3aW1nLmNvbS9tZWRpYS9HekZkbXhEVzBBQVdxeTFKP2Zvcm1hdD1wbmcmdmFzZT0xOTJ4MTkyIiwicHVycG9zZXMiOiJhbnlfdXNlIn0seyJzaXplcyI6IjUxMnU1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIiwic3JjIjoiaHR0cHM6Ly9wYnMudHdpbWc comorbidities/GzZdmXDW0AAWq1J?format=png&name=512x512IiwicHVycG9zZXMiOiJhbnlfdXNlIn1dLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImNsaXByZWZpeCI6ImxvdmUtdGVzdGVyIiwic3RhcnRfdXJsIjoiLiIsIm5hbWUiOiJMb3ZlIFRlc3RlciIsInNob3J0X25hbWUiOiJMb3ZlIFRlc3RlciIsImRlc2NyaXB0aW9uIjoiQ2FsY3VsZSBhIGNvbXBhdGliaWxpZGFkZSBlbnRyZSBub21lcyBlIHBlcnNvbmFsaWRhZGVzIiwiY2xpcHJlZml4IjoibG92ZS10ZXN0ZXIiLCJzdGFydF91cmwiOiIuIiwibmFtZSI6IkxvdmUgVGVzdGVyIiwic2hvcnRfbmFtZSI6IkxvdmUgVGVzdGVyIiwiZGVzY3JpcHRpb24iOiJDYWxjdWxlIGEgY29tcGF0aWJpbGlkYWRlIGVudHJlIG5vbWVzIGUgcGVyc29uYWxpZGFkZXMiLCJ0aGVtZV9jb2xvciI6IiNmZjRkOGQiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzBmMDQxMiJ9">
+
+
+  <!-- Cor do tema (roxo) -->
+  <meta name="theme-color" content="#6A0DAD">
+
+  <!-- Suporte para instalação no iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+    
     <style>
         /* Define a fonte Inter como padrão (similar ao Inter) */
         body {
