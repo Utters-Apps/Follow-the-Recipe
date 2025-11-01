@@ -2,7 +2,7 @@
 <!doctype html>
 <html lang="pt-BR" class="light">
  <head>
-  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=eyYZYuPFgeKZGvmqvtG-1Uo3mgmZ2lluDnU7ZbV6NIxyY6Wnx1OQOZ0JxwnrLh3lk2PP3Ha_vuLIjUQ-TS8CA83B9mYD5k-rhTHeEdZ8hzZqB7iuiiescsS9MhdDoXszprd5kUptez6AXuAGMPFGHBOHUeg6nXVY7cyZhwceUdG5-qBNGuSSgAuvtdgVr0Em" charset="UTF-8"></script><base href="https://utters-apps.github.io/Follow-the-Recipe/">
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=_TvugQNJ7DCDxrVQBy4ToEK5LcCw1pNmrAtYlgWCaDAiBozE_5wNX_5dWyA6PWaWv7sYEVv23Ehmk7_1W0VlO1E0FCfVrhQS7_VGyc9klveYVQZZElYuHQc7CVaMnPTH4JFQe0_D3NB1Si3igtxUCXbCIRBDtd6lnCwD_ZRq59wJpQxrBSrJwdGuz8f-jdso8tBU-hxkgWpatEsxfzktnw" charset="UTF-8"></script><base href="https://utters-apps.github.io/Follow-the-Recipe/index-portuguese.html">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#6A0DAD">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -115,6 +115,8 @@
       will-change:transform, box-shadow;
       border:1px solid transparent;
       box-shadow:0 6px 15px rgba(0,0,0,0.12); /* Increased shadow */
+      /* Added: Subtle gradient/depth */
+      background-image: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(0,0,0,0.05));
     }
     .btn-main:hover{ transform:scale(1.03) }
     .btn-main:active{ transform:scale(.95); box-shadow:0 3px 8px rgba(0,0,0,0.1) }
@@ -142,6 +144,7 @@
     #timer-bar-inner{
       background:var(--timer-grad)!important;
       box-shadow:0 2px 5px rgba(0,0,0,0.2);
+      border-radius:999px; /* Ensure bar is perfectly rounded */
     }
 
     /* Modals */
@@ -172,6 +175,7 @@
       opacity: 0;
       position: absolute;
       flex-direction: column;
+      z-index: 55; /* Higher than normal modals but lower than scrims */
     }
     @keyframes slideInUp {
       0% { transform: translateY(100%); opacity: 0; }
@@ -285,6 +289,8 @@
       border:1px solid var(--bubble-border)!important;
       transition:transform .1s ease, box-shadow .2s ease, opacity .12s ease;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      /* Enhanced tactile look */
+      background-image: linear-gradient(180deg, rgba(255,255,255,0.15), rgba(0,0,0,0.05));
     }
     .ingredient-btn:hover{ transform:scale(1.08); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     .ingredient-btn:active{ transform:scale(.95) }
@@ -309,6 +315,11 @@
 
     /* Consistent emoji & image sizing */
     .ing-img{ width:var(--img-size); height:var(--img-size); object-fit:contain; display:inline-block; vertical-align:middle; }
+    /* Ensure image ingredients display well in the market */
+    .market-img-container img{ 
+        width: 100%; height: 100%; object-fit: contain; border-radius: 8px; 
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
 
     /* Market tabs */
     .tabbar{ display:flex; gap:.5rem; padding:.25rem; background:var(--bubble-bg); border:1px solid var(--bubble-border); border-radius:1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
@@ -508,13 +519,13 @@
   </style>
   <meta http-equiv="X-Translated-By" content="Google">
   <meta http-equiv="X-Translated-To" content="de">
-  <script type="text/javascript" src="https://www.gstatic.com/_/translate_http/_/js/k=translate_http.tr.pt_BR.khhj_ndccYs.O/am=AAAD/d=1/rs=AN8SPfrbLsLK3hKUjZZ-bYOJrLhTs9vC9A/m=corsproxy" data-sourceurl="https://utters-apps.github.io/Follow-the-Recipe/"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/_/translate_http/_/js/k=translate_http.tr.pt_BR.khhj_ndccYs.O/am=AAAD/d=1/rs=AN8SPfrbLsLK3hKUjZZ-bYOJrLhTs9vC9A/m=corsproxy" data-sourceurl="https://utters-apps.github.io/Follow-the-Recipe/index-portuguese.html"></script>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-  <script type="text/javascript" src="https://www.gstatic.com/_/translate_http/_/js/k=translate_http.tr.pt_BR.khhj_ndccYs.O/am=AAAD/d=1/exm=corsproxy/ed=1/rs=AN8SPfrbLsLK3hKUjZZ-bYOJrLhTs9vC9A/m=phishing_protection" data-phishing-protection-enabled="false" data-forms-warning-enabled="true" data-source-url="https://utters-apps.github.io/Follow-the-Recipe/"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/_/translate_http/_/js/k=translate_http.tr.pt_BR.khhj_ndccYs.O/am=AAAD/d=1/exm=corsproxy/ed=1/rs=AN8SPfrbLsLK3hKUjZZ-bYOJrLhTs9vC9A/m=phishing_protection" data-phishing-protection-enabled="false" data-forms-warning-enabled="true" data-source-url="https://utters-apps.github.io/Follow-the-Recipe/index-portuguese.html"></script>
   <meta name="robots" content="none">
  </head>
  <body class="no-select">
-  <script type="text/javascript" src="https://www.gstatic.com/_/translate_http/_/js/k=translate_http.tr.pt_BR.khhj_ndccYs.O/am=AAAD/d=1/exm=corsproxy,phishing_protection/ed=1/rs=AN8SPfrbLsLK3hKUjZZ-bYOJrLhTs9vC9A/m=navigationui" data-environment="prod" data-proxy-url="https://utters--apps-github-io.translate.goog" data-proxy-full-url="https://utters--apps-github-io.translate.goog/Follow-the-Recipe/?_x_tr_sl=auto&amp;_x_tr_tl=de&amp;_x_tr_hl=pt-BR&amp;_x_tr_pto=wapp" data-source-url="https://utters-apps.github.io/Follow-the-Recipe/" data-source-language="auto" data-target-language="de" data-display-language="pt-BR" data-detected-source-language="pt" data-is-source-untranslated="false" data-source-untranslated-url="https://translate.google.com/website?sl=auto&amp;tl=de&amp;hl=pt-BR&amp;client=webapp&amp;u=https://utters-apps.github.io/Follow-the-Recipe/&amp;anno=2" data-client="webapp"></script><!-- Loading Screen -->
+  <script type="text/javascript" src="https://www.gstatic.com/_/translate_http/_/js/k=translate_http.tr.pt_BR.khhj_ndccYs.O/am=AAAD/d=1/exm=corsproxy,phishing_protection/ed=1/rs=AN8SPfrbLsLK3hKUjZZ-bYOJrLhTs9vC9A/m=navigationui" data-environment="prod" data-proxy-url="https://utters--apps-github-io.translate.goog" data-proxy-full-url="https://utters--apps-github-io.translate.goog/Follow-the-Recipe/index-portuguese.html?_x_tr_sl=auto&amp;_x_tr_tl=de&amp;_x_tr_hl=pt-BR&amp;_x_tr_pto=wapp" data-source-url="https://utters-apps.github.io/Follow-the-Recipe/index-portuguese.html" data-source-language="auto" data-target-language="de" data-display-language="pt-BR" data-detected-source-language="pt" data-is-source-untranslated="false" data-source-untranslated-url="https://translate.google.com/website?sl=auto&amp;tl=de&amp;hl=pt-BR&amp;client=webapp&amp;u=https://utters-apps.github.io/Follow-the-Recipe/index-portuguese.html&amp;anno=2" data-client="webapp"></script><!-- Loading Screen -->
   <div id="loading-screen" class="fixed inset-0 flex flex-col items-center justify-center"><i class="fas fa-spinner fa-spin text-6xl text-purple-600 mb-4"></i>
    <h1 class="text-2xl font-bold font-black" style="color:var(--text-primary)">Carregando Cozinha...</h1>
   </div>
@@ -745,7 +756,7 @@ _.na();
 
         c._cest = gtConstEvalStartTime;
         gtConstEvalStartTime = undefined; // hide this eval start time constant
-  c._cl='pt-BR'; c._cuc='gtElInit'; c._cef='\x5b0,1,0,\x5b\x22es_en\x22,\x22en_zh\x22,\x22en_de\x22,\x22en_ja\x22,\x22en_es\x22,\x22de_en\x22\x5d\x5d'; c._cac='wt'; c._cam='lib'; c._cenv='prod'; c._cll='INFO'; c._ctkk='489432.348544699'; const h='translate.googleapis.com'; const oph='translate-pa.googleapis.com'; const s='https'+'://'; c._pah=h; c._pas=s; const b=s+'translate.googleapis.com'; const staticPath = '/translate_static/'; c._pci=b+staticPath+'img/te_ctrl3.gif'; c._pmi=b+staticPath+'img/mini_google.png'; c._pbi=b+staticPath+'img/te_bk.gif'; c._pli=b+staticPath+'img/loading.gif'; c._ps='https:\/\/www.gstatic.com\/_\/translate_http\/_\/ss\/k\x3dtranslate_http.tr.2f3WBw8L4SI.L.W.O\/am\x3dAAAD\/d\x3d0\/rs\x3dAN8SPfpxZ_PDqjwQqfIDlbJ_9iabaVfvFA\/m\x3del_main_css'; c._plla=oph+'\/v1\/supportedLanguages'; c._puh='translate.google.com';c._cnal={};_loadCss(c._ps); _loadJs('https:\/\/translate.googleapis.com\/_\/translate_http\/_\/js\/k\x3dtranslate_http.tr.pt_BR.khhj_ndccYs.O\/am\x3dAAAQ\/d\x3d1\/exm\x3del_conf\/ed\x3d1\/rs\x3dAN8SPfq-2pgOaPRMzof5zxhcRBqJbmO-6g\/m\x3del_main');_exportMessages(); _exportVersion('TE_20251029');
+  c._cl='pt-BR'; c._cuc='gtElInit'; c._cef='\x5b0,1,0,\x5b\x22es_en\x22,\x22en_zh\x22,\x22en_de\x22,\x22en_ja\x22,\x22en_es\x22,\x22de_en\x22\x5d\x5d'; c._cac='wt'; c._cam='lib'; c._cenv='prod'; c._cll='INFO'; c._ctkk='489449.1048845508'; const h='translate.googleapis.com'; const oph='translate-pa.googleapis.com'; const s='https'+'://'; c._pah=h; c._pas=s; const b=s+'translate.googleapis.com'; const staticPath = '/translate_static/'; c._pci=b+staticPath+'img/te_ctrl3.gif'; c._pmi=b+staticPath+'img/mini_google.png'; c._pbi=b+staticPath+'img/te_bk.gif'; c._pli=b+staticPath+'img/loading.gif'; c._ps='https:\/\/www.gstatic.com\/_\/translate_http\/_\/ss\/k\x3dtranslate_http.tr.2f3WBw8L4SI.L.W.O\/am\x3dAAAD\/d\x3d0\/rs\x3dAN8SPfpxZ_PDqjwQqfIDlbJ_9iabaVfvFA\/m\x3del_main_css'; c._plla=oph+'\/v1\/supportedLanguages'; c._puh='translate.google.com';c._cnal={};_loadCss(c._ps); _loadJs('https:\/\/translate.googleapis.com\/_\/translate_http\/_\/js\/k\x3dtranslate_http.tr.pt_BR.khhj_ndccYs.O\/am\x3dAAAQ\/d\x3d1\/exm\x3del_conf\/ed\x3d1\/rs\x3dAN8SPfq-2pgOaPRMzof5zxhcRBqJbmO-6g\/m\x3del_main');_exportMessages(); _exportVersion('TE_20251029');
         })();
       })();
   </script>
