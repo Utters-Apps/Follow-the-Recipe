@@ -187,6 +187,20 @@
       to { opacity: 0; }
     }
 
+    /* NEW: Shake animation for errors/insufficient funds */
+    .shake-animation {
+        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        perspective: 1000px;
+    }
+    @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+
     /* GLOBAL TRANSITION SUPPORT - subtle hardware-accelerated motion */
     .soft-transition { transition: transform .25s cubic-bezier(.2,.9,.2,1), opacity .22s ease, box-shadow .22s ease, background .22s ease; will-change: transform, opacity, box-shadow; }
 
@@ -516,25 +530,52 @@
     }
     /* Subtle polish for gameplay to match new style */
     #order-display{max-width:14rem}
+    
+    /* Ensure scroll regions inherit height from flex-1 parent and handle overflow */
+    #market-scroll, #boosts-scroll {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Ensure inner grids fill vertical space and scroll */
+    #market-items-grid, #market-owned-grid, #boosts-list {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 8px; /* For scrollbar gutter */
+      box-sizing: border-box;
+      max-height: none; /* Override possible restrictions */
+    }
+
+    /* Scrollbar styling for desktop/non-touch devices */
+    #market-items-grid::-webkit-scrollbar, 
+    #market-owned-grid::-webkit-scrollbar, 
+    #boosts-list::-webkit-scrollbar { 
+      width: 8px; height: 8px; 
+    }
+    #market-items-grid::-webkit-scrollbar-thumb, 
+    #market-owned-grid::-webkit-scrollbar-thumb,
+    #boosts-list::-webkit-scrollbar-thumb { 
+      background: rgba(0,0,0,0.08); border-radius: 6px; 
+    }
   </style>
-  <meta http-equiv="X-Translated-By" content="Google">
-  <meta http-equiv="X-Translated-To" content="de">
-  <script type="text/javascript" src="https://www.gstatic.com/_/translate_http/_/js/k=translate_http.tr.pt_BR.khhj_ndccYs.O/am=AAAD/d=1/rs=AN8SPfrbLsLK3hKUjZZ-bYOJrLhTs9vC9A/m=corsproxy" data-sourceurl="https://utters-apps.github.io/Follow-the-Recipe/index-portuguese.html"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-  <script type="text/javascript" src="https://www.gstatic.com/_/translate_http/_/js/k=translate_http.tr.pt_BR.khhj_ndccYs.O/am=AAAD/d=1/exm=corsproxy/ed=1/rs=AN8SPfrbLsLK3hKUjZZ-bYOJrLhTs9vC9A/m=phishing_protection" data-phishing-protection-enabled="false" data-forms-warning-enabled="true" data-source-url="https://utters-apps.github.io/Follow-the-Recipe/index-portuguese.html"></script>
-  <meta name="robots" content="none">
- </head>
- <body class="no-select">
-  <script type="text/javascript" src="https://www.gstatic.com/_/translate_http/_/js/k=translate_http.tr.pt_BR.khhj_ndccYs.O/am=AAAD/d=1/exm=corsproxy,phishing_protection/ed=1/rs=AN8SPfrbLsLK3hKUjZZ-bYOJrLhTs9vC9A/m=navigationui" data-environment="prod" data-proxy-url="https://utters--apps-github-io.translate.goog" data-proxy-full-url="https://utters--apps-github-io.translate.goog/Follow-the-Recipe/index-portuguese.html?_x_tr_sl=auto&amp;_x_tr_tl=de&amp;_x_tr_hl=pt-BR&amp;_x_tr_pto=wapp" data-source-url="https://utters-apps.github.io/Follow-the-Recipe/index-portuguese.html" data-source-language="auto" data-target-language="de" data-display-language="pt-BR" data-detected-source-language="pt" data-is-source-untranslated="false" data-source-untranslated-url="https://translate.google.com/website?sl=auto&amp;tl=de&amp;hl=pt-BR&amp;client=webapp&amp;u=https://utters-apps.github.io/Follow-the-Recipe/index-portuguese.html&amp;anno=2" data-client="webapp"></script><!-- Loading Screen -->
-  <div id="loading-screen" class="fixed inset-0 flex flex-col items-center justify-center"><i class="fas fa-spinner fa-spin text-6xl text-purple-600 mb-4"></i>
-   <h1 class="text-2xl font-bold font-black" style="color:var(--text-primary)">Carregando Cozinha...</h1>
+</head>
+<body class="no-select">
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="fixed inset-0 flex flex-col items-center justify-center">
+    <i class="fas fa-spinner fa-spin text-6xl text-purple-600 mb-4"></i>
+    <h1 class="text-2xl font-bold font-black" style="color:var(--text-primary)">Carregando Cozinha...</h1>
   </div>
-  <div id="app" class="w-full h-full flex items-center justify-center"><!-- conteúdo gerado dinamicamente por app.js -->
-  </div><!-- App modules -->
+
+  <div id="app" class="w-full h-full flex items-center justify-center">
+    <!-- conteúdo gerado dinamicamente por app.js -->
+  </div>
+
+  <!-- App modules -->
   <script type="module" src="./data.js"></script>
   <script type="module" src="./audio.js"></script>
   <script type="module" src="./ui.js"></script>
-  <script type="module" src="./app.js"></script><!-- Registro do Service Worker -->
+  <script type="module" src="./app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
