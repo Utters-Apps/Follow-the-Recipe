@@ -169,23 +169,34 @@
         </div>
     </div>
   <script>
-    document.getElementById("playSound").addEventListener("click", async () => {
-      try {
-        const audioPath = "/click.mp3"; // 🔊 Som na raiz do site
+    const audioPath = "/click.mp3"; // 🔊 Som na raiz do site
 
-        // Verifica se o arquivo existe antes de tocar
+    // Função que toca o som
+    async function playClickSound() {
+      try {
         const response = await fetch(audioPath);
         if (!response.ok) {
-          alert("O arquivo '/click.mp3' não foi encontrado!");
+          console.warn("O arquivo '/click.mp3' não foi encontrado!");
           return;
         }
-
-        // Cria e toca o áudio
         const audio = new Audio(audioPath);
         audio.play();
       } catch (error) {
         console.error("Erro ao tentar tocar o som:", error);
       }
+    }
+
+    // Seleciona todos os botões da página
+    const buttons = document.querySelectorAll("button");
+
+    buttons.forEach((btn, index) => {
+      // Se o botão não tiver id, aplica id automaticamente
+      if (!btn.id) {
+        btn.id = `playSound_${index + 1}`;
+      }
+
+      // Adiciona o evento de clique
+      btn.addEventListener("click", playClickSound);
     });
   </script>
     <script>
