@@ -126,6 +126,8 @@ export const ALL_INGREDIENTS = {
   'mandioquinha': { type: 'image', value: 'https://pbs.twimg.com/media/G4jGTecW8AE5h2V?format=png&name=small' },
   'molho_barbecue': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/4594/4594902.png' },
   'palmito': { type: 'image', value: 'https://pbs.twimg.com/media/G4mnmouXsAAgRv6?format=png&name=small' },
+  'gelatina': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1398/1398525.png' },
+  'mora': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/9138/9138332.png' },
   'iogurte': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2592/2592587.png' } // reutilizável para molhos/sobremesas
 };
 
