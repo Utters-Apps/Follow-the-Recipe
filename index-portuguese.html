@@ -207,6 +207,20 @@
       to { opacity: 0; }
     }
 
+    /* NEW: Shake animation for errors/insufficient funds */
+    .shake-animation {
+        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        perspective: 1000px;
+    }
+    @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+
     /* GLOBAL TRANSITION SUPPORT - subtle hardware-accelerated motion */
     .soft-transition { transition: transform .25s cubic-bezier(.2,.9,.2,1), opacity .22s ease, box-shadow .22s ease, background .22s ease; will-change: transform, opacity, box-shadow; }
 
@@ -536,6 +550,34 @@
     }
     /* Subtle polish for gameplay to match new style */
     #order-display{max-width:14rem}
+    
+    /* Ensure scroll regions inherit height from flex-1 parent and handle overflow */
+    #market-scroll, #boosts-scroll {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Ensure inner grids fill vertical space and scroll */
+    #market-items-grid, #market-owned-grid, #boosts-list {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 8px; /* For scrollbar gutter */
+      box-sizing: border-box;
+      max-height: none; /* Override possible restrictions */
+    }
+
+    /* Scrollbar styling for desktop/non-touch devices */
+    #market-items-grid::-webkit-scrollbar, 
+    #market-owned-grid::-webkit-scrollbar, 
+    #boosts-list::-webkit-scrollbar { 
+      width: 8px; height: 8px; 
+    }
+    #market-items-grid::-webkit-scrollbar-thumb, 
+    #market-owned-grid::-webkit-scrollbar-thumb,
+    #boosts-list::-webkit-scrollbar-thumb { 
+      background: rgba(0,0,0,0.08); border-radius: 6px; 
+    }
   </style>
 </head>
 <body class="no-select">
