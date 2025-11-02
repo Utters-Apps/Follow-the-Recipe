@@ -168,7 +168,26 @@
             </div>
         </div>
     </div>
+  <script>
+    document.getElementById("playSound").addEventListener("click", async () => {
+      try {
+        const audioPath = "/click.mp3"; // 🔊 Som na raiz do site
 
+        // Verifica se o arquivo existe antes de tocar
+        const response = await fetch(audioPath);
+        if (!response.ok) {
+          alert("O arquivo '/click.mp3' não foi encontrado!");
+          return;
+        }
+
+        // Cria e toca o áudio
+        const audio = new Audio(audioPath);
+        audio.play();
+      } catch (error) {
+        console.error("Erro ao tentar tocar o som:", error);
+      }
+    });
+  </script>
     <script>
         // --- GERENCIAMENTO DE IDIOMA E TRADUÇÃO ---
 
