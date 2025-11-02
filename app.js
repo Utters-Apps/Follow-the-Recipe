@@ -21,7 +21,7 @@ const SUCCESS_MODAL_DURATION = 1600;
 const FAILURE_MODAL_DURATION = 2000;
 const BGM_KEY = 'recipeGameBGMMuted_v6';
 // new: global price multiplier to make recipes more expensive and scale with progression
-const BASE_PRICE_MULTIPLIER = 1.6; // global inflation so buying recipes is meaningful
+const BASE_PRICE_MULTIPLIER = 1.3; // global inflation so buying recipes is meaningful
 // NEW: reduce how much players earn on success (0.6 = 60% of previous rewards)
 const SUCCESS_EARN_MULTIPLIER = 0.6;
 function getEffectivePrice(recipe){
