@@ -21,7 +21,9 @@ const SUCCESS_MODAL_DURATION = 1600;
 const FAILURE_MODAL_DURATION = 2000;
 const BGM_KEY = 'recipeGameBGMMuted_v6';
 // new: global price multiplier to make recipes more expensive and scale with progression
-const BASE_PRICE_MULTIPLIER = 1.6; // global inflation so buying recipes is meaningful
+const BASE_PRICE_MULTIPLIER = 1.5; // global inflation so buying recipes is meaningful
+// NEW: reduce how much players earn on success (0.6 = 60% of previous rewards)
+const SUCCESS_EARN_MULTIPLIER = 0.6;
 function getEffectivePrice(recipe){
   // scale price by global multiplier and slightly by recipe.minRank to make higher-rank dishes cost more
   const rankFactor = 1 + ((recipe.minRank || 0) * 0.08);
@@ -1313,6 +1315,10 @@ function checkOrder(isSuccess, reason=''){
     const starsVal = Number(active.stars || 0);
     const starMultiplier = 0.8 + (Math.max(0, Math.min(5, starsVal)) / 5) * 0.6;
     total = Math.round(total * starMultiplier);
+
+    // Apply global success earnings reduction
+    total = Math.max(1, Math.round(total * SUCCESS_EARN_MULTIPLIER));
+
     gameState.money += total;
     updateAllMoneyDisplays();
     successMessage.textContent = `Perfeito! +$${total}`;
@@ -1415,10 +1421,12 @@ ingredientBin.addEventListener('click', (e)=>{
   if (!btn || !session.gameActive || session.isPaused) return;
   ensureAudioStarted();
   
+  // Play a tactile click sound on any ingredient click (Click.mp3)
+  playSound('click');
+  
   // Use ingredient ID as sound name (audio.js handles fallback to click if specific sound is missing)
   const id = btn.dataset.id;
-  playSound(id);
-  
+  // playSound(id); // keep optional ingredient-specific sound suppressed to prioritize click feedback
   session.playerSelection.push(id);
   const span = document.createElement('span'); span.className='text-3xl'; span.innerHTML = getIngredientHTML(id,'inline-block');
   playerPlate.appendChild(span);
