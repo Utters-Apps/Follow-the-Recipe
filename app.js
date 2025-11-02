@@ -13,14 +13,56 @@ const VIP_CHANCE_BASE = 0.06;
 const VIP_CHANCE_PER_RANK = 0.1; // increased from 0.06 -> 0.1
 const RUSH_HOUR_CHANCE_BASE = 0.12; // increased baseline
 const RUSH_HOUR_CHANCE_PER_RANK = 0.12; // increased per-rank scaling
-const BASE_TIMER_DURATION = 15;
-const MIN_TIMER_DURATION = 3; // allow shorter minimum
+const BASE_TIMER_DURATION = 10; // Changed from 15 to 10
+const MIN_TIMER_DURATION = 5; // Changed from 3 to 5
 const RUSH_HOUR_TIMER_MULTIPLIER = 0.6; // faster during rush
 const VIP_REWARD_MULTIPLIER = 1.9; // slightly bigger VIP reward
 const SUCCESS_MODAL_DURATION = 1600;
 const FAILURE_MODAL_DURATION = 2000;
 const BGM_KEY = 'recipeGameBGMMuted_v6';
+// new: global price multiplier to make recipes more expensive and scale with progression
+const BASE_PRICE_MULTIPLIER = 1.6; // global inflation so buying recipes is meaningful
+function getEffectivePrice(recipe){
+  // scale price by global multiplier and slightly by recipe.minRank to make higher-rank dishes cost more
+  const rankFactor = 1 + ((recipe.minRank || 0) * 0.08);
+  return Math.max(1, Math.round((recipe.price || 0) * BASE_PRICE_MULTIPLIER * rankFactor));
+}
 /* ---------------------- */
+
+const BOOSTS = [
+    { 
+        id: 'timer_plus_1', 
+        name: '+1s Tempo Base', 
+        desc: 'Aumenta o tempo base do pedido em 1 segundo (permanente).', 
+        price: 500, 
+        maxLevel: 5,
+        icon: '⏱️'
+    },
+    { 
+        id: 'vip_chance_increase', 
+        name: '+5% Chance VIP', 
+        desc: 'Aumenta permanentemente a chance de aparecer um Cliente VIP em +5%.', 
+        price: 800, 
+        maxLevel: 3,
+        icon: '✨'
+    },
+    { 
+        id: 'streak_star_boost', 
+        name: 'Bônus Estrela Aprimorado', 
+        desc: 'Dobra o ganho de estrelas por sequência de acertos.', 
+        price: 1500, 
+        maxLevel: 1,
+        icon: '⭐'
+    },
+    { 
+        id: 'optional_ingredient_reduction', 
+        name: 'Receitas mais Simples', 
+        desc: 'Reduz a chance de ingredientes opcionais serem adicionados aos pedidos.', 
+        price: 1200, 
+        maxLevel: 2,
+        icon: '➖'
+    }
+];
 
 function buildLayout() {
   appRoot.innerHTML = `
@@ -75,13 +117,15 @@ function buildLayout() {
         <div id="rank-icon" class="text-6xl mb-1">🧼</div>
         <h2 id="rank-name" class="text-2xl font-bold">Lava-pratos</h2>
         <button id="view-upcoming-ranks" class="btn-main mt-2 bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm">Ver próximos ranques</button>
+        <button id="view-tutorial" class="btn-main mt-2 bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm ml-2 hidden">Ver Tutorial</button>
       </div>
       <div id="rank-goal" class="p-3 rounded-xl mb-4 text-center w-full shadow-inner border">
         <h4 class="text-base font-bold">Próximo Nível</h4>
         <p id="rank-goal-text" class="text-sm">Compre a receita no Mercado!</p>
       </div>
       <button id="play-button" class="btn-main w-full bg-green-500 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg mb-3"><i class="fas fa-play mr-2"></i> Próximo Pedido</button>
-      <button id="market-button" class="btn-main w-full bg-blue-500 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg"><i class="fas fa-store mr-2"></i> Mercado</button>
+      <button id="market-button" class="btn-main w-full bg-blue-500 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg mb-3"><i class="fas fa-store mr-2"></i> Mercado</button>
+      <button id="boosts-button" class="btn-main w-full bg-yellow-600 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg mb-3"><i class="fas fa-rocket mr-2"></i> Vantagens</button>
       <div id="restaurants-button-container" class="mt-2 hidden">
         <button id="restaurants-button" class="btn-main w-full bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl text-lg"><i class="fas fa-utensils mr-2"></i> Meus Restaurantes</button>
       </div>
@@ -139,18 +183,39 @@ function buildLayout() {
           </div>
         </div>
       </header>
-      <main class="flex-1 p-3 w-full space-y-3">
+      <main class="flex-1 p-3 w-full space-y-3 flex flex-col overflow-hidden">
         <div class="tabbar sticky top-0 z-10">
           <button id="tab-buy" class="tab active"><i class="fas fa-coins mr-2"></i>Comprar Pratos</button>
           <button id="tab-owned" class="tab"><i class="fas fa-utensils mr-2"></i>Meus Pratos</button>
         </div>
-        <div id="market-scroll" class="relative">
+        <div id="market-scroll" class="relative flex-1 overflow-y-auto">
           <div id="market-items-grid" class="space-y-3"></div>
           <div id="market-owned-grid" class="space-y-3 hidden"></div>
         </div>
       </main>
     </div>
 
+    <!-- Boosts Screen -->
+    <div id="boosts-screen" class="screen flex-col hidden h-full">
+        <header class="border-b p-3 z-10">
+          <div class="flex items-center justify-between">
+            <button id="menu-button-boosts" class="text-2xl w-10 h-10 flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
+            <h2 class="text-xl font-bold flex-1 text-center m-0 title-wrap">Vantagens</h2>
+            <div class="header-right flex items-center gap-2">
+              <div id="money-display-boosts" class="money-pill font-bold px-4 py-2 rounded-full text-base shadow-md">$50</div>
+              <div id="stars-display-boosts" class="stars-pill font-bold text-base">0.0 ★</div>
+            </div>
+          </div>
+        </header>
+        <main class="flex-1 p-3 w-full flex flex-col overflow-hidden">
+          <div id="boosts-scroll" class="relative flex-1 overflow-y-auto">
+            <div id="boosts-list" class="space-y-3">
+              <!-- Boost cards generated here -->
+            </div>
+          </div>
+        </main>
+    </div>
+    
     <!-- Create Restaurant Screen -->
     <div id="create-restaurant-screen" class="screen p-4 flex flex-col items-stretch justify-start h-full hidden">
       <h2 class="text-2xl font-black mb-3 text-center">Novo Restaurante</h2>
@@ -249,6 +314,32 @@ function buildLayout() {
       </div>
     </div>
 
+    <div id="insufficient-funds-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center p-6">
+      <div class="card p-5 rounded-2xl w-full max-w-sm text-center">
+        <h3 class="text-2xl font-bold mb-2" id="funds-title">Dinheiro Insuficiente!</h3>
+        <p class="text-sm mb-4" id="funds-text">Você precisa de <span id="funds-needed">$0</span> para comprar isso.</p>
+        <div class="flex gap-2">
+          <button id="funds-skip" class="btn-main w-full bg-gray-400 text-white font-bold py-3 rounded-lg">Depois</button>
+          <button id="funds-buy" class="btn-main w-full bg-purple-600 text-white font-bold py-3 rounded-lg">Comprar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tutorial-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center p-6">
+      <div class="card p-5 rounded-2xl w-full max-w-md text-center">
+        <h3 class="text-2xl font-bold mb-2">Tutorial</h3>
+        <p class="text-sm mb-4" id="tutorial-content"></p>
+        <div class="flex gap-2">
+          <button id="tutorial-prev" class="btn-main w-full bg-gray-400 text-white font-bold py-3 rounded-lg">Anterior</button>
+          <button id="tutorial-next" class="btn-main w-full bg-purple-600 text-white font-bold py-3 rounded-lg">Próximo</button>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <button id="tutorial-start" class="btn-main w-full bg-green-500 text-white font-bold py-3 rounded-lg">Começar</button>
+          <button id="tutorial-close-btn" class="btn-main w-full bg-gray-400 text-white font-bold py-3 rounded-lg">Fechar</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Restaurants Modal -->
     <div id="restaurants-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center p-6">
       <div class="card p-5 rounded-2xl w-full max-w-md text-left">
@@ -301,7 +392,7 @@ let gameState = loadFromStorage(SAVE_KEY) || {
   // new restaurants structure
   restaurants: [
     // default restaurant (migrated from legacy fields on init if needed)
-    { id: crypto?.randomUUID?.() || 'r0', name: 'Meu Restaurante', cuisine: null, unlockedRecipeNames: ["Misto Quente","Limonada","Café"], unlockedIngredientIds: ["pao","manteiga","queijo","tomate","limao","mel","gelo","ervas","cafe","leite"], rank:0 }
+    { id: crypto?.randomUUID?.() || 'r0', name: 'Meu Restaurante', cuisine: null, unlockedRecipeNames: ["Misto Quente","Limonada","Café"], unlockedIngredientIds: ["pao","manteiga","queijo","tomate","limao","mel","gelo","ervas","cafe","leite"], rank:0, stars: 0.0, boosts: {} } // Initialized with boosts field
   ],
   activeRestaurantIndex: 0
 };
@@ -334,8 +425,10 @@ const themeToggleSetup = query('theme-toggle-setup');
 const welcomePlayButton = query('welcome-play-button');
 const playButton = query('play-button');
 const marketButton = query('market-button');
+const boostsButton = query('boosts-button');
 const pauseButton = query('pause-button');
 const menuButtonMarket = query('menu-button-market');
+const menuButtonBoosts = query('menu-button-boosts');
 const marketMessageClose = query('market-message-close');
 const resetButtonWelcome = query('reset-button-welcome');
 const resetButtonMenu = query('reset-button-menu');
@@ -349,6 +442,7 @@ let musicToggleSetup, musicToggleWelcomeBtn, musicToggleMenuBtn;
 
 const moneyDisplayGame = query('money-display-game');
 const moneyDisplayMarket = query('money-display-market');
+const moneyDisplayBoosts = query('money-display-boosts');
 const streakDisplay = query('streak-display');
 const restoNameDisplay = query('resto-name-display');
 
@@ -386,6 +480,7 @@ const welcomeScreen = document.querySelector('#welcome-screen');
 const menuScreen = document.querySelector('#menu-screen');
 const gameScreen = document.querySelector('#game-screen');
 const marketScreen = document.querySelector('#market-screen');
+const boostsScreen = document.querySelector('#boosts-screen');
 const confirmResetModal = query('confirm-reset-modal');
 const successModal = query('success-modal');
 const successMessage = query('success-message');
@@ -401,12 +496,30 @@ const pauseReturnMenu = query('pause-return-menu');
 const musicToggle = query('music-toggle');
 const createRestaurantScreen = query('create-restaurant-screen'); // add ref for create screen
 
+/* NEW: Insufficient Funds Modal Refs */
+const insufficientFundsModal = query('insufficient-funds-modal');
+const fundsTitle = query('funds-title');
+const fundsText = query('funds-text');
+const fundsNeeded = query('funds-needed');
+const fundsClose = query('funds-close');
+
+/* NEW: Tutorial Modal Refs */
+const tutorialModal = query('tutorial-modal');
+const tutorialContent = query('tutorial-content');
+const tutorialPrev = query('tutorial-prev');
+const tutorialNext = query('tutorial-next');
+const tutorialStart = query('tutorial-start');
+const tutorialCloseBtn = query('tutorial-close-btn');
+
 /* NEW: Loading Screen Ref */
 const loadingScreen = document.getElementById('loading-screen'); 
 
+/* NEW: Rank Up Context Flag */
+let rankUpContext = null; // 'market_purchase' or 'auto_offer'
+
 /* ---------- Screen helpers ---------- */
 function showScreen(id){
-  const screens = [setupScreen, welcomeScreen, menuScreen, gameScreen, marketScreen, createRestaurantScreen];
+  const screens = [setupScreen, welcomeScreen, menuScreen, gameScreen, marketScreen, boostsScreen, createRestaurantScreen];
   screens.forEach(s => {
     if (!s) return;
     if (s.id === id){
@@ -418,6 +531,21 @@ function showScreen(id){
     }
   });
 }
+
+/* New function: Insufficient funds modal */
+function showInsufficientFundsModal(neededPrice){
+  fundsNeeded.textContent = neededPrice;
+  // Ensure icon shakes visually
+  const icon = insufficientFundsModal.querySelector('.shake-animation');
+  if(icon){ 
+    icon.classList.remove('shake-animation'); 
+    void icon.offsetWidth; 
+    icon.classList.add('shake-animation');
+  }
+  
+  showModalById('insufficient-funds-modal');
+}
+fundsClose?.addEventListener('click', ()=>{ hideModalById('insufficient-funds-modal'); playSound('click'); });
 
 /* ---------- Theme helpers (fixed to apply consistently) ---------- */
 function applyTheme(theme){
@@ -451,14 +579,24 @@ function filterRecipesByCuisine(recipes, cuisine = null){
 // helper: current restaurant accessor & migration
 function getActiveRestaurant(){
   if (!gameState.restaurants || !Array.isArray(gameState.restaurants) || gameState.restaurants.length===0){
-    gameState.restaurants = [{ id: 'r0', name:'Meu Restaurante', cuisine: profile.cuisine || null, unlockedRecipeNames: gameState.unlockedRecipeNames || [], unlockedIngredientIds: gameState.unlockedIngredientIds || [], rank: gameState.rank || 0 }];
+    const defaultResto = { id: crypto?.randomUUID?.() || 'r0', name: profile.restoName || 'Meu Restaurante', cuisine: profile.cuisine || null, unlockedRecipeNames: gameState.unlockedRecipeNames || [], unlockedIngredientIds: gameState.unlockedIngredientIds || [], rank: gameState.rank || 0, stars: 0.0, boosts: {} }; // Initialize boosts
+    gameState.restaurants = [defaultResto];
     gameState.activeRestaurantIndex = 0;
     saveGame();
   }
   // migrate legacy top-level lists into first restaurant if legacy fields exist
   const r = gameState.restaurants[gameState.activeRestaurantIndex || 0];
   if (!r.unlockedRecipeNames && gameState.unlockedRecipeNames) r.unlockedRecipeNames = gameState.unlockedRecipeNames;
+  // Initialize stars and boosts if absent (new fields)
+  if (typeof r.stars === 'undefined' || r.stars === null) r.stars = 0.0;
+  if (typeof r.boosts === 'undefined' || r.boosts === null) r.boosts = {};
   return gameState.restaurants[gameState.activeRestaurantIndex || 0];
+}
+
+// Helper function for Boost levels
+function getBoostLevel(id){
+    const active = getActiveRestaurant();
+    return active?.boosts?.[id] || 0;
 }
 
 // New: produce exactly 2 starter recipes and ensure starters do NOT include any future rank-up recipe names
@@ -586,7 +724,8 @@ function updateAllMoneyDisplays(){
   const txt = `$${gameState.money}`;
   if (moneyDisplayGame) moneyDisplayGame.textContent = txt;
   if (moneyDisplayMarket) moneyDisplayMarket.textContent = txt;
-  [moneyDisplayGame, moneyDisplayMarket].forEach(d => { 
+  if (moneyDisplayBoosts) moneyDisplayBoosts.textContent = txt;
+  [moneyDisplayGame, moneyDisplayMarket, moneyDisplayBoosts].forEach(d => { 
     if (d){ 
       d.classList.remove('scale-110'); 
       void d.offsetWidth; 
@@ -616,12 +755,16 @@ function updateAllMoneyDisplays(){
       return starsEl;
     }
 
-    const gameStars = ensureStarsElement(moneyDisplayGame, 'stars-display-game');
-    const marketStars = ensureStarsElement(moneyDisplayMarket, 'stars-display-market');
+    // Game screen may not have the stars element hardcoded, so use helper
+    const gameStars = document.getElementById('stars-display-game') || ensureStarsElement(moneyDisplayGame, 'stars-display-game');
+    // Market and Boosts have it hardcoded
+    const marketStars = document.getElementById('stars-display-market');
+    const boostsStars = document.getElementById('stars-display-boosts');
 
     const starHTML = `${starsVal} ★`;
-    if (gameStars) gameStars.textContent = starHTML;
-    if (marketStars) marketStars.textContent = starHTML;
+    if (gameStars) { gameStars.textContent = starHTML; gameStars.classList.remove('hidden'); }
+    if (marketStars) { marketStars.textContent = starHTML; marketStars.classList.remove('hidden'); }
+    if (boostsStars) { boostsStars.textContent = starHTML; boostsStars.classList.remove('hidden'); }
   } catch(e){
     console.warn('Failed to render stars display', e);
   }
@@ -643,7 +786,9 @@ function updateRankDisplay(){
     const goalName = getRankUnlockRecipeName(idx, cuisine) || String(nextRank.recipeToUnlock || '—');
     if (goalName && goalName !== 'null'){
       rankGoal.style.display = 'block';
-      rankGoalText.innerHTML = `Compre a receita <span class="font-bold">${goalName}</span> no Mercado para atingir <span class="text-purple-600">${nextRank.name}</span>!`;
+      // Added stars requirement hint to menu goal
+      const nextRankStars = ranks[idx + 1]?.requiredStars || 0.0;
+      rankGoalText.innerHTML = `Compre a receita <span class="font-bold">${goalName}</span> (★${nextRankStars.toFixed(1)}) no Mercado para atingir <span class="text-purple-600">${nextRank.name}</span>!`;
       return;
     }
   }
@@ -737,14 +882,19 @@ function renderMarket(){
       </div>
       ${
         isUnlocked ? `<div class="font-bold px-4 py-2 rounded-lg" style="background:var(--muted); color:var(--text-primary)">Comprado</div>` :
-        isBuyable ? `<button class="btn-buy btn-main bg-purple-500 text-white font-bold px-6 py-3 rounded-lg text-lg" data-recipe="${recipe.name}"><i class="fas fa-coins mr-1"></i> $${recipe.price}</button>` :
+        isBuyable ? `<button class="btn-buy btn-main bg-purple-500 text-white font-bold px-6 py-3 rounded-lg text-lg" data-recipe="${recipe.name}"><i class="fas fa-coins mr-1"></i> $${getEffectivePrice(recipe)}</button>` :
         `<div class="font-bold px-3 py-2 rounded-lg text-center" style="background:var(--muted); color:var(--text-primary)"><i class="fas fa-lock mr-1"></i><span class="text-xs">Ranque: ${ranks[recipe.minRank]?.name || '—'}</span></div>`
       }
     `;
     marketItemsGrid.appendChild(card);
     if (!isUnlocked && isBuyable){
       const btn = card.querySelector('.btn-buy');
-      btn && btn.addEventListener('click', ()=> buyRecipe(recipe.name));
+      if (btn){
+        // enable/disable based on effective price (prevents greyed out when affordable)
+        const effective = getEffectivePrice(recipe);
+        btn.disabled = gameState.money < effective;
+        // btn.addEventListener('click', ()=> buyRecipe(recipe.name)); // REMOVED: using delegated listener
+      }
     }
   });
 
@@ -771,6 +921,88 @@ function renderMarket(){
   }
 }
 
+// NEW: Boost Shop Renderer improvements (mobile scrolling + proper enable states)
+function renderBoostShop(){
+    const listEl = document.getElementById('boosts-list');
+    const active = getActiveRestaurant();
+    listEl.innerHTML = '';
+    
+    // ensure the boosts list scrolls on small screens and has a sensible max height
+    listEl.style.maxHeight = 'calc(100vh - 240px)';
+    listEl.style.overflowY = 'auto';
+    listEl.style.webkitOverflowScrolling = 'touch';
+    
+    BOOSTS.forEach(boost => {
+        const currentLevel = getBoostLevel(boost.id);
+        const maxLevel = boost.maxLevel;
+        const isMax = currentLevel >= maxLevel;
+        const price = boost.price * (currentLevel + 1); // Simple multiplicative cost increase
+
+        let statusHtml = '';
+        if (isMax) {
+            statusHtml = `<div class="font-bold px-4 py-2 rounded-lg bg-green-100 text-green-700">Máximo Atingido</div>`;
+        } else {
+            const canBuy = gameState.money >= price;
+            statusHtml = `<button class="btn-buy-boost btn-main ${canBuy ? 'bg-yellow-500 text-white' : 'bg-gray-400 text-gray-700'} font-bold px-6 py-3 rounded-lg text-lg" data-boost-id="${boost.id}" ${!canBuy ? 'disabled' : ''}>
+                            <i class="fas fa-coins mr-1"></i> $${price}
+                          </button>`;
+        }
+
+        const levelText = maxLevel > 1 ? `Nível ${currentLevel} / ${maxLevel}` : (isMax ? 'Comprado' : 'Disponível');
+        
+        const card = document.createElement('div');
+        card.className = `card rounded-xl shadow-lg p-4 flex items-start space-x-4 transition-all relative border`;
+        card.innerHTML = `
+            <div class="text-4xl mt-1">${boost.icon}</div>
+            <div class="flex-1">
+                <h4 class="text-xl font-bold">${boost.name}</h4>
+                <p class="text-sm opacity-80">${boost.desc}</p>
+                <p class="text-xs mt-1 font-semibold text-purple-600">${levelText}</p>
+            </div>
+            ${statusHtml}
+        `;
+        listEl.appendChild(card);
+        
+        if (!isMax) {
+            const btn = card.querySelector('.btn-buy-boost');
+            if (btn){
+              btn.disabled = gameState.money < price;
+              btn.addEventListener('click', () => buyBoost(boost.id));
+            }
+        }
+    });
+}
+
+function buyBoost(boostId){
+    const boost = BOOSTS.find(b => b.id === boostId);
+    if (!boost) return;
+    
+    const active = getActiveRestaurant();
+    const currentLevel = getBoostLevel(boostId);
+    if (currentLevel >= boost.maxLevel) {
+        showMarketMessage("Nível Máximo!", `${boost.name} já está no nível máximo.`, false);
+        return;
+    }
+
+    const price = boost.price * (currentLevel + 1);
+    
+    if (gameState.money >= price){
+        playSound('buy');
+        gameState.money -= price;
+        active.boosts[boostId] = currentLevel + 1;
+        
+        saveGame();
+        renderBoostShop();
+        updateAllMoneyDisplays();
+        
+        showMarketMessage("Vantagem Comprada!", `Você melhorou ${boost.name} para Nível ${currentLevel + 1}!`, true);
+
+    } else {
+        playSound('error');
+        showInsufficientFundsModal(price);
+    }
+}
+
 /* ---------- Game logic & difficulty ---------- */
 function saveGame(){ saveToStorage(SAVE_KEY, gameState); }
 
@@ -788,7 +1020,7 @@ function resetGame(){
   // Redirect player to the external follow-the-recipe page and request it to clear its own storage via query flag
   window.location.href = 'https://utters-apps.github.io/Follow-the-Recipe?clearStorage=1';
   // (following redirect; fallback local reset retained for safety if redirect blocked)
-  gameState = { money:50, restaurants:[{ id:'r0', name:'Meu Restaurante', cuisine:null, unlockedRecipeNames:[], unlockedIngredientIds:[], rank:0 }], activeRestaurantIndex:0 };
+  gameState = { money:50, restaurants:[{ id:'r0', name:'Meu Restaurante', cuisine:null, unlockedRecipeNames:[], unlockedIngredientIds:[], rank:0, stars:0.0, boosts:{} }], activeRestaurantIndex:0 };
   profile = { restoName:null, cuisine:null };
   saveGame();
   // UI back to first-run
@@ -813,7 +1045,7 @@ function showMarketMessage(title,text,isSuccess=true){
   setTimeout(()=>{ document.getElementById('market-message-close')?.focus(); }, 180);
 }
 function showRankUpModal(){
-  playSound('success');
+  playSound('rank_up');
   const active = getActiveRestaurant();
   const ranks = getActiveRanks() || RANKS;
   const idx = Math.max(0, Math.min((active && typeof active.rank==='number')?active.rank:0, ranks.length-1));
@@ -830,11 +1062,12 @@ function showRankUpModal(){
 
 function buyRecipe(recipeName){
   const recipe = ALL_RECIPES.find(r=>r.name===recipeName);
-  if (!recipe) return;
+  if (!recipe) return { success: false, advanced: false };
   const active = getActiveRestaurant();
-  if (gameState.money >= recipe.price){
+  const effective = getEffectivePrice(recipe);
+  if (gameState.money >= effective){
     playSound('buy');
-    gameState.money -= recipe.price;
+    gameState.money -= effective;
     active.unlockedRecipeNames = Array.from(new Set([...(active.unlockedRecipeNames||[]), recipe.name]));
     const s = new Set(active.unlockedIngredientIds || []);
     [...recipe.baseRecipe, ...recipe.optionalIngredients].forEach(id=>s.add(id));
@@ -847,9 +1080,10 @@ function buyRecipe(recipeName){
     let advanced = false;
     if (currIdx < ranks.length - 1){
       const nextIdx = currIdx + 1;
-      const nextGoalName = getRankUnlockRecipeName(currIdx, cuisine) || ranks[nextIdx]?.recipeToUnlock;
+      const nextDef = ranks[nextIdx] || null;
+      const nextGoalName = nextDef ? (getRankUnlockRecipeName(currIdx, cuisine) || nextDef.recipeToUnlock) : null;
       // Use the configured requiredStars from the rank definition (no additional +1.0)
-      const requiredStars = Number(ranks[nextIdx]?.requiredStars || 0);
+      const requiredStars = Number(nextDef?.requiredStars || 0);
       const activeStars = Number(active.stars || 0);
       if (nextGoalName && nextGoalName === recipe.name){
         if (activeStars >= requiredStars){
@@ -867,28 +1101,35 @@ function buyRecipe(recipeName){
       saveGame();
       showRankUpModal();
     } else {
-      // only show generic message if not already shown for star-blocked promotion
-      if (!advanced) showMarketMessage("Receita Comprada!", `Você aprendeu a fazer ${recipe.name}!`, true);
+      // Do NOT show generic message if not already shown for star-blocked promotion
+      if (!advanced && !marketMessageModal.classList.contains('show')) showMarketMessage("Receita Comprada!", `Você aprendeu a fazer ${recipe.name}!`, true);
     }
     saveGame(); renderMarket(); updateAllMoneyDisplays();
+    return { success: true, advanced: advanced }; // Return status
   } else {
     playSound('error');
-    showMarketMessage("Dinheiro Insuficiente!", `Você precisa de $${recipe.price}.`, false);
+    // Use new insufficient funds modal
+    showInsufficientFundsModal(effective);
+    return { success: false, advanced: false }; // Return status
   }
 }
 
 function getTimerDuration(){
   const active = getActiveRestaurant();
   const ranks = getActiveRanks();
-  const base = BASE_TIMER_DURATION;
+  
+  // Apply Boost: timer_plus_1
+  const timerBoost = getBoostLevel('timer_plus_1');
+  const base = BASE_TIMER_DURATION + timerBoost;
+  
   const maxDifficultyRanks = Math.max(0, ranks.length - 1);
   const activeRank = (active && typeof active.rank === 'number') ? active.rank : 0;
 
-  // Aggressive difficulty curve: each rank reduces time progressively (log-ish scaling)
+  // Aggressive difficulty curve: each rank reduces time progressively
   const rankFactor = Math.min(maxDifficultyRanks, activeRank);
-  // stronger decay: subtract up to ~50% of base across ranks, clamp to MIN_TIMER_DURATION
-  const decay = Math.round((base * 0.5) * (rankFactor / Math.max(1, maxDifficultyRanks)));
-  let dur = Math.max(MIN_TIMER_DURATION, base - decay - Math.round(rankFactor * 0.6));
+  // decay reduces based on rank (each rank removes ~0.8s)
+  const decayReduction = Math.round(rankFactor * 0.8);
+  let dur = Math.max(MIN_TIMER_DURATION, base - decayReduction);
 
   // VIPs make a single order slightly easier (add +1s), but still fast at high ranks
   if (session.isVIP) dur = Math.min(base, dur + 1);
@@ -956,16 +1197,23 @@ function startNewOrder(){
   session.playerSelection = [];
   session.timer = getTimerDuration();
   session.isPaused = false;
-  session.isVIP = Math.random() < Math.min(VIP_CHANCE_BASE + gameState.rank*VIP_CHANCE_PER_RANK, 0.4);
-  playerPlate.innerHTML = '';
-  messageBox.textContent = '';
+  
+  // ensure the player's plate is cleared at the start of a new order
+  try { playerPlate.innerHTML = ''; } catch(e){ /* ignore if not yet mounted */ }
+  
+  const active = getActiveRestaurant();
+  const activeRank = active.rank || 0;
+  
+  // Apply Boost: vip_chance_increase
+  const vipBoostLevel = getBoostLevel('vip_chance_increase');
+  const vipChance = Math.min(VIP_CHANCE_BASE + activeRank * VIP_CHANCE_PER_RANK + vipBoostLevel * 0.05, 0.6); // Cap VIP chance at 60%
+  session.isVIP = Math.random() < vipChance;
 
   // Rush hour occurs more often at higher rank
-  session.isRushHour = Math.random() < Math.min(RUSH_HOUR_CHANCE_BASE + gameState.rank*RUSH_HOUR_CHANCE_PER_RANK, 0.45);
+  session.isRushHour = Math.random() < Math.min(RUSH_HOUR_CHANCE_BASE + activeRank * RUSH_HOUR_CHANCE_PER_RANK, 0.45);
   if (session.isRushHour) rushHourBanner.classList.remove('hidden'); else rushHourBanner.classList.add('hidden');
 
   // Safe recipe pool selection (per-restaurant)
-  const active = getActiveRestaurant();
   const unlockedRecipes = ALL_RECIPES.filter(r => (active.unlockedRecipeNames||[]).includes(r.name));
   const availableByCuisine = filterRecipesByCuisine(unlockedRecipes);
   const pool = (availableByCuisine.length > 0 ? availableByCuisine : unlockedRecipes);
@@ -991,7 +1239,12 @@ function startNewOrder(){
   const availableOptionals = (Array.isArray(session.currentOrder.optionalIngredients) ? session.currentOrder.optionalIngredients : [])
     .filter(id => (active.unlockedIngredientIds || []).includes(id)); // FIX: use active restaurant ingredients
 
-  const optionalRate = Math.min(0.5, 0.3 + gameState.rank*0.1);
+  // Apply Boost: optional_ingredient_reduction
+  const reductionBoostLevel = getBoostLevel('optional_ingredient_reduction');
+  // Base rate depends on rank, reduced by boost (Level 1: -0.1, Level 2: -0.2)
+  const baseOptionalRate = 0.3 + activeRank * 0.1;
+  const optionalRate = Math.min(0.5, Math.max(0.1, baseOptionalRate - reductionBoostLevel * 0.1));
+  
   const optionalsToAdd = availableOptionals.filter(()=>Math.random() < optionalRate);
   if (session.isVIP && availableOptionals.length > 0) optionalsToAdd.push(availableOptionals[Math.floor(Math.random()*availableOptionals.length)]);
 
@@ -1029,14 +1282,22 @@ function checkOrder(isSuccess, reason=''){
   if (!session.gameActive) return;
   session.gameActive = false;
   stopTimer(true);
+  // always clear the player's placed-ingredient emojis when an order finishes (success or failure)
+  try { playerPlate.innerHTML = ''; } catch(e){ /* ignore if element missing */ }
+  session.playerSelection = []; // Ensure selection array is explicitly cleared here too, in case of timer expiry or external failure call
   const active = getActiveRestaurant();
   if (isSuccess){
     playOutcomeAudio('success');
     session.currentStreak++;
-    // Every time the player completes 2 correct orders in a row, award +0.1 stars (clamped to 5.0)
-    const active = getActiveRestaurant(); // ensure single active binding used
+    
+    // Apply Boost: streak_star_boost
+    const starBoost = getBoostLevel('streak_star_boost');
+    const starIncrement = starBoost > 0 ? 0.2 : 0.1;
+
+    // Every time the player completes 2 correct orders in a row, award stars (clamped to 5.0)
+    const active = getActiveRestaurant(); // use same active here
     if (session.currentStreak > 0 && session.currentStreak % 2 === 0){
-      active.stars = Math.min(5.0, Number((Number(active.stars || 0) + 0.1).toFixed(1)));
+      active.stars = Math.min(5.0, Number((Number(active.stars || 0) + starIncrement).toFixed(1)));
     }
 
     const ranks = getActiveRanks();
@@ -1058,8 +1319,18 @@ function checkOrder(isSuccess, reason=''){
     successModal.classList.remove('hidden');
     setTimeout(()=>{
       successModal.classList.add('hidden');
-      const offer = findAffordableRecipe();
-      if (offer){ showAutoOffer(offer); } else { startNewOrder(); }
+      
+      const recipeOffer = findAffordableRecipe();
+      if (recipeOffer){ 
+        showAutoOffer(recipeOffer); 
+      } else {
+        const boostOffer = findAffordableBoost();
+        if (boostOffer) {
+          showAutoOffer(boostOffer);
+        } else {
+          startNewOrder(); 
+        }
+      }
     },SUCCESS_MODAL_DURATION);
   } else {
     playOutcomeAudio('fail');
@@ -1143,14 +1414,26 @@ ingredientBin.addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
   if (!btn || !session.gameActive || session.isPaused) return;
   ensureAudioStarted();
-  playSound('click');
+  
+  // Use ingredient ID as sound name (audio.js handles fallback to click if specific sound is missing)
   const id = btn.dataset.id;
+  playSound(id);
+  
   session.playerSelection.push(id);
   const span = document.createElement('span'); span.className='text-3xl'; span.innerHTML = getIngredientHTML(id,'inline-block');
   playerPlate.appendChild(span);
   playerPlate.scrollTop = playerPlate.scrollHeight;
   const idx = session.playerSelection.length-1;
-  if (session.playerSelection[idx] !== session.currentOrder.recipe[idx]) { playSound('error'); span.classList.add('text-red-500'); checkOrder(false,'Ingrediente errado!'); return; }
+  if (session.playerSelection[idx] !== session.currentOrder.recipe[idx]) { 
+    playSound('error'); 
+    span.classList.add('text-red-500'); 
+    
+    // Clear display immediately upon failure visual feedback
+    playerPlate.innerHTML = '';
+
+    checkOrder(false,'Ingrediente errado!'); 
+    return; 
+  }
   const stepEl = document.getElementById(`step-${idx}`);
   stepEl && stepEl.classList.add('correct');
   if (session.playerSelection.length === session.currentOrder.recipe.length) checkOrder(true);
@@ -1232,7 +1515,8 @@ welcomePlayButton.addEventListener('click', ()=>{
   const TKEY = 'recipeGameSeenTutorial_v1';
   const seen = localStorage.getItem(TKEY) === '1';
   if (!seen){
-    showMarketMessage("Bem-vindo! Como jogar","Clique em 'Próximo Pedido' para receber um pedido, selecione os ingredientes exibidos na ordem mostrada e complete a receita antes do tempo acabar. Acertar 2 pedidos seguidos aumenta sua avaliação (★) — boas avaliações aumentam seus ganhos. Visite o Mercado para comprar novas receitas.", true);
+    // Instead of showMarketMessage, show the new visual tutorial
+    showTutorialModal();
     localStorage.setItem(TKEY,'1');
     // after player closes the modal they'll enter menu; ensure modal close returns them to menu
     const originalHandler = marketMessageClose.onclick;
@@ -1252,6 +1536,13 @@ playButton.addEventListener('click', ()=>{
   startNewOrder(); renderUnlockedIngredientBin(); showScreen('game-screen'); 
 });
 marketButton.addEventListener('click', ()=>{ renderMarket(); updateAllMoneyDisplays(); showScreen('market-screen'); activateTab('buy'); });
+
+boostsButton?.addEventListener('click', ()=>{ 
+  playSound('click');
+  updateAllMoneyDisplays();
+  renderBoostShop();
+  showScreen('boosts-screen'); 
+});
 
 pauseButton.addEventListener('click', ()=>{ 
   if (!session.gameActive || session.isPaused) return; 
@@ -1279,6 +1570,7 @@ pauseReturnMenu.addEventListener('click', () => {
 if (musicToggle) musicToggle.addEventListener('click', toggleBgm);
 
 menuButtonMarket.addEventListener('click', ()=>{ showScreen('menu-screen'); });
+menuButtonBoosts?.addEventListener('click', ()=>{ showScreen('menu-screen'); });
 marketMessageClose.addEventListener('click', ()=>{ playSound('click'); marketMessageModal.classList.add('hidden'); });
 resetButtonWelcome.addEventListener('click', showConfirmResetModal);
 resetButtonMenu.addEventListener('click', showConfirmResetModal);
@@ -1288,16 +1580,51 @@ confirmResetConfirm.addEventListener('click', ()=>{
   confirmResetModal.classList.add('hidden');
   resetGame();
 });
-rankUpClose.addEventListener('click', ()=>{ rankUpModal.classList.add('hidden'); });
+rankUpClose.addEventListener('click', ()=>{ 
+  rankUpModal.classList.add('hidden'); 
+  
+  if (rankUpContext === 'auto_offer') {
+    // Continue the post-order flow (check for remaining offers or start new order)
+    const recipeOffer = findAffordableRecipe();
+    if (recipeOffer){ 
+      showAutoOffer(recipeOffer); 
+      return;
+    }
+    const boostOffer = findAffordableBoost();
+    if (boostOffer) {
+      showAutoOffer(boostOffer); 
+      return;
+    }
+    startNewOrder();
+  } else {
+    // Default: return to menu (e.g., from Market button click)
+    showScreen('menu-screen');
+  }
+});
 themeToggleWelcome && themeToggleWelcome.addEventListener('click', toggleTheme);
 themeToggleMenu && themeToggleMenu.addEventListener('click', toggleTheme);
 themeToggleSetup && themeToggleSetup.addEventListener('click', toggleTheme);
+
+tabBuy.addEventListener('click', ()=>{ activateTab('buy'); });
+tabOwned.addEventListener('click', ()=>{ activateTab('owned'); });
+
+// NEW: Delegated listener for Market item purchases
+marketItemsGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-buy');
+    if (btn && !btn.disabled) {
+        const recipeName = btn.dataset.recipe;
+        // The logic inside buyRecipe handles the purchase, failure modal, and rank up flow
+        rankUpContext = 'market_purchase';
+        buyRecipe(recipeName);
+        rankUpContext = null;
+    }
+});
 
 /* ---------- Init ---------- */
 function init(){
   // migrate legacy top-level fields into restaurants if needed
   if (!gameState.restaurants || !Array.isArray(gameState.restaurants)){
-    const migrated = { id: 'r0', name:'Meu Restaurante', cuisine: profile.cuisine || null, unlockedRecipeNames: gameState.unlockedRecipeNames || [], unlockedIngredientIds: gameState.unlockedIngredientIds || [], rank: gameState.rank || 0 };
+    const migrated = { id: 'r0', name:'Meu Restaurante', cuisine: profile.cuisine || null, unlockedRecipeNames: gameState.unlockedRecipeNames || [], unlockedIngredientIds: gameState.unlockedIngredientIds || [], rank: gameState.rank || 0, stars: 0.0, boosts: {} }; // Init boosts
     // sanitize migrated unlocked recipes so required rank recipes are not pre-bought
     migrated.unlockedRecipeNames = sanitizeUnlocks(migrated.cuisine, migrated.unlockedRecipeNames || []);
     gameState.restaurants = [migrated];
@@ -1343,7 +1670,7 @@ const offerTitle = document.getElementById('offer-title');
 const offerDesc = document.getElementById('offer-desc');
 const offerSkip = document.getElementById('offer-skip');
 const offerBuy = document.getElementById('offer-buy');
-let pendingOffer = null;
+let pendingOffer = null; // Can be a recipe object or a boost object + level info
 
 function findAffordableRecipe() {
   const active = getActiveRestaurant();
@@ -1358,8 +1685,8 @@ function findAffordableRecipe() {
   // If the mandatory recipe for the next rank exists but has been already purchased, treat as not available.
   if (currentRank?.recipeToUnlock) {
     const mandatory = notUnlockedAll.find(r => r.name === currentRank.recipeToUnlock);
-    // Only return mandatory if it's truly not yet unlocked and affordable
-    if (mandatory && gameState.money >= mandatory.price) return mandatory;
+    // Only return mandatory if it's truly not yet unlocked and affordable (use effective price)
+    if (mandatory && gameState.money >= getEffectivePrice(mandatory)) return mandatory;
   }
 
   // Otherwise pick the cheapest allowed by current rank but ensure it's not already unlocked and within cuisine
@@ -1367,92 +1694,214 @@ function findAffordableRecipe() {
   // if pool is empty try to fallback to any notUnlocked regardless of minRank (but must be affordable)
   let candidate = pool.sort((a,b)=>a.price-b.price)[0];
   if (!candidate) candidate = notUnlockedAll.sort((a,b)=>a.price-b.price)[0];
-  return (candidate && gameState.money>=candidate.price) ? candidate : null;
+  return (candidate && gameState.money>=getEffectivePrice(candidate)) ? candidate : null;
 }
 
-function showAutoOffer(recipe){
-  // validate recipe is still not unlocked and affordable (race safety)
+function findAffordableBoost(){
+    const active = getActiveRestaurant();
+    const affordable = BOOSTS.map(boost => {
+        const currentLevel = getBoostLevel(boost.id);
+        if (currentLevel >= boost.maxLevel) return null;
+        const price = boost.price * (currentLevel + 1);
+        if (gameState.money >= price) {
+            return {
+                id: boost.id,
+                name: boost.name,
+                icon: boost.icon,
+                currentLevel: currentLevel,
+                maxLevel: boost.maxLevel,
+                price: price,
+                desc: boost.desc
+            };
+        }
+        return null;
+    }).filter(Boolean);
+
+    // Prioritize cheapest boost
+    affordable.sort((a, b) => a.price - b.price);
+    return affordable[0] || null;
+}
+
+
+function showAutoOffer(item){
   const active = getActiveRestaurant();
-  if (!recipe || (active.unlockedRecipeNames||[]).includes(recipe.name) || gameState.money < recipe.price){
-    // try to find another valid offer; if none, just start next order
-    const alt = findAffordableRecipe();
-    if (!alt) { startNewOrder(); return; }
-    recipe = alt;
-  }
-  pendingOffer = recipe;
+  // Check if item is a Recipe or a Boost (Recipe has baseRecipe property)
+  const isRecipe = !!item.baseRecipe;
 
-  // Determine next-rank requirement if this recipe is the rank-up recipe
-  const ranks = getActiveRanks();
-  const currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
-  const nextIdx = Math.min(ranks.length - 1, currIdx + 1);
-  const nextDef = ranks[nextIdx] || null;
-  let starsNeeded = null;
-  if (nextDef){
-    // use configured requiredStars (no additional +1.0)
-    const baseReq = Number(nextDef.requiredStars || 0);
-    starsNeeded = Number((baseReq).toFixed(1));
+  if (isRecipe) {
+    // Validate recipe is still not unlocked and affordable (race safety)
+    if (!item || (active.unlockedRecipeNames||[]).includes(item.name) || gameState.money < getEffectivePrice(item)){
+      const alt = findAffordableRecipe();
+      if (!alt) { 
+        const boostAlt = findAffordableBoost(); // Check boost if recipe fails
+        if (boostAlt) { showAutoOffer(boostAlt); return; }
+        startNewOrder(); 
+        return; 
+      }
+      item = alt;
+    }
+    pendingOffer = item;
+
+    // Determine next-rank requirement if this recipe is the rank-up recipe
+    const ranks = getActiveRanks();
+    const currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+    const nextIdx = Math.min(ranks.length - 1, currIdx + 1);
+    const nextDef = ranks[nextIdx] || null;
+    let starsNeeded = null;
+    if (nextDef){
+      const baseReq = Number(nextDef.requiredStars || 0);
+      starsNeeded = Number((baseReq).toFixed(1));
+    }
+
+    // Build modal content for Recipe
+    const effectivePrice = getEffectivePrice(item);
+    offerTitle.textContent = `Você pode comprar: ${item.name}`;
+    let starsInfo = '';
+    if (starsNeeded !== null){
+      const have = Number(active.stars || 0);
+      const meets = have >= starsNeeded;
+      starsInfo = `<div style="margin-top:.5rem; color:${meets ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">Ranque: ${starsNeeded} ★ — Você: ${have.toFixed(1)} ★ ${meets ? '✓' : '✕'}</div>`;
+    }
+    offerDesc.innerHTML = `<div style="display:flex;align-items:center;gap:.6rem;justify-content:center">
+        <span style="font-size:2.2rem">${item.emoji || '🍽️'}</span>
+        <div style="text-align:left">
+          <div style="font-weight:800;font-size:1.05rem">${item.name}</div>
+          <div style="opacity:.85">Preço: <span style="font-weight:700">$${effectivePrice}</span></div>
+          ${starsInfo}
+        </div>
+      </div>`;
+    offerBuy.textContent = `Comprar ($${effectivePrice})`;
+  } else {
+    // Handling Boost
+    const boost = item;
+    // Validate boost is still affordable (race safety)
+    const currentLevel = getBoostLevel(boost.id);
+    const expectedPrice = boost.price;
+
+    if (currentLevel >= boost.maxLevel || gameState.money < expectedPrice) {
+        // Boost is no longer available/affordable, check for next cheapest boost
+        const alt = findAffordableBoost();
+        if (alt) { showAutoOffer(alt); return; }
+        // If no alternative boost, check for affordable recipe
+        const recipeAlt = findAffordableRecipe();
+        if (recipeAlt) { showAutoOffer(recipeAlt); return; }
+        startNewOrder();
+        return;
+    }
+
+    pendingOffer = boost; // Store the affordable boost info
+
+    const levelText = boost.maxLevel > 1 ? `Nível ${currentLevel} -> ${currentLevel + 1}` : 'Nível Máximo';
+
+    offerTitle.textContent = `Nova Vantagem Disponível!`;
+    offerDesc.innerHTML = `<div style="display:flex;align-items:center;gap:.6rem;justify-content:center">
+        <span style="font-size:2.2rem">${boost.icon}</span>
+        <div style="text-align:left">
+          <div style="font-weight:800;font-size:1.05rem">${boost.name} (${levelText})</div>
+          <div style="opacity:.85">${boost.desc}</div>
+          <div style="opacity:.85; margin-top: .5rem">Custo: <span style="font-weight:700">$${boost.price}</span></div>
+        </div>
+      </div>`;
+    offerBuy.textContent = `Comprar Vantagem ($${boost.price})`;
   }
 
-  // Build modal content with clearer presentation
-  offerTitle.textContent = `Você pode comprar: ${recipe.name}`;
-  let starsInfo = '';
-  if (starsNeeded !== null){
-    const have = Number(active.stars || 0);
-    const meets = have >= starsNeeded;
-    starsInfo = `<div style="margin-top:.5rem; color:${meets ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">Requer: ${starsNeeded} ★ — Você: ${have.toFixed(1)} ★ ${meets ? '✓' : '✕'}</div>`;
-  }
-  offerDesc.innerHTML = `<div style="display:flex;align-items:center;gap:.6rem;justify-content:center">
-      <span style="font-size:2.2rem">${recipe.emoji}</span>
-      <div style="text-align:left">
-        <div style="font-weight:800;font-size:1.05rem">${recipe.name}</div>
-        <div style="opacity:.85">Preço: <span style="font-weight:700">$${recipe.price}</span></div>
-        ${starsInfo}
-      </div>
-    </div>`;
+  // Show modal
   autoOfferModal.classList.remove('hidden');
-  // ensure it's shown as modal-wrap for consistent scrim behavior
   autoOfferModal.classList.add('modal-wrap','show','modal-scrim-pane');
   const inner = autoOfferModal.querySelector('.card, .p-5');
   if (inner) inner.classList.add('modal-card','fade');
 }
 
-offerSkip?.addEventListener('click', ()=>{ autoOfferModal.classList.add('hidden'); pendingOffer=null; startNewOrder(); });
+offerSkip?.addEventListener('click', ()=>{ 
+  // If skipping a recipe offer, check for affordable boost next
+  if (pendingOffer && pendingOffer.baseRecipe) {
+    const boostAlt = findAffordableBoost();
+    if (boostAlt) { 
+        autoOfferModal.classList.add('hidden'); 
+        pendingOffer = null; 
+        showAutoOffer(boostAlt); 
+        return; 
+    }
+  }
+  // If skipping a boost offer, or if no boost alternative found, continue to next order
+  autoOfferModal.classList.add('hidden'); 
+  pendingOffer=null; 
+  startNewOrder(); 
+});
+
 offerBuy?.addEventListener('click', ()=>{
   const active = getActiveRestaurant();
   if (!pendingOffer){ autoOfferModal.classList.add('hidden'); pendingOffer=null; startNewOrder(); return; }
 
-  // Before attempting to buy, compute rank-up requirement and whether purchase would trigger rank advancement
-  const recipe = pendingOffer;
-  const ranks = getActiveRanks();
-  let currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
-  const cuisine = active.cuisine || profile.cuisine || null;
-  const nextIdx = currIdx + 1;
-  const nextDef = ranks[nextIdx] || null;
-  const nextGoalName = nextDef ? (getRankUnlockRecipeName(currIdx, cuisine) || nextDef.recipeToUnlock) : null;
-  const baseRequiredStars = nextDef ? Number(nextDef.requiredStars || 0) : 0;
-  const starsNeeded = Number((baseRequiredStars).toFixed(1)); // use exact requiredStars
+  const item = pendingOffer;
 
-  // Perform purchase normally (will deduct money and unlock)
-  buyRecipe(recipe.name);
+  if (item.baseRecipe){
+    // Buying Recipe
+    const recipe = item;
+    
+    rankUpContext = 'auto_offer';
+    const result = buyRecipe(recipe.name); 
+    rankUpContext = null; 
 
-  // if this purchase is the rank-up recipe attempt, check stars to decide whether we advanced or just bought it
-  if (nextGoalName && recipe.name === nextGoalName){
-    const haveStars = Number(active.stars || 0);
-    if (haveStars < starsNeeded){
-      showMarketMessage("Comprado — Estrelas insuficientes", `Você comprou ${recipe.name}, mas precisa de ★${starsNeeded.toFixed(1)} para subir de ranque (você tem ${haveStars.toFixed(1)}).`, false);
+    // If purchase succeeded AND triggered rank advancement, the rankUpModal is now visible.
+    // The rankUpModalClose handler must take over the flow. We exit here.
+    if (result.success && result.advanced) {
+        autoOfferModal.classList.add('hidden'); 
+        pendingOffer = null;
+        return; 
+    }
+    
+    // If purchase failed (not enough money), the Insufficient Funds modal is visible. We exit.
+    if (!result.success) {
+        autoOfferModal.classList.add('hidden');
+        pendingOffer = null;
+        return; 
+    }
+    
+    // After buying recipe, check for affordable boost before starting new order
+    const boostAlt = findAffordableBoost();
+    if (boostAlt) { 
+        autoOfferModal.classList.add('hidden'); 
+        pendingOffer = null; 
+        showAutoOffer(boostAlt); 
+        return; 
+    }
+
+  } else {
+    // Buying Boost
+    const boost = item;
+    // Check price again for safety
+    if (gameState.money >= boost.price){
+        // buyBoost handles state updates and message popups
+        buyBoost(boost.id); 
     } else {
-      updateRankDisplay();
+        showMarketMessage("Dinheiro Insuficiente!", `Você precisa de $${boost.price}.`, false);
+    }
+    
+    // After buying boost, check for affordable recipe or another affordable boost
+    const recipeAlt = findAffordableRecipe();
+    if (recipeAlt) { 
+        autoOfferModal.classList.add('hidden'); 
+        pendingOffer = null; 
+        showAutoOffer(recipeAlt); 
+        return; 
+    }
+    const boostAlt = findAffordableBoost();
+    if (boostAlt) {
+        autoOfferModal.classList.add('hidden');
+        pendingOffer = null;
+        showAutoOffer(boostAlt);
+        return;
     }
   }
 
+  // If nothing else to offer, start new order
   autoOfferModal.classList.add('hidden'); pendingOffer=null; startNewOrder();
 });
 
 /* ---------- Background music handling ---------- */
-document.addEventListener('visibilitychange', ()=>{
-  if (document.hidden && bgAudio) { try { bgAudio.pause(); } catch(e){} }
-});
-window.addEventListener('pagehide', ()=>{ if (bgAudio) { try { bgAudio.pause(); } catch(e){} } });
+/* Removed explicit pause listeners to fix user background music stopping issue */
+
 
 /* ---------- Setup interactions (Halloween button) ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -1485,7 +1934,7 @@ function showModalById(id){
   const el = document.getElementById(id);
   if (!el) return;
   el.classList.remove('hidden');
-  el.classList.add('modal-wrap','show');
+  el.classList.add('modal-wrap','show','modal-scrim-pane');
   const inner = el.querySelector('.p-5, .card, .modal-card');
   if (inner) inner.classList.add('modal-card','fade');
   // focus first button
@@ -1498,212 +1947,155 @@ function hideModalById(id){
   const inner = el.querySelector('.p-5, .card, .modal-card');
   if (inner) inner.classList.remove('modal-card','fade');
   // wait transition then hide
-  setTimeout(()=>{ el.classList.add('hidden'); }, 300);
+  setTimeout(()=>{ el.classList.add('hidden'); el.classList.remove('modal-scrim-pane'); }, 300);
 }
 
-/* Replace direct .classList.remove/add('hidden') usages for restaurants modal only to avoid wide changes.
-   Wire restaurants button to open restaurants modal; when closing restaurants modal, keep restaurants-button visible. */
-document.addEventListener('click', (e)=>{
-  if (e.target && e.target.id === 'restaurants-button'){
-    renderRestaurantsModal();
-    showModalById('restaurants-modal');
-  }
+// TUTORIAL LOGIC START
+const TUTORIAL_STEPS = [
+    { 
+        title: "Bem-vindo, Chef!", 
+        content: "Siga a Receita é um jogo de gerenciamento de tempo rápido. Seu objetivo é montar pratos na ordem correta antes que o tempo acabe!", 
+        emoji: "🧑‍🍳",
+        visual: `<i class="fas fa-hat-chef text-6xl text-purple-600 mb-2"></i>`
+    },
+    { 
+        title: "O Pedido e o Timer", 
+        content: "A receita aparece logo abaixo do cliente (NPC). Abaixo dela, a barra de tempo conta. Seja rápido! Se o tempo zerar, você perde o pedido.", 
+        emoji: "⏱️",
+        visual: `<div class="w-full h-8 bg-gray-200 rounded-full overflow-hidden shadow-inner flex items-center mb-2"><div class="h-full bg-red-400 w-3/4" style="transition: width 0.5s ease; width: 75%;"></div></div><div class="text-xs font-bold mb-2 text-red-600">⏳ O tempo está correndo!</div>`
+    },
+    { 
+        title: "Montando o Prato", 
+        content: "O campo abaixo do timer mostra o que você já colocou. Os ingredientes (na parte inferior) devem ser selecionados EXATAMENTE na ordem da receita.", 
+        emoji: "🍔",
+        visual: `<div class="p-3 border-2 border-green-500 rounded-lg flex justify-center gap-2"><span class="text-3xl">🍞</span><span class="text-3xl text-green-500">🧀</span><span class="text-3xl">🍅</span></div><div class="text-xs mt-2 font-bold text-purple-600">A ordem correta é crucial para a satisfação do cliente!</div>`
+    },
+    { 
+        title: "Mercado e Ranques", 
+        content: "Use seu dinheiro para comprar novas receitas no Mercado. Cada receita comprada te ajuda a subir de ranque. Ranques mais altos significam clientes mais rápidos e mais dinheiro.", 
+        emoji: "💰",
+        visual: `<div class="flex gap-4 justify-center items-center"><i class="fas fa-store text-4xl text-blue-500"></i><i class="fas fa-arrow-right text-lg text-gray-400"></i><i class="fas fa-star text-4xl text-yellow-500"></i><div class="text-2xl font-bold">Chef II</div></div><div class="text-sm mt-2">Pratos desbloqueiam Ranques!</div>`
+    },
+    { 
+        title: "Estrelas e Vantagens", 
+        content: "Sua avaliação (★) aumenta ao completar sequências de acertos. Estrelas desbloqueiam Ranques. Visite Vantagens para comprar melhorias permanentes (Boosts) para tempo extra ou clientes VIPs.", 
+        emoji: "⭐",
+        visual: `<div class="flex gap-4 justify-center items-center"><span class="stars-pill">★ 1.8</span><i class="fas fa-arrow-right text-lg text-gray-400"></i><button class="btn-main bg-yellow-600 text-white font-bold px-4 py-2 rounded-lg text-lg"><i class="fas fa-rocket mr-1"></i> Vantagens</button></div>`
+    }
+];
+
+let currentTutorialStep = 0;
+
+function renderTutorialStep(stepIndex) {
+    const step = TUTORIAL_STEPS[stepIndex];
+    if (!step) return;
+
+    tutorialContent.innerHTML = `
+        <div class="flex flex-col items-center flex-1 text-center">
+            <div class="text-6xl mb-4">${step.emoji}</div>
+            <h3 class="text-2xl font-bold mb-2">${step.title}</h3>
+            <p class="text-base opacity-90 mb-4">${step.content}</p>
+            <div class="mt-4 w-full flex flex-col items-center justify-center">
+                ${step.visual || ''}
+            </div>
+        </div>
+        <div class="text-center text-sm opacity-60 pt-4">Passo ${stepIndex + 1} de ${TUTORIAL_STEPS.length}</div>
+    `;
+
+    // Update navigation buttons
+    tutorialPrev.classList.toggle('hidden', stepIndex === 0);
+    tutorialNext.classList.toggle('hidden', stepIndex === TUTORIAL_STEPS.length - 1);
+    
+    // Ensure 'Start' or 'Close' is shown on the last step
+    const isFromMenu = !tutorialCloseBtn.classList.contains('hidden');
+    if (stepIndex === TUTORIAL_STEPS.length - 1) {
+        tutorialNext.classList.add('hidden');
+        tutorialStart.classList.toggle('hidden', isFromMenu); // Show Start if not from Menu
+        tutorialCloseBtn.classList.toggle('hidden', !isFromMenu); // Show Close if from Menu
+    } else {
+        tutorialStart.classList.add('hidden');
+        tutorialCloseBtn.classList.add('hidden');
+    }
+}
+
+function showTutorialModal(fromMenu = false) {
+    currentTutorialStep = 0;
+    
+    // Set initial state for close/start buttons based on context
+    if (fromMenu) {
+        tutorialCloseBtn.classList.remove('hidden');
+        tutorialStart.classList.add('hidden');
+    } else {
+        tutorialCloseBtn.classList.add('hidden');
+        tutorialStart.classList.remove('hidden');
+    }
+    
+    renderTutorialStep(currentTutorialStep);
+    showModalById('tutorial-modal');
+}
+
+tutorialPrev?.addEventListener('click', () => {
+    if (currentTutorialStep > 0) {
+        playSound('click');
+        currentTutorialStep--;
+        renderTutorialStep(currentTutorialStep);
+    }
 });
 
-/* Replace create-resto flow: open create screen instead of inline small input, and make sure create button on modal opens this screen */
-const closeRestaurantsBtn = document.getElementById('close-restaurants');
-closeRestaurantsBtn && closeRestaurantsBtn.addEventListener('click', ()=>{
-  hideModalById('restaurants-modal');
-  // ensure restaurants-button remains visible after closing
-  document.getElementById('restaurants-button-container')?.classList.remove('hidden');
+tutorialNext?.addEventListener('click', () => {
+    if (currentTutorialStep < TUTORIAL_STEPS.length - 1) {
+        playSound('click');
+        currentTutorialStep++;
+        renderTutorialStep(currentTutorialStep);
+    }
 });
 
-/* Hook create button to open full creation screen */
-const createRestoBtn = document.getElementById('create-resto');
-createRestoBtn && createRestoBtn.addEventListener('click', ()=>{
-  // Close restaurants modal and open full create screen
-  hideModalById('restaurants-modal');
-  showScreen('create-restaurant-screen');
-  return;
-});
-
-/* New handlers for full create screen */
-document.addEventListener('DOMContentLoaded', ()=>{
-  const createConfirm = document.getElementById('create-resto-confirm');
-  const createCancel = document.getElementById('create-resto-cancel');
-  const nameInputFull = document.getElementById('new-resto-name-full');
-  // Dynamic choices
-  const cuisineWrap = document.getElementById('create-cuisine-choices');
-  const iconWrap = document.getElementById('icon-choices');
-  const colorWrap = document.getElementById('color-choices');
-  const icons = ["🍽️","🍣","🍕","🌮","🥐","🍜","🥗","🍔","🍰","🍛","🍟","🍩"];
-  const colors = ["#8b5cf6","#06b6d4","#10b981","#f59e0b","#ef4444","#3b82f6","#111827","#14b8a6"];
-  cuisineWrap.innerHTML = ["Brasileiro","Italiano","Japonês","Mexicano","Francês","Halloween"].map(c=>`<button class="create-cuisine-btn btn-main p-2 rounded-lg border text-sm" data-cuisine="${c}">${c}</button>`).join('');
-  iconWrap.innerHTML = icons.map(i=>`<button class="icon-btn btn-main p-2 rounded-lg border">${i}</button>`).join('');
-  colorWrap.innerHTML = colors.map(c=>`<button class="color-btn w-8 h-8 rounded-full border" style="background:${c}" data-color="${c}" aria-label="${c}"></button>`).join('');
-  let chosenCuisine = null;
-  let chosenIcon = "🍽️";
-  let chosenColor = "#8b5cf6";
-  document.getElementById('create-cuisine-choices')?.addEventListener('click', (e)=>{
-    const b = e.target.closest('.create-cuisine-btn');
-    if (!b) return;
-    document.querySelectorAll('.create-cuisine-btn').forEach(x=>x.classList.remove('bg-green-500','text-white'));
-    b.classList.add('bg-green-500','text-white');
-    chosenCuisine = b.dataset.cuisine;
-    document.getElementById('preview-meta').textContent = `${chosenCuisine} • 0.0 ★`;
-  });
-  iconWrap?.addEventListener('click',(e)=>{ const b=e.target.closest('.icon-btn'); if(!b)return; chosenIcon=b.textContent.trim(); document.getElementById('preview-icon').textContent=chosenIcon; });
-  colorWrap?.addEventListener('click',(e)=>{ const b=e.target.closest('.color-btn'); if(!b)return; chosenColor=b.dataset.color; document.getElementById('preview-badge').style.background=chosenColor; });
-  nameInputFull?.addEventListener('input',()=>{ document.getElementById('preview-name').textContent = (nameInputFull.value||'Restaurante').slice(0,24); });
-  createCancel && createCancel.addEventListener('click', ()=>{
+tutorialStart?.addEventListener('click', () => {
+    // If successful, transition to menu screen (used on first run)
+    playSound('success');
+    hideModalById('tutorial-modal');
     showScreen('menu-screen');
-    renderRestaurantsButtonIfEligible();
-  });
-  createConfirm && createConfirm.addEventListener('click', ()=>{
-    const rawName = (nameInputFull && nameInputFull.value.trim()) || '';
-    const defaultName = `Restaurante ${ (gameState.restaurants||[]).length + 1 }`;
-    const name = rawName.length > 0 ? rawName.slice(0,24) : defaultName;
+});
 
-    if ((gameState.restaurants||[]).length >= 6){
-      showMarketMessage('Limite atingido','Você não pode ter mais que 6 restaurantes.', false);
-      return;
+tutorialCloseBtn?.addEventListener('click', () => {
+    playSound('click');
+    hideModalById('tutorial-modal');
+});
+
+
+// Add a button in the Menu screen to view the tutorial again
+document.addEventListener('DOMContentLoaded', () => {
+    // Find the container for rank information
+    const rankDisplay = query('rank-display');
+    if(rankDisplay && !rankDisplay.querySelector('#view-tutorial')){
+        const existingButton = query('view-upcoming-ranks');
+        const tutorialBtn = createElementFromHTML(`<button id="view-tutorial" class="btn-main mt-2 bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm ml-2">Ver Tutorial</button>`);
+        
+        // Insert 'Ver Tutorial' right after 'Ver próximos ranques'
+        if (existingButton) {
+            existingButton.insertAdjacentElement('afterend', tutorialBtn);
+        } else {
+            rankDisplay.appendChild(tutorialBtn);
+        }
+
+        tutorialBtn.addEventListener('click', () => {
+            playSound('click');
+            showTutorialModal(true); // pass true to indicate opening from menu
+        });
     }
 
-    if (!chosenCuisine){
-      showMarketMessage('Escolha uma culinária','Selecione a culinária para o novo restaurante.', false);
-      return;
-    }
-
-    const chosen = chosenCuisine || profile.cuisine || null;
-    // compute starting unlocks robustly and sanitize them against rank-required recipes
-    const starters = getStartingUnlocks(chosen);
-    const sanitizedStarters = sanitizeUnlocks(chosen, starters);
-    const ingSet = new Set();
-    sanitizedStarters.forEach(rn=>{
-      const rec = ALL_RECIPES.find(x=>x.name===rn);
-      if (rec){
-        [...rec.baseRecipe, ...(rec.optionalIngredients||[])].forEach(i=>ingSet.add(i));
-      }
+    // NEW: Delegated listener for Market item purchases (moved here to ensure it only binds once)
+    marketItemsGrid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-buy');
+        if (btn && !btn.disabled) {
+            const recipeName = btn.dataset.recipe;
+            // The logic inside buyRecipe handles the purchase, failure modal, and rank up flow
+            rankUpContext = 'market_purchase';
+            buyRecipe(recipeName);
+            rankUpContext = null;
+        }
     });
 
-    const newR = { 
-      id: crypto?.randomUUID?.() || `r${Date.now()}`, 
-      name, 
-      cuisine: chosen, 
-      unlockedRecipeNames: Array.from(new Set(sanitizedStarters)), 
-      unlockedIngredientIds: Array.from(ingSet), 
-      rank: 0,
-      icon: chosenIcon,
-      color: chosenColor,
-      stars: 0.0
-    };
-
-    // final sanitize: remove any accidental rank unlocks and ensure arrays exist
-    newR.unlockedRecipeNames = sanitizeUnlocks(newR.cuisine, newR.unlockedRecipeNames || []);
-    newR.unlockedIngredientIds = Array.from(new Set(newR.unlockedIngredientIds || []));
-
-    gameState.restaurants = gameState.restaurants || [];
-    gameState.restaurants.push(newR);
-    gameState.activeRestaurantIndex = gameState.restaurants.length - 1;
-    saveGame();
-
-    // reset UI inputs and states
-    if (nameInputFull) nameInputFull.value = '';
-    chosenCuisine = null;
-    document.querySelectorAll('.create-cuisine-btn').forEach(x=>x.classList.remove('bg-green-500','text-white'));
-
-    // Re-render everything consistently
-    renderRestaurantsModal();
-    renderMarket();
-    renderUnlockedIngredientBin();
-    renderRestaurantsButtonIfEligible();
-
-    // return to menu screen and show confirmation
-    showScreen('menu-screen');
-    showMarketMessage('Restaurante criado', `${newR.name} • ${newR.cuisine || '—'} criado com sucesso!`, true);
-  });
-});
-
-// Restaurants logic
-function renderRestaurantsButtonIfEligible(){
-  const active = getActiveRestaurant();
-  // cuisine may be null for new restaurants; find cuisine-specific pool
-  const cuisine = active.cuisine || profile.cuisine;
-  const pool = ALL_RECIPES.filter(r => !cuisine || (Array.isArray(r.cuisine)? r.cuisine.includes(cuisine): true));
-  const allNames = pool.map(r=>r.name);
-  const unlocked = new Set(active.unlockedRecipeNames || []);
-  const allBought = allNames.every(n=>unlocked.has(n));
-  const container = document.getElementById('restaurants-button-container');
-  if (allBought) container.classList.remove('hidden'); else container.classList.add('hidden');
-}
-
-function renderRestaurantsModal(){
-  const list = document.getElementById('restaurants-list');
-  list.innerHTML = '';
-  (gameState.restaurants || []).forEach((r, idx)=>{
-    const total = ALL_RECIPES.filter(rec => !r.cuisine || (Array.isArray(rec.cuisine)? rec.cuisine.includes(r.cuisine): true)).length || 1;
-    const completed = (r.unlockedRecipeNames||[]).length;
-    const pct = Math.round((completed/total)*100);
-    const icon = r.icon || '🍽️'; const color = r.color || 'var(--accent)';
-    const el = document.createElement('div');
-    el.className = 'resto-entry';
-    el.innerHTML = `
-      <div style="display:flex;align-items:center;gap:.75rem;">
-        <div style="width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:${color}22;color:${color};font-size:1.2rem">${icon}</div>
-        <div>
-          <div class="font-bold">${r.name} ${idx===gameState.activeRestaurantIndex?'<span class="text-sm text-green-600"> (Ativo)</span>':''}</div>
-          <div class="text-sm text-gray-500">${r.cuisine || '—'} • ${pct}% concluído (${completed}/${total})</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:.5rem;align-items:center">
-        <button class="switch-resto btn-main px-3 py-1 rounded bg-blue-500 text-white" data-idx="${idx}">Abrir</button>
-        <button class="delete-resto btn-main px-3 py-1 rounded bg-red-500 text-white" data-idx="${idx}">Apagar</button>
-      </div>
-    `;
-    list.appendChild(el);
-  });
-  // attach handlers (rebind)
-  list.querySelectorAll('.switch-resto').forEach(b=>b.addEventListener('click', (e)=>{
-    const i = Number(e.currentTarget.dataset.idx);
-    gameState.activeRestaurantIndex = i;
-    saveGame();
-    renderMarket();
-    renderUnlockedIngredientBin();
-    updateAllMoneyDisplays();
-    renderRestaurantsModal();
-    renderRestaurantsButtonIfEligible();
-    playSound('click');
-  }));
-  list.querySelectorAll('.delete-resto').forEach(b=>b.addEventListener('click', (e)=>{
-    const i = Number(e.currentTarget.dataset.idx);
-    // confirmation modal improved (theme-aware)
-    const confirmed = confirm(`Apagar "${gameState.restaurants[i].name}"? Esta ação não pode ser desfeita.`);
-    if (!confirmed) return;
-    gameState.restaurants.splice(i,1);
-    if ((gameState.restaurants||[]).length === 0) {
-      localStorage.clear();
-      gameState = { money:50, restaurants: [{ id:'r0', name:'Meu Restaurante', cuisine:null, unlockedRecipeNames:[], unlockedIngredientIds:[], rank:0 }], activeRestaurantIndex:0 };
-      saveGame();
-      resetGame();
-      return;
-    }
-    if (gameState.activeRestaurantIndex >= gameState.restaurants.length) gameState.activeRestaurantIndex = 0;
-    saveGame();
-    renderRestaurantsModal();
-    renderRestaurantsButtonIfEligible();
-    playSound('error');
-  }));
-}
-
-document.addEventListener('click', (e)=>{
-  if (e.target && e.target.id === 'restaurants-button'){
-    renderRestaurantsModal();
-    showModalById('restaurants-modal');
-  }
-});
-
-// Executa quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
   const closeBtn = document.getElementById('close-restaurants');
   const createBtn = document.getElementById('create-resto');
 
@@ -1718,6 +2110,14 @@ document.addEventListener('DOMContentLoaded', () => {
   createBtn?.addEventListener('click', () => {
     hideModalById('restaurants-modal');
     showScreen('create-restaurant-screen');
+  });
+
+  // Global handler for the restaurants button which is dynamically hidden/shown
+  document.addEventListener('click', (e)=>{
+      if (e.target && e.target.id === 'restaurants-button'){
+        renderRestaurantsModal();
+        showModalById('restaurants-modal');
+      }
   });
 
   // Inicialização geral do app, se a função existir
@@ -1788,4 +2188,91 @@ function shuffleArray(arr){
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
+}
+
+// New function: renderRestaurantsButtonIfEligible
+function renderRestaurantsButtonIfEligible(){
+  const active = getActiveRestaurant();
+  // cuisine may be null for new restaurants; find cuisine-specific pool
+  const cuisine = active.cuisine || profile.cuisine;
+  // Consider all recipes associated with this cuisine
+  const pool = ALL_RECIPES.filter(r => !cuisine || (Array.isArray(r.cuisine)? r.cuisine.includes(cuisine): true));
+  const allNames = pool.map(r=>r.name);
+  const unlocked = new Set(active.unlockedRecipeNames || []);
+  // A restaurant is 'complete' when all relevant recipes are unlocked
+  const allBought = allNames.every(n=>unlocked.has(n));
+  const container = document.getElementById('restaurants-button-container');
+  if (container) container.classList.toggle('hidden', !allBought);
+}
+
+// New function: renderRestaurantsModal
+function renderRestaurantsModal(){
+  const list = document.getElementById('restaurants-list');
+  list.innerHTML = '';
+  (gameState.restaurants || []).forEach((r, idx)=>{
+    const total = ALL_RECIPES.filter(rec => !r.cuisine || (Array.isArray(rec.cuisine)? rec.cuisine.includes(r.cuisine): true)).length || 1;
+    const completed = (r.unlockedRecipeNames||[]).length;
+    const pct = Math.round((completed/total)*100);
+    const el = document.createElement('div');
+    el.className = 'resto-entry flex items-center justify-between p-2 border rounded-lg'; // Use resto-entry class for style
+    el.innerHTML = `<div>
+                      <div class="font-bold">${r.name} ${idx===gameState.activeRestaurantIndex?'<span class="text-sm text-green-600"> (Ativo)</span>':''}</div>
+                      <div class="text-sm text-gray-500">${r.cuisine || '—'} • ${pct}% concluído (${completed}/${total})</div>
+                    </div>
+                    <div class="flex gap-2">
+                      <button class="switch-resto btn-main bg-indigo-500 text-white px-3 py-1 rounded" data-idx="${idx}">Abrir</button>
+                      <button class="delete-resto btn-main bg-red-500 text-white px-3 py-1 rounded" data-idx="${idx}" ${gameState.restaurants.length <= 1 ? 'disabled' : ''}>Apagar</button>
+                    </div>`;
+    list.appendChild(el);
+  });
+  // attach handlers
+  list.querySelectorAll('.switch-resto').forEach(b=>b.addEventListener('click', (e)=>{
+    const i = Number(e.currentTarget.dataset.idx);
+    gameState.activeRestaurantIndex = i;
+    saveGame();
+    // Update profile context for non-multiresto specific calls
+    const active = getActiveRestaurant();
+    profile.restoName = active.name;
+    profile.cuisine = active.cuisine;
+    restoNameDisplay.textContent = `${profile.restoName} • ${profile.cuisine}`;
+    updateRankDisplay();
+    renderMarket();
+    renderUnlockedIngredientBin();
+    updateAllMoneyDisplays();
+    renderRestaurantsModal();
+    renderRestaurantsButtonIfEligible();
+    hideModalById('restaurants-modal'); // Auto close after switch
+  }));
+  list.querySelectorAll('.delete-resto').forEach(b=>b.addEventListener('click', (e)=>{
+    const idxToDelete = Number(e.currentTarget.dataset.idx);
+    if (gameState.restaurants.length <= 1) {
+        showMarketMessage("Erro", "Você não pode deletar seu último restaurante!", false);
+        return;
+    }
+    
+    // Confirm delete flow
+    if (!window.confirm(`Tem certeza que deseja apagar o restaurante ${gameState.restaurants[idxToDelete].name}?`)) return;
+
+    gameState.restaurants.splice(idxToDelete,1);
+    
+    if (gameState.activeRestaurantIndex === idxToDelete) {
+        // If the active restaurant was deleted, switch to the first one available
+        gameState.activeRestaurantIndex = 0;
+    } else if (gameState.activeRestaurantIndex > idxToDelete) {
+        // If an earlier restaurant was deleted, adjust the index
+        gameState.activeRestaurantIndex--;
+    }
+    
+    saveGame();
+    
+    // Switch context to new active restaurant if needed
+    const active = getActiveRestaurant();
+    profile.restoName = active.name;
+    profile.cuisine = active.cuisine;
+    restoNameDisplay.textContent = `${profile.restoName} • ${profile.cuisine}`;
+    updateRankDisplay();
+
+    renderRestaurantsModal();
+    renderRestaurantsButtonIfEligible();
+  }));
 }
