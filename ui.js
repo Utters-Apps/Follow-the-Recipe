@@ -16,7 +16,8 @@ export function getIngredientHTML(id, classes = '') {
   if (ingredient.type === 'image' && typeof ingredient.value === 'string' && ingredient.value.trim().length>0) {
     const safeSrc = ingredient.value.trim();
     const fallback = `https://placehold.co/40x40/efefef/111?text=${encodeURIComponent((id||'I').substring(0,1).toUpperCase())}`;
-    return `<img src="${safeSrc}" class="ing-img ${classes}" alt="${id}" onerror="this.onerror=null;this.src='${fallback}';this.style.objectFit='contain'">`;
+    // Using a clear onerror to display nothing if the image fails to load, preventing ugly broken icons
+    return `<img src="${safeSrc}" class="ing-img ${classes}" alt="${id}" style="width:var(--img-size);height:var(--img-size);object-fit:contain;" onerror="this.onerror=null;this.src='${fallback}';this.style.objectFit='contain'">`;
   }
   // emoji or text
   return `<span class="${classes}">${ingredient.value || String(id)}</span>`;
