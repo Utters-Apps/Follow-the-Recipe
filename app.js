@@ -21,7 +21,7 @@ const SUCCESS_MODAL_DURATION = 1600;
 const FAILURE_MODAL_DURATION = 2000;
 const BGM_KEY = 'recipeGameBGMMuted_v6';
 // new: global price multiplier to make recipes more expensive and scale with progression
-const BASE_PRICE_MULTIPLIER = 1.5; // global inflation so buying recipes is meaningful
+const BASE_PRICE_MULTIPLIER = 1.6; // global inflation so buying recipes is meaningful
 // NEW: reduce how much players earn on success (0.6 = 60% of previous rewards)
 const SUCCESS_EARN_MULTIPLIER = 0.6;
 function getEffectivePrice(recipe){
@@ -2284,3 +2284,10 @@ function renderRestaurantsModal(){
     renderRestaurantsButtonIfEligible();
   }));
 }
+
+// Global helper: ensure audio starts on first user interaction and play a tactile click for buttons
+document.addEventListener('click', (e) => {
+    const el = e.target.closest('button, .btn-main, .ingredient-btn, .btn-buy, .btn-buy-boost, [role="button"]');
+    if (!el) return;
+    try { ensureAudioStarted(); playSound('click', 0.9); } catch (err) { console.warn('Click sound failed', err); }
+});
