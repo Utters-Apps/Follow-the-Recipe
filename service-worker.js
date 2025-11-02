@@ -90,4 +90,3 @@ self.addEventListener('fetch', event => {
 self.addEventListener('message', (evt) => {
   if (evt.data && evt.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
-
