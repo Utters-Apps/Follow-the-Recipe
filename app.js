@@ -21,7 +21,7 @@ const SUCCESS_MODAL_DURATION = 1600;
 const FAILURE_MODAL_DURATION = 2000;
 const BGM_KEY = 'recipeGameBGMMuted_v6';
 // new: global price multiplier to make recipes more expensive and scale with progression
-const BASE_PRICE_MULTIPLIER = 1.3; // global inflation so buying recipes is meaningful
+const BASE_PRICE_MULTIPLIER = 1.6; // global inflation so buying recipes is meaningful
 // NEW: reduce how much players earn on success (0.6 = 60% of previous rewards)
 const SUCCESS_EARN_MULTIPLIER = 0.6;
 function getEffectivePrice(recipe){
@@ -35,7 +35,7 @@ const BOOSTS = [
     { 
         id: 'timer_plus_1', 
         name: '+1s Tempo Base', 
-        desc: 'Aumenta o tempo base do pedido em 1 segundo (permanente).', 
+        desc: 'Aumenta o tempo base do pedido em 1 segundo. Nível Máximo: +5s.', 
         price: 500, 
         maxLevel: 5,
         icon: '⏱️'
@@ -43,7 +43,7 @@ const BOOSTS = [
     { 
         id: 'vip_chance_increase', 
         name: '+5% Chance VIP', 
-        desc: 'Aumenta permanentemente a chance de aparecer um Cliente VIP em +5%.', 
+        desc: 'Aumenta a chance de clientes VIPs aparecerem. Nível Máximo: +15%.', 
         price: 800, 
         maxLevel: 3,
         icon: '✨'
@@ -51,7 +51,7 @@ const BOOSTS = [
     { 
         id: 'streak_star_boost', 
         name: 'Bônus Estrela Aprimorado', 
-        desc: 'Dobra o ganho de estrelas por sequência de acertos.', 
+        desc: 'Dobra o ganho de estrelas (★) por sequência de acertos (2x).', 
         price: 1500, 
         maxLevel: 1,
         icon: '⭐'
@@ -59,7 +59,7 @@ const BOOSTS = [
     { 
         id: 'optional_ingredient_reduction', 
         name: 'Receitas mais Simples', 
-        desc: 'Reduz a chance de ingredientes opcionais serem adicionados aos pedidos.', 
+        desc: 'Reduz a chance de ingredientes opcionais serem adicionados aos pedidos. Torna o jogo mais fácil.', 
         price: 1200, 
         maxLevel: 2,
         icon: '➖'
@@ -102,6 +102,11 @@ function buildLayout() {
       <button id="welcome-play-button" class="btn-main w-full bg-green-500 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg">
         <i class="fas fa-play mr-2"></i> Jogar
       </button>
+      <div class="w-full grid grid-cols-3 gap-2 mt-3 mb-2">
+        <button id="welcome-stats-button" class="btn-main w-full text-white font-bold py-3 rounded-xl text-lg shadow-lg" style="background:#5e72e4!important; display: flex; flex-direction: column; align-items: center;"><i class="fas fa-chart-line"></i> <span class="text-sm">Estatísticas</span></button>
+        <button id="welcome-settings-button" class="btn-main w-full text-white font-bold py-3 rounded-xl text-lg shadow-lg" style="background:#8c5cf6!important; display: flex; flex-direction: column; align-items: center;"><i class="fas fa-cog"></i> <span class="text-sm">Configurações</span></button>
+        <button id="welcome-tutorial-button" class="btn-main w-full text-white font-bold py-3 rounded-xl text-lg shadow-lg" style="background:#f97316!important; display: flex; flex-direction: column; align-items: center;"><i class="fas fa-book"></i> <span class="text-sm">Tutorial</span></button>
+      </div>
       <!-- PWA install button (hidden by default, shown when browser supports beforeinstallprompt) -->
       <button id="install-pwa-button" class="btn-main w-full mt-3 bg-indigo-600 text-white font-bold px-10 py-3 rounded-xl text-lg hidden">
         <i class="fas fa-download mr-2"></i> Instalar jogo
@@ -119,7 +124,7 @@ function buildLayout() {
         <div id="rank-icon" class="text-6xl mb-1">🧼</div>
         <h2 id="rank-name" class="text-2xl font-bold">Lava-pratos</h2>
         <button id="view-upcoming-ranks" class="btn-main mt-2 bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm">Ver próximos ranques</button>
-        <button id="view-tutorial" class="btn-main mt-2 bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm ml-2 hidden">Ver Tutorial</button>
+        <button id="view-tutorial" class="btn-main mt-2 bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm ml-2">Ver Tutorial</button>
       </div>
       <div id="rank-goal" class="p-3 rounded-xl mb-4 text-center w-full shadow-inner border">
         <h4 class="text-base font-bold">Próximo Nível</h4>
@@ -127,7 +132,11 @@ function buildLayout() {
       </div>
       <button id="play-button" class="btn-main w-full bg-green-500 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg mb-3"><i class="fas fa-play mr-2"></i> Próximo Pedido</button>
       <button id="market-button" class="btn-main w-full bg-blue-500 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg mb-3"><i class="fas fa-store mr-2"></i> Mercado</button>
-      <button id="boosts-button" class="btn-main w-full bg-yellow-600 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg mb-3"><i class="fas fa-rocket mr-2"></i> Vantagens</button>
+      <button id="boosts-button" class="btn-main w-full bg-yellow-600 text-white font-bold px-10 py-4 rounded-xl text-2xl shadow-lg mb-3"><i class="fas fa-rocket mr-2"></i> <span id="boosts-label">Vantagens</span></button>
+      <div class="w-full grid grid-cols-3 gap-2 mt-2">
+        <!-- Buttons moved to Welcome screen for clearer flow -->
+        <div></div><div></div><div></div>
+      </div>
       <div id="restaurants-button-container" class="mt-2 hidden">
         <button id="restaurants-button" class="btn-main w-full bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl text-lg"><i class="fas fa-utensils mr-2"></i> Meus Restaurantes</button>
       </div>
@@ -342,6 +351,31 @@ function buildLayout() {
       </div>
     </div>
 
+    <!-- Stats Modal -->
+    <div id="stats-modal" class="hidden absolute inset-0 z-60 flex items-center justify-center p-6">
+      <div class="modal-card p-5 rounded-2xl w-full max-w-sm text-left">
+        <div class="flex justify-between items-center mb-3"><h3 class="text-2xl font-bold">📊 Estatísticas</h3><button id="close-stats" class="btn-main btn-ghost px-3 py-2 rounded-lg">Fechar</button></div>
+        <div id="stats-content" class="text-sm opacity-90 space-y-3 font-semibold">
+          <div class="flex justify-between items-center"><div>💰 Dinheiro</div><span id="stat-money" class="text-base font-bold text-green-600">$0</span></div>
+          <div class="flex justify-between items-center"><div>🏅 Ranque Atual</div><span id="stat-rank" class="text-base font-bold">—</span></div>
+          <div class="flex justify-between items-center"><div>⭐ Estrelas (restaurante)</div><span id="stat-stars" class="text-base font-bold text-yellow-500">0.0 ★</span></div>
+          <div class="flex justify-between items-center"><div>🍽️ Receitas Compradas</div><span id="stat-recipes" class="text-base font-bold">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="hidden absolute inset-0 z-60 flex items-center justify-center p-6">
+      <div class="modal-card p-5 rounded-2xl w-full max-w-sm text-left">
+        <div class="flex justify-between items-center mb-3"><h3 class="text-2xl font-bold">⚙️ Configurações</h3><button id="close-settings" class="btn-main btn-ghost px-3 py-2 rounded-lg">Fechar</button></div>
+        <div id="settings-content" class="text-sm opacity-90 space-y-3">
+          <div class="flex items-center justify-between"><div>Som (Música de Fundo)</div><button id="settings-toggle-sound" class="btn-main bg-gray-100 text-gray-800 px-3 py-1 rounded">Ativado</button></div>
+          <div class="flex items-center justify-between"><div>Tema (Claro/Escuro)</div><button id="settings-toggle-theme" class="btn-main bg-gray-100 text-gray-800 px-3 py-1 rounded">Alternar Tema</button></div>
+          <div><small class="opacity-70">Mais opções virão em atualizações.</small></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Restaurants Modal -->
     <div id="restaurants-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center p-6">
       <div class="card p-5 rounded-2xl w-full max-w-md text-left">
@@ -378,6 +412,16 @@ function buildLayout() {
   `;
 }
 buildLayout();
+
+// localization helper: set boost label according to browser language
+function applyLocalizationLabels(){
+  const lang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+  const isPt = lang.startsWith('pt');
+  const boostsLabel = document.getElementById('boosts-label');
+  const boostsHeader = document.querySelector('#boosts-screen h2.title-wrap') || document.querySelector('#boosts-screen h2');
+  if (boostsLabel) boostsLabel.textContent = isPt ? 'Vantagens' : 'Boosts';
+  if (boostsHeader) boostsHeader.textContent = isPt ? 'Vantagens' : 'Boosts';
+}
 
 /* ---------- State ---------- */
 function saveToStorage(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
@@ -519,6 +563,22 @@ const loadingScreen = document.getElementById('loading-screen');
 /* NEW: Rank Up Context Flag */
 let rankUpContext = null; // 'market_purchase' or 'auto_offer'
 
+/* NEW: Stats Modal Refs */
+const statsModal = query('stats-modal');
+const statsContent = query('stats-content');
+const statMoney = query('stat-money');
+const statRank = query('stat-rank');
+const statStars = query('stat-stars');
+const statRecipes = query('stat-recipes');
+const closeStats = query('close-stats');
+
+/* NEW: Settings Modal Refs */
+const settingsModal = query('settings-modal');
+const settingsContent = query('settings-content');
+const settingsToggleSound = query('settings-toggle-sound');
+const settingsToggleTheme = query('settings-toggle-theme');
+const closeSettings = query('close-settings');
+
 /* ---------- Screen helpers ---------- */
 function showScreen(id){
   const screens = [setupScreen, welcomeScreen, menuScreen, gameScreen, marketScreen, boostsScreen, createRestaurantScreen];
@@ -558,6 +618,43 @@ function applyTheme(theme){
   const icon = t === 'dark' ? 'fa-sun' : 'fa-moon';
   [themeToggleSetup, themeToggleWelcome, themeToggleMenu].forEach(btn => { if (btn) btn.innerHTML = `<i class="fas ${icon}"></i>`; });
   setTheme(t);
+
+  // Ensure key UI controls adapt their text/classes for dark mode immediately
+  try {
+    // Tutorial button: ensure it is visible and has clear styling in both themes
+    const vt = document.getElementById('view-tutorial');
+    if (vt) {
+      vt.classList.add('btn-main');
+      // Theme-adaptive background for visibility
+      if (t === 'dark') {
+        vt.classList.remove('bg-gray-100','text-gray-800');
+        vt.classList.add('bg-gray-700','text-white','border','border-gray-600');
+      } else {
+        vt.classList.remove('bg-gray-700','text-white','border','border-gray-600');
+        vt.classList.add('bg-gray-100','text-gray-800');
+      }
+      // (re)bind click to be certain it works
+      vt.onclick = () => { playSound('click'); showTutorialModal(true); };
+    }
+
+    // Settings buttons text should reflect current theme/sound state in the correct language
+    const settingsThemeBtn = document.getElementById('settings-toggle-theme');
+    if (settingsThemeBtn) {
+      settingsThemeBtn.textContent = t === 'dark' ? 'Tema: Escuro' : 'Tema: Claro';
+      settingsThemeBtn.classList.add('btn-main','btn-theme');
+      if (t === 'dark') settingsThemeBtn.classList.add('bg-gray-700','text-white'); else settingsThemeBtn.classList.remove('bg-gray-700','text-white');
+    }
+    const settingsSoundBtn = document.getElementById('settings-toggle-sound');
+    if (settingsSoundBtn) {
+      const muted = localStorage.getItem(BGM_KEY) === '1';
+      settingsSoundBtn.textContent = muted ? 'Som: Desativado' : 'Som: Ativado';
+      settingsSoundBtn.classList.add('btn-main','btn-theme');
+      if (t === 'dark') settingsSoundBtn.classList.add('bg-gray-700','text-white'); else settingsSoundBtn.classList.remove('bg-gray-700','text-white');
+    }
+  } catch(e){
+    // non-critical, keep app running
+    console.warn('Theme adapt helpers failed', e);
+  }
 }
 function loadTheme(){
   const t = getTheme();
@@ -789,7 +886,7 @@ function updateRankDisplay(){
     if (goalName && goalName !== 'null'){
       rankGoal.style.display = 'block';
       // Added stars requirement hint to menu goal
-      const nextRankStars = ranks[idx + 1]?.requiredStars || 0.0;
+      const nextRankStars = ALL_RECIPES.find(r => r.name === goalName)?.requiredStars || 0.0;
       rankGoalText.innerHTML = `Compre a receita <span class="font-bold">${goalName}</span> (★${nextRankStars.toFixed(1)}) no Mercado para atingir <span class="text-purple-600">${nextRank.name}</span>!`;
       return;
     }
@@ -945,7 +1042,7 @@ function renderBoostShop(){
             statusHtml = `<div class="font-bold px-4 py-2 rounded-lg bg-green-100 text-green-700">Máximo Atingido</div>`;
         } else {
             const canBuy = gameState.money >= price;
-            statusHtml = `<button class="btn-buy-boost btn-main ${canBuy ? 'bg-yellow-500 text-white' : 'bg-gray-400 text-gray-700'} font-bold px-6 py-3 rounded-lg text-lg" data-boost-id="${boost.id}" ${!canBuy ? 'disabled' : ''}>
+            statusHtml = `<button class="btn-buy-boost btn-main ${canBuy ? 'bg-purple-500 text-white' : 'bg-gray-400 text-gray-700'} font-bold px-6 py-3 rounded-lg text-lg" data-boost-id="${boost.id}" ${!canBuy ? 'disabled' : ''}>
                             <i class="fas fa-coins mr-1"></i> $${price}
                           </button>`;
         }
@@ -1085,7 +1182,7 @@ function buyRecipe(recipeName){
       const nextDef = ranks[nextIdx] || null;
       const nextGoalName = nextDef ? (getRankUnlockRecipeName(currIdx, cuisine) || nextDef.recipeToUnlock) : null;
       // Use the configured requiredStars from the rank definition (no additional +1.0)
-      const requiredStars = Number(nextDef?.requiredStars || 0);
+      const requiredStars = ALL_RECIPES.find(r => r.name === nextGoalName)?.requiredStars || 0.0;
       const activeStars = Number(active.stars || 0);
       if (nextGoalName && nextGoalName === recipe.name){
         if (activeStars >= requiredStars){
@@ -1663,6 +1760,15 @@ function init(){
   // Restore BGM icon state
   setBgmIcon();
   
+  // apply localization labels early so UI shows correct words
+  applyLocalizationLabels();
+  
+  // wire quick tutorial/settings/stats buttons added to menu
+  // Welcome screen action buttons (moved from Menu)
+  document.getElementById('welcome-tutorial-button')?.addEventListener('click', ()=>{ playSound('click'); showTutorialModal(true); });
+  document.getElementById('welcome-stats-button')?.addEventListener('click', ()=>{ playSound('click'); showStatsModal(); });
+  document.getElementById('welcome-settings-button')?.addEventListener('click', ()=>{ playSound('click'); showSettingsModal(); });
+  
   // Hide loading screen
   if (loadingScreen) {
     loadingScreen.classList.add('fade-out');
@@ -1755,21 +1861,27 @@ function showAutoOffer(item){
     const currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
     const nextIdx = Math.min(ranks.length - 1, currIdx + 1);
     const nextDef = ranks[nextIdx] || null;
-    let starsNeeded = null;
-    if (nextDef){
-      const baseReq = Number(nextDef.requiredStars || 0);
-      starsNeeded = Number((baseReq).toFixed(1));
+    let requiredStars = 0.0;
+    
+    // Calculate required stars using ALL_RECIPES lookup for the rank goal recipe name
+    const requiredRankGoalName = getRankUnlockRecipeName(currIdx, active.cuisine || profile.cuisine);
+    const isRankGoal = item.name === requiredRankGoalName;
+
+    if (isRankGoal) {
+        requiredStars = ALL_RECIPES.find(r => r.name === requiredRankGoalName)?.requiredStars || 0.0;
     }
 
     // Build modal content for Recipe
     const effectivePrice = getEffectivePrice(item);
     offerTitle.textContent = `Você pode comprar: ${item.name}`;
     let starsInfo = '';
-    if (starsNeeded !== null){
+    
+    if (isRankGoal){
       const have = Number(active.stars || 0);
-      const meets = have >= starsNeeded;
-      starsInfo = `<div style="margin-top:.5rem; color:${meets ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">Ranque: ${starsNeeded} ★ — Você: ${have.toFixed(1)} ★ ${meets ? '✓' : '✕'}</div>`;
+      const meets = have >= requiredStars;
+      starsInfo = `<div style="margin-top:.5rem; color:${meets ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">Ranque: ★${requiredStars.toFixed(1)} (Você: ${have.toFixed(1)} ★ ${meets ? '✓' : '✕'})</div>`;
     }
+    
     offerDesc.innerHTML = `<div style="display:flex;align-items:center;gap:.6rem;justify-content:center">
         <span style="font-size:2.2rem">${item.emoji || '🍽️'}</span>
         <div style="text-align:left">
@@ -1932,6 +2044,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
   musicToggleMenuBtn?.addEventListener('click', toggleBgm);
   setBgmIcon();
 
+  // ensure localized labels are applied for dynamically injected elements too
+  applyLocalizationLabels();
+
   // Restaurants logic
   renderRestaurantsButtonIfEligible();
   renderRestaurantsModal();
@@ -1961,34 +2076,40 @@ function hideModalById(id){
 // TUTORIAL LOGIC START
 const TUTORIAL_STEPS = [
     { 
-        title: "Bem-vindo, Chef!", 
-        content: "Siga a Receita é um jogo de gerenciamento de tempo rápido. Seu objetivo é montar pratos na ordem correta antes que o tempo acabe!", 
+        title: "Bem-vindo(a), Chef!", 
+        content: "Siga a Receita é um jogo de gerenciamento de tempo rápido. Seu objetivo é montar pratos na ordem correta antes que o tempo acabe! Cada segundo conta.", 
         emoji: "🧑‍🍳",
-        visual: `<i class="fas fa-hat-chef text-6xl text-purple-600 mb-2"></i>`
+        visual: `<i class="fas fa-hat-chef text-6xl text-purple-600 mb-2 animate-bounce"></i>` // Added subtle animation hint
     },
     { 
         title: "O Pedido e o Timer", 
-        content: "A receita aparece logo abaixo do cliente (NPC). Abaixo dela, a barra de tempo conta. Seja rápido! Se o tempo zerar, você perde o pedido.", 
+        content: "O cliente (NPC) faz o pedido, mostrando a receita e o prato. A barra de tempo conta abaixo. Se o tempo zerar, você perde reputação (★) e dinheiro.", 
         emoji: "⏱️",
-        visual: `<div class="w-full h-8 bg-gray-200 rounded-full overflow-hidden shadow-inner flex items-center mb-2"><div class="h-full bg-red-400 w-3/4" style="transition: width 0.5s ease; width: 75%;"></div></div><div class="text-xs font-bold mb-2 text-red-600">⏳ O tempo está correndo!</div>`
+        visual: `<div class="w-full max-w-[200px] h-8 bg-gray-200 rounded-full overflow-hidden shadow-inner flex items-center mb-2 mx-auto"><div class="h-full bg-red-500 w-3/4" style="width: 75%;"></div></div><div class="text-sm font-bold mb-2 text-red-600">⏳ O tempo é seu maior desafio!</div>` // Ensured visual elements are centered
     },
     { 
         title: "Montando o Prato", 
-        content: "O campo abaixo do timer mostra o que você já colocou. Os ingredientes (na parte inferior) devem ser selecionados EXATAMENTE na ordem da receita.", 
+        content: "Os ingredientes no topo são o gabarito. Selecione os ingredientes na parte inferior EXATAMENTE na mesma sequência. Um erro ou ingrediente faltando, e o pedido falha.", 
         emoji: "🍔",
-        visual: `<div class="p-3 border-2 border-green-500 rounded-lg flex justify-center gap-2"><span class="text-3xl">🍞</span><span class="text-3xl text-green-500">🧀</span><span class="text-3xl">🍅</span></div><div class="text-xs mt-2 font-bold text-purple-600">A ordem correta é crucial para a satisfação do cliente!</div>`
+        visual: `<div class="p-3 border-2 border-green-500 rounded-lg flex justify-center gap-2 items-center"><span class="text-3xl">🍞</span><span class="text-3xl text-green-500 font-bold">-></span><span class="text-3xl">🧀</span><span class="text-3xl text-green-500 font-bold">-></span><span class="text-3xl">🍅</span></div><div class="text-xs mt-2 font-bold text-purple-600">A ordem correta (esquerda para direita) é crucial!</div>`
     },
     { 
         title: "Mercado e Ranques", 
-        content: "Use seu dinheiro para comprar novas receitas no Mercado. Cada receita comprada te ajuda a subir de ranque. Ranques mais altos significam clientes mais rápidos e mais dinheiro.", 
+        content: "Compre novas receitas no Mercado para avançar seu Ranque. Cada ranque desbloqueado aumenta o dinheiro base que você ganha por pedido.", 
         emoji: "💰",
-        visual: `<div class="flex gap-4 justify-center items-center"><i class="fas fa-store text-4xl text-blue-500"></i><i class="fas fa-arrow-right text-lg text-gray-400"></i><i class="fas fa-star text-4xl text-yellow-500"></i><div class="text-2xl font-bold">Chef II</div></div><div class="text-sm mt-2">Pratos desbloqueiam Ranques!</div>`
+        visual: `<div class="flex gap-4 justify-center items-center"><i class="fas fa-store text-4xl text-blue-500"></i><i class="fas fa-arrow-right text-lg text-gray-400"></i><i class="fas fa-star text-4xl text-yellow-500"></i><div class="text-2xl font-bold">Chef II</div></div><div class="text-sm mt-2">Invista em novos pratos para progredir!</div>`
     },
     { 
         title: "Estrelas e Vantagens", 
-        content: "Sua avaliação (★) aumenta ao completar sequências de acertos. Estrelas desbloqueiam Ranques. Visite Vantagens para comprar melhorias permanentes (Boosts) para tempo extra ou clientes VIPs.", 
+        content: "Sua avaliação de Estrelas (★) aumenta ao completar sequências (streaks) de acertos. Estrelas são necessárias para subir de Ranque após comprar a receita-chave. Use Vantagens (Boosts) para melhorar permanentemente o jogo.", 
         emoji: "⭐",
         visual: `<div class="flex gap-4 justify-center items-center"><span class="stars-pill">★ 1.8</span><i class="fas fa-arrow-right text-lg text-gray-400"></i><button class="btn-main bg-yellow-600 text-white font-bold px-4 py-2 rounded-lg text-lg"><i class="fas fa-rocket mr-1"></i> Vantagens</button></div>`
+    },
+    {
+        title: "Estatísticas e Configurações",
+        content: "Acesse suas estatísticas de jogo e gerencie o Tema (Claro/Escuro) e o Som de Fundo através dos botões na tela de Menu Inicial.",
+        emoji: "⚙️",
+        visual: `<div class="flex gap-3 justify-center items-center"><button class="text-2xl text-purple-600"><i class="fas fa-chart-line"></i></button><button class="text-2xl text-purple-600"><i class="fas fa-cog"></i></button><button class="text-2xl text-purple-600"><i class="fas fa-book"></i></button></div><div class="text-sm mt-2">Seus controles de jogo e progresso.</div>`
     }
 ];
 
@@ -2015,11 +2136,20 @@ function renderTutorialStep(stepIndex) {
     tutorialNext.classList.toggle('hidden', stepIndex === TUTORIAL_STEPS.length - 1);
     
     // Ensure 'Start' or 'Close' is shown on the last step
-    const isFromMenu = !tutorialCloseBtn.classList.contains('hidden');
-    if (stepIndex === TUTORIAL_STEPS.length - 1) {
+    const isFromMenu = tutorialCloseBtn.classList.contains('hidden') === false; // Check context set by showTutorialModal
+    const totalSteps = TUTORIAL_STEPS.length;
+
+    if (stepIndex === totalSteps - 1) {
         tutorialNext.classList.add('hidden');
-        tutorialStart.classList.toggle('hidden', isFromMenu); // Show Start if not from Menu
-        tutorialCloseBtn.classList.toggle('hidden', !isFromMenu); // Show Close if from Menu
+        // If we are on the first step AND it was triggered from a non-menu flow, show START
+        if (currentTutorialStep === 0 && !isFromMenu) {
+            tutorialStart.classList.remove('hidden');
+            tutorialCloseBtn.classList.add('hidden');
+        } else {
+            // Otherwise, if finished or called from menu link, show CLOSE
+            tutorialStart.classList.add('hidden');
+            tutorialCloseBtn.classList.remove('hidden');
+        }
     } else {
         tutorialStart.classList.add('hidden');
         tutorialCloseBtn.classList.add('hidden');
@@ -2031,9 +2161,11 @@ function showTutorialModal(fromMenu = false) {
     
     // Set initial state for close/start buttons based on context
     if (fromMenu) {
+        // If coming from the menu link, we intend to close it afterwards
         tutorialCloseBtn.classList.remove('hidden');
         tutorialStart.classList.add('hidden');
     } else {
+        // If coming from the first time play click, we intend to start the game afterwards
         tutorialCloseBtn.classList.add('hidden');
         tutorialStart.classList.remove('hidden');
     }
@@ -2290,4 +2422,49 @@ document.addEventListener('click', (e) => {
     const el = e.target.closest('button, .btn-main, .ingredient-btn, .btn-buy, .btn-buy-boost, [role="button"]');
     if (!el) return;
     try { ensureAudioStarted(); playSound('click', 0.9); } catch (err) { console.warn('Click sound failed', err); }
+});
+
+// New: showStatsModal & showSettingsModal functions and handlers
+function showStatsModal(){
+  const active = getActiveRestaurant();
+  document.getElementById('stat-money').textContent = `$${gameState.money}`;
+  const ranks = getActiveRanks();
+  const idx = Number.isInteger(active?.rank) ? active.rank : 0;
+  // Use current rank name, and the goal recipe requirement if applicable, for better flavor
+  const currentRank = ranks[idx];
+  let rankText = `${currentRank?.name || '—'} (Lv ${idx})`;
+  if (idx < ranks.length - 1) {
+      const nextGoal = getRankUnlockRecipeName(idx, active.cuisine || profile.cuisine);
+      if (nextGoal) rankText += ` | Próx: ${nextGoal}`;
+  }
+  document.getElementById('stat-rank').textContent = rankText;
+  document.getElementById('stat-stars').textContent = `${Number(active.stars||0).toFixed(1)} ★`;
+  document.getElementById('stat-recipes').textContent = `${(active.unlockedRecipeNames||[]).length}`;
+  showModalById('stats-modal');
+}
+document.getElementById('close-stats')?.addEventListener('click', ()=>{ playSound('click'); hideModalById('stats-modal'); });
+
+// Settings modal
+function showSettingsModal(){
+  // set initial settings state
+  const muted = localStorage.getItem(BGM_KEY) === '1';
+  document.getElementById('settings-toggle-sound').textContent = muted ? 'Som: Desativado' : 'Som: Ativado';
+  
+  // Update theme button text for better clarity
+  const currentTheme = document.documentElement.classList.contains('dark') ? 'Escuro' : 'Claro';
+  document.getElementById('settings-toggle-theme').textContent = `Tema: ${currentTheme}`;
+
+  showModalById('settings-modal');
+}
+document.getElementById('close-settings')?.addEventListener('click', ()=>{ playSound('click'); hideModalById('settings-modal'); });
+document.getElementById('settings-toggle-theme')?.addEventListener('click', ()=>{ 
+    playSound('click'); 
+    toggleTheme(); 
+    const currentTheme = document.documentElement.classList.contains('dark') ? 'Escuro' : 'Claro';
+    document.getElementById('settings-toggle-theme').textContent = `Tema: ${currentTheme}`;
+});
+document.getElementById('settings-toggle-sound')?.addEventListener('click', ()=>{ 
+    playSound('click'); 
+    toggleBgm(); 
+    document.getElementById('settings-toggle-sound').textContent = (localStorage.getItem(BGM_KEY) === '1') ? 'Som: Desativado' : 'Som: Ativado'; 
 });
