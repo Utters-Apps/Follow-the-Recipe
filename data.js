@@ -360,55 +360,55 @@ export const ALL_RECIPES = [
 // Themed ranks per cuisine with improved names and clearer progression hints
 export const CUISINE_DEFS = {
   "Brasileiro": [
-    { name: "Aspirante do Boteco", icon:"🧼", recipeToUnlock:"Suco de Laranja", baseReward: 10 },
-    { name: "Cozinheiro Caseiro", icon:"🧑‍🍳", recipeToUnlock:"Vitamina de Banana", baseReward: 15 },
-    { name: "Cozinheiro de Bairro", icon:"🍳", recipeToUnlock:"Caipirinha", baseReward: 22 },
-    { name: "Mestre do Fogão", icon:"🥘", recipeToUnlock:"Feijoada", baseReward: 35 },
-    { name: "Maestro do Sabor", icon:"🥇", recipeToUnlock:"Doce de Leite", baseReward: 55 } // preenchido (antes null)
+    { name: "Aspirante do Boteco", icon:"🧼", recipeToUnlock:"Suco de Laranja", baseReward: 10, requiredStars: 0.0 },
+    { name: "Cozinheiro Caseiro", icon:"🧑‍🍳", recipeToUnlock:"Vitamina de Banana", baseReward: 15, requiredStars: 0.3 },
+    { name: "Cozinheiro de Bairro", icon:"🍳", recipeToUnlock:"Caipirinha", baseReward: 22, requiredStars: 0.8 },
+    { name: "Mestre do Fogão", icon:"🥘", recipeToUnlock:"Feijoada", baseReward: 35, requiredStars: 1.6 },
+    { name: "Maestro do Sabor", icon:"🥇", recipeToUnlock:"Doce de Leite", baseReward: 55, requiredStars: 2.8 } // preenchido (antes null)
   ],
   "Italiano": [
-    { name: "Aprendiz da Massa", icon:"🍞", recipeToUnlock:"Bruschetta", baseReward: 12 },
-    { name: "Pizzaiolo em Treino", icon:"🍕", recipeToUnlock:"Pizza Margherita", baseReward: 18 },
-    { name: "Maestro della Pasta", icon:"🍝", recipeToUnlock:"Carbonara", baseReward: 30 },
-    { name: "Chef Rinomato", icon:"🏆", recipeToUnlock:"Tiramisù", baseReward: 48 },
-    { name: "Lendário Culinário", icon:"🌟", recipeToUnlock:"Panzerotti", baseReward: 70 } // preenchido (antes null)
+    { name: "Aprendiz da Massa", icon:"🍞", recipeToUnlock:"Bruschetta", baseReward: 12, requiredStars: 0.0 },
+    { name: "Pizzaiolo em Treino", icon:"🍕", recipeToUnlock:"Pizza Margherita", baseReward: 18, requiredStars: 0.4 },
+    { name: "Maestro della Pasta", icon:"🍝", recipeToUnlock:"Carbonara", baseReward: 30, requiredStars: 1.0 },
+    { name: "Chef Rinomato", icon:"🏆", recipeToUnlock:"Tiramisù", baseReward: 48, requiredStars: 2.0 },
+    { name: "Lendário Culinário", icon:"🌟", recipeToUnlock:"Panzerotti", baseReward: 70, requiredStars: 3.0 } // preenchido (antes null)
   ],
   "Japonês": [
-    { name: "Iniciando no Itamae", icon:"🍣", recipeToUnlock:"Onigiri", baseReward: 10 },
-    { name: "Sushiman Júnior", icon:"🔪", recipeToUnlock:"Sushi", baseReward: 18 },
-    { name: "Especialista em Ramen", icon:"🍜", recipeToUnlock:"Ramen", baseReward: 28 },
-    { name: "Mestre do Izakaya", icon:"🐙", recipeToUnlock:"Takoyaki", baseReward: 45 },
-    { name: "Itamae Lendário", icon:"⛩️", recipeToUnlock:"Temaki", baseReward: 70 } // preenchido (antes null)
+    { name: "Iniciando no Itamae", icon:"🍣", recipeToUnlock:"Onigiri", baseReward: 10, requiredStars: 0.0 },
+    { name: "Sushiman Júnior", icon:"🔪", recipeToUnlock:"Sushi", baseReward: 18, requiredStars: 0.5 },
+    { name: "Especialista em Ramen", icon:"🍜", recipeToUnlock:"Ramen", baseReward: 28, requiredStars: 1.2 },
+    { name: "Mestre do Izakaya", icon:"🐙", recipeToUnlock:"Takoyaki", baseReward: 45, requiredStars: 2.2 },
+    { name: "Itamae Lendário", icon:"⛩️", recipeToUnlock:"Temaki", baseReward: 70, requiredStars: 3.5 } // preenchido (antes null)
   ],
   "Mexicano": [
-    { name: "Taquero Iniciante", icon:"🌮", recipeToUnlock:"Milho Assado (Elote)", baseReward: 11 },
-    { name: "Mestre do Sabor", icon:"🌶️", recipeToUnlock:"Guacamole", baseReward: 18 },
-    { name: "Chef de Sazón", icon:"🏵️", recipeToUnlock:"Taco", baseReward: 30 },
-    { name: "Lenda da Cozinha", icon:"🇲🇽", recipeToUnlock:"Queso Fundido", baseReward: 55 } // preenchido (antes null)
+    { name: "Taquero Iniciante", icon:"🌮", recipeToUnlock:"Milho Assado (Elote)", baseReward: 11, requiredStars: 0.0 },
+    { name: "Mestre do Sabor", icon:"🌶️", recipeToUnlock:"Guacamole", baseReward: 18, requiredStars: 0.4 },
+    { name: "Chef de Sazón", icon:"🏵️", recipeToUnlock:"Taco", baseReward: 30, requiredStars: 1.0 },
+    { name: "Lenda da Cozinha", icon:"🇲🇽", recipeToUnlock:"Queso Fundido", baseReward: 55, requiredStars: 2.4 } // preenchido (antes null)
   ],
   "Francês": [
-    { name: "Commis Talentoso", icon:"🥖", recipeToUnlock:"Torrada", baseReward: 11 },
-    { name: "Sous-chef", icon:"🥈", recipeToUnlock:"Salada César", baseReward: 18 },
-    { name: "Chef de Cuisine", icon:"🥇", recipeToUnlock:"Crepe Suzette", baseReward: 32 },
-    { name: "Patrono Culinário", icon:"🇫🇷", recipeToUnlock:"Ratatouille Provençal", baseReward: 55 } // preenchido (antes null)
+    { name: "Commis Talentoso", icon:"🥖", recipeToUnlock:"Torrada", baseReward: 11, requiredStars: 0.0 },
+    { name: "Sous-chef", icon:"🥈", recipeToUnlock:"Salada César", baseReward: 18, requiredStars: 0.4 },
+    { name: "Chef de Cuisine", icon:"🥇", recipeToUnlock:"Crepe Suzette", baseReward: 32, requiredStars: 1.2 },
+    { name: "Patrono Culinário", icon:"🇫🇷", recipeToUnlock:"Ratatouille Provençal", baseReward: 55, requiredStars: 2.6 } // preenchido (antes null)
   ],
   "Halloween": [
-    { name: "Trickster Cook", icon:"🎃", recipeToUnlock:"Panqueca do Terror", baseReward: 12 },
-    { name: "Cozinheiro Sombrio", icon:"🕯️", recipeToUnlock:"Onigiri Fantasma", baseReward: 20 },
-    { name: "Mestre das Sombras", icon:"👻", recipeToUnlock:"Takoyaki Tenebroso", baseReward: 38 },
-    { name: "Lenda Assombrada", icon:"🦇", recipeToUnlock:"Poção Efervescente", baseReward: 65 } // preenchido (antes null)
+    { name: "Trickster Cook", icon:"🎃", recipeToUnlock:"Panqueca do Terror", baseReward: 12, requiredStars: 0.0 },
+    { name: "Cozinheiro Sombrio", icon:"🕯️", recipeToUnlock:"Onigiri Fantasma", baseReward: 20, requiredStars: 0.5 },
+    { name: "Mestre das Sombras", icon:"👻", recipeToUnlock:"Takoyaki Tenebroso", baseReward: 38, requiredStars: 1.6 },
+    { name: "Lenda Assombrada", icon:"🦇", recipeToUnlock:"Poção Efervescente", baseReward: 65, requiredStars: 3.0 } // preenchido (antes null)
   ]
 };
 
 // Default fallback ranks (polished)
 export const RANKS = [
-  { name: "Lava-pratos", icon: "🧼", recipeToUnlock: "Suco de Laranja", baseReward: 8 },
-  { name: "Ajudante de Cozinha", icon: "🧑‍🍳", recipeToUnlock: "Hambúrguer", baseReward: 12 },
-  { name: "Cozinheiro Júnior", icon: "🔪", recipeToUnlock: "Pizza Margherita", baseReward: 18 },
-  { name: "Cozinheiro Pleno", icon: "🥘", recipeToUnlock: "Ramen", baseReward: 26 },
-  { name: "Subchefe", icon: "🥈", recipeToUnlock: "Sashimi", baseReward: 36 },
-  { name: "Chefe de Cozinha", icon: "🥇", recipeToUnlock: "Ratatouille", baseReward: 50 },
-  { name: "Mestre Cuca", icon: "🏆", recipeToUnlock: "Feijoada", baseReward: 80 } // preenchido (antes null)
+  { name: "Lava-pratos", icon: "🧼", recipeToUnlock: "Suco de Laranja", baseReward: 8, requiredStars: 0.0 },
+  { name: "Ajudante de Cozinha", icon: "🧑‍🍳", recipeToUnlock: "Hambúrguer", baseReward: 12, requiredStars: 0.3 },
+  { name: "Cozinheiro Júnior", icon: "🔪", recipeToUnlock: "Pizza Margherita", baseReward: 18, requiredStars: 0.9 },
+  { name: "Cozinheiro Pleno", icon: "🥘", recipeToUnlock: "Ramen", baseReward: 26, requiredStars: 1.8 },
+  { name: "Subchefe", icon: "🥈", recipeToUnlock: "Sashimi", baseReward: 36, requiredStars: 2.8 },
+  { name: "Chefe de Cozinha", icon: "🥇", recipeToUnlock: "Ratatouille", baseReward: 50, requiredStars: 3.6 },
+  { name: "Mestre Cuca", icon: "🏆", recipeToUnlock: "Feijoada", baseReward: 80, requiredStars: 4.5 } // preenchido (antes null)
 ];
 
 export const SAVE_KEY = 'recipeGameData_v6';
