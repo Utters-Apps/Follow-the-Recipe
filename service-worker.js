@@ -3,7 +3,7 @@ const PRECACHE_URLS = [
   '/', '/index.html', '/offline.html', '/manifest.webmanifest',
   '/icon-192.png', '/icon-512.png',
   '/ui.js', '/app.js', '/data.js', '/audio.js', '/service-worker.js',
-  '/usr/share/sounds/click.mp3', '/usr/share/sounds/success.mp3',
+  '/usr/share/sounds/success.mp3',
   '/usr/share/sounds/error.mp3', '/usr/share/sounds/buy.mp3', '/usr/share/sounds/timer_warning.mp3',
   '/usr/share/sounds/rush_hour.mp3', '/usr/share/sounds/purr.mp3', '/usr/share/sounds/rank_up.mp3',
   '/mascarpone.mp3', '/couve.mp3', '/carne_seca.mp3', '/repolho.mp3', '/polvo.mp3',
