@@ -4,7 +4,7 @@ let hasAudioStarted = false;
 
 // Map logical sound names to asset paths
 const SOUND_ASSETS = {
-  click: '/usr/share/sounds/click.mp3',
+  click: 'https://yelping-blush-iwjnbbvvy0.edgeone.app/click.mp3',
   success: '/usr/share/sounds/success.mp3',
   error: '/usr/share/sounds/error.mp3',
   buy: '/usr/share/sounds/buy.mp3',
