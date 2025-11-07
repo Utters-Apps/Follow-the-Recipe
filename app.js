@@ -27,7 +27,13 @@ const SUCCESS_EARN_MULTIPLIER = 0.6;
 function getEffectivePrice(recipe){
   // scale price by global multiplier and slightly by recipe.minRank to make higher-rank dishes cost more
   const rankFactor = 1 + ((recipe.minRank || 0) * 0.08);
-  return Math.max(1, Math.round((recipe.price || 0) * BASE_PRICE_MULTIPLIER * rankFactor));
+
+  // NEW: employee discount from cook (reduces market price per level)
+  const cookLevel = typeof getBoostLevel === 'function' ? getBoostLevel('cook_base') : 0;
+  const cookDiscountPerLevel = 0.05; // 5% off per cook level
+  const discountFactor = Math.max(0.5, 1 - (cookLevel * cookDiscountPerLevel)); // clamp so price never goes below 50%
+
+  return Math.max(1, Math.round((recipe.price || 0) * BASE_PRICE_MULTIPLIER * rankFactor * discountFactor));
 }
 /* ---------------------- */
 
@@ -70,7 +76,7 @@ const EMPLOYEES = [
     {
         id: 'cook_base',
         name: 'Cozinheiro Júnior',
-        desc: 'Aumenta o tempo base do pedido em +1s por nível. (Nível Máximo: 3)',
+        desc: 'Cozinheiro que reduz o preço dos pratos no Mercado em 5% por nível (máximo 3 níveis).',
         price: 1000,
         maxLevel: 3,
         icon: '👨‍🍳'
@@ -84,6 +90,22 @@ const EMPLOYEES = [
         icon: '🤵'
     }
 ];
+
+/* --- NEW: Update modal control constants --- */
+const LATEST_UPDATE_TEXT = `A Atualização Neve & Banquete já está no ar! 🎄❄️
+
+O Siga a Receita entrou de vez no clima das festas!
+Chegou o Restaurante de Inverno, cheio de pratos natalinos e novas contratações!
+
+👨‍🍳 Cozinheiro Júnior: 5% de desconto nas compras do mercado ($1000)
+🤵 Garçom Eficiente: 10% a mais de lucro por pedido ($1500)
+
+🎁 Restaurante de Natal — suba de rank e desbloqueie receitas exclusivas das festas!
+
+Cozinhe mais rápido, fature mais e aproveite o fim de ano com estilo!
+
+Queremos saber o que você achou 💬`;
+const UPDATE_SEEN_KEY = 'recipeGameLastSeenUpdate_v1';
 
 function buildLayout() {
   appRoot.innerHTML = `
@@ -447,6 +469,17 @@ function buildLayout() {
         </div>
       </div>
     </div>
+
+    <!-- NEW: Update modal (What's New) -->
+    <div id="update-modal" class="hidden absolute inset-0 z-70 flex items-center justify-center p-6">
+      <div class="card modal-card p-5 rounded-2xl w-full max-w-sm text-left">
+        <h3 class="text-2xl font-bold mb-2">Novidades</h3>
+        <div id="update-modal-content" class="text-sm opacity-90 mb-4" style="white-space:pre-wrap;"></div>
+        <div class="flex gap-2">
+          <button id="update-modal-close" class="btn-main w-full bg-purple-600 text-white font-bold py-3 rounded-lg">Fechar e não mostrar novamente</button>
+        </div>
+      </div>
+    </div>
   </div>
   `;
 }
@@ -633,6 +666,11 @@ const settingsContent = query('settings-content');
 const settingsToggleSound = query('settings-toggle-sound');
 const settingsToggleTheme = query('settings-toggle-theme');
 const closeSettings = query('close-settings');
+
+/* NEW: Update modal refs */
+const updateModal = document.getElementById('update-modal');
+const updateModalContent = document.getElementById('update-modal-content');
+const updateModalClose = document.getElementById('update-modal-close');
 
 /* ---------- Screen helpers ---------- */
 function showScreen(id){
@@ -1964,7 +2002,12 @@ function init(){
     loadingScreen.classList.add('fade-out');
     setTimeout(() => {
       loadingScreen.style.display = 'none';
+      // After loading finishes, check update modal
+      showUpdateModalIfNeeded();
     }, 500);
+  } else {
+    // fallback if no loading screen element
+    showUpdateModalIfNeeded();
   }
 }
 
@@ -2703,4 +2746,30 @@ document.getElementById('settings-toggle-sound')?.addEventListener('click', ()=>
     playSound('click'); 
     toggleBgm(); 
     document.getElementById('settings-toggle-sound').textContent = (localStorage.getItem(BGM_KEY) === '1') ? 'Som: Desativado' : 'Som: Ativado'; 
+});
+
+// helper to show the update modal (only shown when stored seen text differs)
+function showUpdateModalIfNeeded(){
+  try {
+    const seen = localStorage.getItem(UPDATE_SEEN_KEY);
+    if (seen === LATEST_UPDATE_TEXT) return; // already seen this exact update
+    if (updateModal && updateModalContent && updateModalClose){
+      updateModalContent.textContent = LATEST_UPDATE_TEXT;
+      updateModal.classList.remove('hidden');
+      updateModal.classList.add('modal-wrap','show','modal-scrim-pane');
+      const inner = updateModal.querySelector('.card, .modal-card');
+      if (inner) inner.classList.add('modal-card','fade');
+      updateModalClose.focus();
+    }
+  } catch(e){ console.warn('showUpdateModalIfNeeded failed', e); }
+}
+updateModalClose?.addEventListener('click', ()=>{
+  try {
+    localStorage.setItem(UPDATE_SEEN_KEY, LATEST_UPDATE_TEXT);
+  } catch(e){}
+  if (updateModal) {
+    updateModal.classList.remove('show');
+    setTimeout(()=> updateModal.classList.add('hidden'), 220);
+  }
+  playSound('click');
 });
