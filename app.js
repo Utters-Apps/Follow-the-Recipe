@@ -59,10 +59,29 @@ const BOOSTS = [
     { 
         id: 'optional_ingredient_reduction', 
         name: 'Receitas mais Simples', 
-        desc: 'Reduz a chance de ingredientes opcionais serem adicionados aos pedidos. Torna o jogo mais fácil.', 
+        desc: 'Reduz a chance de ingredientes opcionais serem adicionados aos pedidos.', 
         price: 1200, 
         maxLevel: 2,
         icon: '➖'
+    }
+];
+
+const EMPLOYEES = [
+    {
+        id: 'cook_base',
+        name: 'Cozinheiro Júnior',
+        desc: 'Aumenta o tempo base do pedido em +1s por nível. (Nível Máximo: 3)',
+        price: 1000,
+        maxLevel: 3,
+        icon: '👨‍🍳'
+    },
+    {
+        id: 'waiter_base',
+        name: 'Garçom Eficiente',
+        desc: 'Aumenta o dinheiro base ganho por pedido em +10% por nível. (Nível Máximo: 5)',
+        price: 1500,
+        maxLevel: 5,
+        icon: '🤵'
     }
 ];
 
@@ -82,8 +101,21 @@ function buildLayout() {
         <label class="block text-left text-sm font-semibold mb-2">Escolha a Culinária</label>
         <div id="cuisine-choices" class="grid grid-cols-2 gap-2">
           ${[
-            {n:"Brasileiro",e:"🇧🇷"},{n:"Italiano",e:"🇮🇹"},{n:"Japonês",e:"🇯🇵"},{n:"Mexicano",e:"🇲🇽"},{n:"Francês",e:"🇫🇷"}
-          ].map(c=>`<button class="cuisine-btn btn-main w-full p-3 rounded-xl border" data-cuisine="${c.n}">${c.e} ${c.n}</button>`).join('')}
+            {groupLabel: 'Principais', items:[
+              {n:"Brasileiro",e:"🇧🇷"},{n:"Italiano",e:"🇮🇹"},{n:"Japonês",e:"🇯🇵"},{n:"Mexicano",e:"🇲🇽"},{n:"Francês",e:"🇫🇷"}
+            ]},
+            {groupLabel: 'Sazonais', items:[
+              {n:"Natal", e:"🎄"},{n:"Halloween", e:"🎃"}
+            ]}
+          ].map(group=>{
+            if(group.groupLabel === 'Sazonais'){
+              return `<div class="col-span-2 mt-2">
+                        <div class="text-xs font-semibold mb-1 opacity-80">${group.groupLabel}</div>
+                        <div class="grid grid-cols-2 gap-2">${group.items.map(c=>`<button class="cuisine-btn btn-main w-full p-3 rounded-xl border" data-cuisine="${c.n}">${c.e} ${c.n}</button>`).join('')}</div>
+                      </div>`;
+            }
+            return group.items.map(c=>`<button class="cuisine-btn btn-main w-full p-3 rounded-xl border" data-cuisine="${c.n}">${c.e} ${c.n}</button>`).join('');
+          }).join('')}
         </div>
       </div>
       <button id="setup-confirm" class="btn-main w-full mt-6 bg-green-500 text-white font-bold px-6 py-4 rounded-xl text-2xl shadow-lg disabled:opacity-60" disabled>
@@ -219,9 +251,16 @@ function buildLayout() {
           </div>
         </header>
         <main class="flex-1 p-3 w-full flex flex-col overflow-hidden">
+          <div class="tabbar sticky top-0 z-10">
+            <button id="tab-improvements" class="tab active"><i class="fas fa-magic mr-2"></i>Melhorias</button>
+            <button id="tab-employees" class="tab"><i class="fas fa-users mr-2"></i>Funcionários</button>
+          </div>
           <div id="boosts-scroll" class="relative flex-1 overflow-y-auto">
-            <div id="boosts-list" class="space-y-3">
-              <!-- Boost cards generated here -->
+            <div id="boosts-improvements-list" class="space-y-3">
+              <!-- Improvement cards generated here -->
+            </div>
+            <div id="boosts-employees-list" class="space-y-3 hidden">
+              <!-- Employee cards generated here -->
             </div>
           </div>
         </main>
@@ -421,6 +460,16 @@ function applyLocalizationLabels(){
   const boostsHeader = document.querySelector('#boosts-screen h2.title-wrap') || document.querySelector('#boosts-screen h2');
   if (boostsLabel) boostsLabel.textContent = isPt ? 'Vantagens' : 'Boosts';
   if (boostsHeader) boostsHeader.textContent = isPt ? 'Vantagens' : 'Boosts';
+  
+  // New: Update tab labels if not PT
+  if (!isPt) {
+      if (tabImprovements) tabImprovements.innerHTML = `<i class="fas fa-magic mr-2"></i>Improvements`;
+      if (tabEmployees) tabEmployees.innerHTML = `<i class="fas fa-users mr-2"></i>Employees`;
+  } else {
+      // Ensure PT names are always correct if PT
+      if (tabImprovements) tabImprovements.innerHTML = `<i class="fas fa-magic mr-2"></i>Melhorias`;
+      if (tabEmployees) tabEmployees.innerHTML = `<i class="fas fa-users mr-2"></i>Funcionários`;
+  }
 }
 
 /* ---------- State ---------- */
@@ -541,6 +590,12 @@ const pauseResume = query('pause-resume');
 const pauseReturnMenu = query('pause-return-menu');
 const musicToggle = query('music-toggle');
 const createRestaurantScreen = query('create-restaurant-screen'); // add ref for create screen
+
+/* NEW: Boost Tabs Refs */
+const tabImprovements = query('tab-improvements');
+const tabEmployees = query('tab-employees');
+const boostsImprovementsList = query('boosts-improvements-list');
+const boostsEmployeesList = query('boosts-employees-list');
 
 /* NEW: Insufficient Funds Modal Refs */
 const insufficientFundsModal = query('insufficient-funds-modal');
@@ -707,6 +762,7 @@ function getStartingUnlocks(cuisine){
     "Japonês": ["Mochi","Tamagoyaki","Yakitori"],
     "Mexicano": ["Churros","Salsa Fresca","Água Fresca"],
     "Francês": ["Croissant Recheado","Macarons","Pain Perdu"],
+    "Natal": ["Chocolate Quente", "Biscoito de Gengibre", "Rabanada (mini)"],
     "Halloween": ["Café Preto (Espresso)","Biscoitos Fantasma"]
   };
   if (cuisine && cuisineStarters[cuisine]) {
@@ -886,7 +942,7 @@ function updateRankDisplay(){
     if (goalName && goalName !== 'null'){
       rankGoal.style.display = 'block';
       // Added stars requirement hint to menu goal
-      const nextRankStars = ALL_RECIPES.find(r => r.name === goalName)?.requiredStars || 0.0;
+      const nextRankStars = nextRank.requiredStars || 0.0; // Correctly pull requiredStars from the RANK definition
       rankGoalText.innerHTML = `Compre a receita <span class="font-bold">${goalName}</span> (★${nextRankStars.toFixed(1)}) no Mercado para atingir <span class="text-purple-600">${nextRank.name}</span>!`;
       return;
     }
@@ -1020,16 +1076,12 @@ function renderMarket(){
   }
 }
 
-// NEW: Boost Shop Renderer improvements (mobile scrolling + proper enable states)
-function renderBoostShop(){
-    const listEl = document.getElementById('boosts-list');
+// NEW: Improvements Shop Renderer (modified from old renderBoostShop)
+function renderImprovementsShop(){
+    const listEl = boostsImprovementsList;
     const active = getActiveRestaurant();
+    if (!listEl) return;
     listEl.innerHTML = '';
-    
-    // ensure the boosts list scrolls on small screens and has a sensible max height
-    listEl.style.maxHeight = 'calc(100vh - 240px)';
-    listEl.style.overflowY = 'auto';
-    listEl.style.webkitOverflowScrolling = 'touch';
     
     BOOSTS.forEach(boost => {
         const currentLevel = getBoostLevel(boost.id);
@@ -1042,6 +1094,7 @@ function renderBoostShop(){
             statusHtml = `<div class="font-bold px-4 py-2 rounded-lg bg-green-100 text-green-700">Máximo Atingido</div>`;
         } else {
             const canBuy = gameState.money >= price;
+            // Use purple accent for buy buttons (consistent with market)
             statusHtml = `<button class="btn-buy-boost btn-main ${canBuy ? 'bg-purple-500 text-white' : 'bg-gray-400 text-gray-700'} font-bold px-6 py-3 rounded-lg text-lg" data-boost-id="${boost.id}" ${!canBuy ? 'disabled' : ''}>
                             <i class="fas fa-coins mr-1"></i> $${price}
                           </button>`;
@@ -1066,13 +1119,62 @@ function renderBoostShop(){
             const btn = card.querySelector('.btn-buy-boost');
             if (btn){
               btn.disabled = gameState.money < price;
-              btn.addEventListener('click', () => buyBoost(boost.id));
+              // delegated listener handles purchase later
             }
         }
     });
 }
 
-function buyBoost(boostId){
+// NEW: Employees Shop Renderer
+function renderEmployeesShop(){
+    const listEl = boostsEmployeesList;
+    const active = getActiveRestaurant();
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    
+    EMPLOYEES.forEach(employee => {
+        const currentLevel = getBoostLevel(employee.id);
+        const maxLevel = employee.maxLevel;
+        const isMax = currentLevel >= maxLevel;
+        const price = employee.price * (currentLevel + 1);
+
+        let statusHtml = '';
+        if (isMax) {
+            statusHtml = `<div class="font-bold px-4 py-2 rounded-lg bg-green-100 text-green-700">Contratado (Máx)</div>`;
+        } else {
+            const canBuy = gameState.money >= price;
+            // Use indigo accent for employee buy buttons
+            statusHtml = `<button class="btn-hire-employee btn-main ${canBuy ? 'bg-indigo-500 text-white' : 'bg-gray-400 text-gray-700'} font-bold px-6 py-3 rounded-lg text-lg" data-employee-id="${employee.id}" ${!canBuy ? 'disabled' : ''}>
+                            <i class="fas fa-user-plus mr-1"></i> $${price}
+                          </button>`;
+        }
+
+        const levelText = `Nível ${currentLevel} / ${maxLevel}`;
+        
+        const card = document.createElement('div');
+        card.className = `card rounded-xl shadow-lg p-4 flex items-start space-x-4 transition-all relative border`;
+        card.innerHTML = `
+            <div class="text-4xl mt-1">${employee.icon}</div>
+            <div class="flex-1">
+                <h4 class="text-xl font-bold">${employee.name}</h4>
+                <p class="text-sm opacity-80">${employee.desc}</p>
+                <p class="text-xs mt-1 font-semibold text-indigo-600">${levelText}</p>
+            </div>
+            ${statusHtml}
+        `;
+        listEl.appendChild(card);
+        
+        if (!isMax) {
+            const btn = card.querySelector('.btn-hire-employee');
+            if (btn){
+              btn.disabled = gameState.money < price;
+              // Delegated listener handles purchase later
+            }
+        }
+    });
+}
+
+function buyImprovement(boostId){
     const boost = BOOSTS.find(b => b.id === boostId);
     if (!boost) return;
     
@@ -1091,14 +1193,63 @@ function buyBoost(boostId){
         active.boosts[boostId] = currentLevel + 1;
         
         saveGame();
-        renderBoostShop();
+        renderImprovementsShop();
         updateAllMoneyDisplays();
         
-        showMarketMessage("Vantagem Comprada!", `Você melhorou ${boost.name} para Nível ${currentLevel + 1}!`, true);
+        const lang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+        const msg = lang.startsWith('pt') ? "Melhoria Comprada!" : "Improvement Purchased!";
+        showMarketMessage(msg, `Você melhorou ${boost.name} para Nível ${currentLevel + 1}!`, true);
 
     } else {
         playSound('error');
         showInsufficientFundsModal(price);
+    }
+}
+
+function buyEmployee(employeeId){
+    const employee = EMPLOYEES.find(e => e.id === employeeId);
+    if (!employee) return;
+    
+    const active = getActiveRestaurant();
+    const currentLevel = getBoostLevel(employeeId);
+    if (currentLevel >= employee.maxLevel) {
+        const lang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+        const msg = lang.startsWith('pt') ? "Contratação Máxima!" : "Maximum Hired!";
+        showMarketMessage(msg, `${employee.name} já está no nível máximo de contratações.`, false);
+        return;
+    }
+
+    const price = employee.price * (currentLevel + 1);
+    
+    if (gameState.money >= price){
+        playSound('buy');
+        gameState.money -= price;
+        active.boosts[employeeId] = currentLevel + 1;
+        
+        saveGame();
+        renderEmployeesShop();
+        updateAllMoneyDisplays();
+        
+        const lang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+        const msg = lang.startsWith('pt') ? "Funcionário Contratado!" : "Employee Hired!";
+        showMarketMessage(msg, `Você contratou ${employee.name} (Nível ${currentLevel + 1})!`, true);
+
+    } else {
+        playSound('error');
+        showInsufficientFundsModal(price);
+    }
+}
+
+// Helper to switch boost tabs
+function activateBoostTab(tab){
+    if (tab === 'improvements'){
+        tabImprovements.classList.add('active'); tabEmployees.classList.remove('active');
+        boostsImprovementsList.classList.remove('hidden'); boostsEmployeesList.classList.add('hidden');
+        renderImprovementsShop();
+    } else {
+        tabEmployees.classList.add('active'); tabImprovements.classList.remove('active');
+        boostsEmployeesList.classList.remove('hidden'); boostsImprovementsList.classList.add('hidden');
+        renderEmployeesShop();
     }
 }
 
@@ -1171,9 +1322,24 @@ function buyRecipe(recipeName){
     const s = new Set(active.unlockedIngredientIds || []);
     [...recipe.baseRecipe, ...recipe.optionalIngredients].forEach(id=>s.add(id));
     active.unlockedIngredientIds = Array.from(s);
-    // After purchase check if this purchase satisfies any rank-up(s).
+    
+    // Check if the recipe is the rank goal and prevent purchase if stars are insufficient
     const ranks = getActiveRanks();
     let currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+    const nextDef = ranks[currIdx + 1] || null;
+    const requiredRankGoalName = getRankUnlockRecipeName(currIdx, active.cuisine || profile.cuisine);
+    const isRankGoal = recipe.name === requiredRankGoalName;
+    const requiredStars = isRankGoal ? (Number(nextDef?.requiredStars || 0)) : 0;
+    const activeStars = Number(active.stars || 0);
+
+    // FIX 1: Prevent purchasing the rank-up recipe if Star requirement is not met
+    if (isRankGoal && activeStars < requiredStars){
+      playSound('error');
+      showMarketMessage("Estrelas Insuficientes", `Você precisa de ★${requiredStars.toFixed(1)} para desbloquear o ranque ${nextDef.name} antes de comprar esta receita.`, false);
+      return { success: false, advanced: false };
+    }
+
+    // After purchase check if this purchase satisfies any rank-up(s).
     const cuisine = active.cuisine || profile.cuisine || null;
     // Only advance a single rank if the purchased recipe exactly matches the next rank goal AND stars requirement is met.
     let advanced = false;
@@ -1200,8 +1366,8 @@ function buyRecipe(recipeName){
       saveGame();
       showRankUpModal();
     } else {
-      // Do NOT show generic message if not already shown for star-blocked promotion
-      if (!advanced && !marketMessageModal.classList.contains('show')) showMarketMessage("Receita Comprada!", `Você aprendeu a fazer ${recipe.name}!`, true);
+      // Do NOT show generic message if already shown for star-blocked promotion (which we now prevent above)
+      if (!isRankGoal && !marketMessageModal.classList.contains('show')) showMarketMessage("Receita Comprada!", `Você aprendeu a fazer ${recipe.name}!`, true);
     }
     saveGame(); renderMarket(); updateAllMoneyDisplays();
     return { success: true, advanced: advanced }; // Return status
@@ -1219,7 +1385,10 @@ function getTimerDuration(){
   
   // Apply Boost: timer_plus_1
   const timerBoost = getBoostLevel('timer_plus_1');
-  const base = BASE_TIMER_DURATION + timerBoost;
+  // Apply Employee Boost: cook_base
+  const cookBoost = getBoostLevel('cook_base');
+  
+  const base = BASE_TIMER_DURATION + timerBoost + cookBoost; // Add cook boost here
   
   const maxDifficultyRanks = Math.max(0, ranks.length - 1);
   const activeRank = (active && typeof active.rank === 'number') ? active.rank : 0;
@@ -1407,6 +1576,12 @@ function checkOrder(isSuccess, reason=''){
     let total = baseReward + streakExtra;
     if (session.isRushHour){ total = (baseReward*2)+(streakExtra*2); session.isRushHour = false; }
     if (session.isVIP){ total = Math.round(total * VIP_REWARD_MULTIPLIER); }
+    
+    // Apply Employee Boost: waiter_base (10% per level)
+    const waiterLevel = getBoostLevel('waiter_base');
+    if (waiterLevel > 0) {
+        total = Math.round(total * (1 + waiterLevel * 0.10));
+    }
 
     // Scale reward by stars: stars in [0..5] map to multiplier roughly 0.8..1.4
     const starsVal = Number(active.stars || 0);
@@ -1645,7 +1820,8 @@ marketButton.addEventListener('click', ()=>{ renderMarket(); updateAllMoneyDispl
 boostsButton?.addEventListener('click', ()=>{ 
   playSound('click');
   updateAllMoneyDisplays();
-  renderBoostShop();
+  renderImprovementsShop();
+  activateBoostTab('improvements');
   showScreen('boosts-screen'); 
 });
 
@@ -1713,16 +1889,30 @@ themeToggleSetup && themeToggleSetup.addEventListener('click', toggleTheme);
 tabBuy.addEventListener('click', ()=>{ activateTab('buy'); });
 tabOwned.addEventListener('click', ()=>{ activateTab('owned'); });
 
-// NEW: Delegated listener for Market item purchases
-marketItemsGrid.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-buy');
-    if (btn && !btn.disabled) {
-        const recipeName = btn.dataset.recipe;
-        // The logic inside buyRecipe handles the purchase, failure modal, and rank up flow
-        rankUpContext = 'market_purchase';
-        buyRecipe(recipeName);
-        rankUpContext = null;
-    }
+// NEW: Boosts/Employees tab listeners
+tabImprovements?.addEventListener('click', () => { playSound('click'); activateBoostTab('improvements'); });
+tabEmployees?.addEventListener('click', () => { playSound('click'); activateBoostTab('employees'); });
+
+// NEW: Delegated listener for Boost item purchases (Improvements tab)
+document.addEventListener('DOMContentLoaded', () => {
+    // This listener should be delegated globally or attached to the boost screen container.
+    // Since marketItemsGrid listener is fine, we can add boost specific listeners here.
+    boostsImprovementsList?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-buy-boost');
+        if (btn && !btn.disabled) {
+            const boostId = btn.dataset.boostId;
+            buyImprovement(boostId);
+        }
+    });
+
+    // NEW: Delegated listener for Employee item purchases (Employees tab)
+    boostsEmployeesList?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-hire-employee');
+        if (btn && !btn.disabled) {
+            const employeeId = btn.dataset.employeeId;
+            buyEmployee(employeeId);
+        }
+    });
 });
 
 /* ---------- Init ---------- */
@@ -1813,25 +2003,30 @@ function findAffordableRecipe() {
 
 function findAffordableBoost(){
     const active = getActiveRestaurant();
-    const affordable = BOOSTS.map(boost => {
-        const currentLevel = getBoostLevel(boost.id);
-        if (currentLevel >= boost.maxLevel) return null;
-        const price = boost.price * (currentLevel + 1);
+    
+    // Combine BOOSTS and EMPLOYEES for centralized logic
+    const allPurchasables = [...BOOSTS.map(b => ({...b, type: 'improvement'})), ...EMPLOYEES.map(e => ({...e, type: 'employee'}))];
+
+    const affordable = allPurchasables.map(item => {
+        const currentLevel = getBoostLevel(item.id);
+        if (currentLevel >= item.maxLevel) return null;
+        const price = item.price * (currentLevel + 1);
         if (gameState.money >= price) {
             return {
-                id: boost.id,
-                name: boost.name,
-                icon: boost.icon,
+                id: item.id,
+                name: item.name,
+                icon: item.icon,
                 currentLevel: currentLevel,
-                maxLevel: boost.maxLevel,
+                maxLevel: item.maxLevel,
                 price: price,
-                desc: boost.desc
+                desc: item.desc,
+                type: item.type
             };
         }
         return null;
     }).filter(Boolean);
 
-    // Prioritize cheapest boost
+    // Prioritize cheapest purchasable
     affordable.sort((a, b) => a.price - b.price);
     return affordable[0] || null;
 }
@@ -1839,45 +2034,46 @@ function findAffordableBoost(){
 
 function showAutoOffer(item){
   const active = getActiveRestaurant();
-  // Check if item is a Recipe or a Boost (Recipe has baseRecipe property)
+  // Check if item is a Recipe or a Purchasable (Improvement/Employee)
   const isRecipe = !!item.baseRecipe;
 
   if (isRecipe) {
+    // RECIPE LOGIC (uses definitive rank requiredStars)
     // Validate recipe is still not unlocked and affordable (race safety)
-    if (!item || (active.unlockedRecipeNames||[]).includes(item.name) || gameState.money < getEffectivePrice(item)){
+    const ranks = getActiveRanks();
+    let currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+    const nextDef = ranks[currIdx + 1] || null;
+    const requiredRankGoalName = getRankUnlockRecipeName(currIdx, active.cuisine || profile.cuisine);
+    const isRankGoal = item.name === requiredRankGoalName;
+
+    let requiredStars = 0.0;
+    if (isRankGoal) {
+        // Use rank's requiredStars
+        requiredStars = Number(nextDef?.requiredStars || 0);
+    }
+    
+    // Safety check for purchase capability based on money and required stars (only for rank goal recipes)
+    if (!item || (active.unlockedRecipeNames||[]).includes(item.name) || gameState.money < getEffectivePrice(item) || (isRankGoal && Number(active.stars || 0) < requiredStars)){
       const alt = findAffordableRecipe();
       if (!alt) { 
-        const boostAlt = findAffordableBoost(); // Check boost if recipe fails
-        if (boostAlt) { showAutoOffer(boostAlt); return; }
+        const purchasableAlt = findAffordableBoost(); 
+        if (purchasableAlt) { showAutoOffer(purchasableAlt); return; }
         startNewOrder(); 
         return; 
       }
       item = alt;
+      // Re-evaluate requiredStars and isRankGoal for the new item if needed, but since it passed findAffordableRecipe, we proceed with the offer.
     }
     pendingOffer = item;
-
-    // Determine next-rank requirement if this recipe is the rank-up recipe
-    const ranks = getActiveRanks();
-    const currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
-    const nextIdx = Math.min(ranks.length - 1, currIdx + 1);
-    const nextDef = ranks[nextIdx] || null;
-    let requiredStars = 0.0;
-    
-    // Calculate required stars using ALL_RECIPES lookup for the rank goal recipe name
-    const requiredRankGoalName = getRankUnlockRecipeName(currIdx, active.cuisine || profile.cuisine);
-    const isRankGoal = item.name === requiredRankGoalName;
-
-    if (isRankGoal) {
-        requiredStars = ALL_RECIPES.find(r => r.name === requiredRankGoalName)?.requiredStars || 0.0;
-    }
 
     // Build modal content for Recipe
     const effectivePrice = getEffectivePrice(item);
     offerTitle.textContent = `Você pode comprar: ${item.name}`;
     let starsInfo = '';
     
+    // Recalculate stars info based on potentially new item (if original failed)
+    const have = Number(active.stars || 0);
     if (isRankGoal){
-      const have = Number(active.stars || 0);
       const meets = have >= requiredStars;
       starsInfo = `<div style="margin-top:.5rem; color:${meets ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">Ranque: ★${requiredStars.toFixed(1)} (Você: ${have.toFixed(1)} ★ ${meets ? '✓' : '✕'})</div>`;
     }
@@ -1892,37 +2088,40 @@ function showAutoOffer(item){
       </div>`;
     offerBuy.textContent = `Comprar ($${effectivePrice})`;
   } else {
-    // Handling Boost
-    const boost = item;
-    // Validate boost is still affordable (race safety)
-    const currentLevel = getBoostLevel(boost.id);
-    const expectedPrice = boost.price;
+    // Handling BOOST or EMPLOYEE
+    const purchasable = item;
+    // Validate is still affordable (race safety)
+    const expectedPrice = purchasable.price;
+    const currentLevel = getBoostLevel(purchasable.id);
+    const isMax = currentLevel >= purchasable.maxLevel;
 
-    if (currentLevel >= boost.maxLevel || gameState.money < expectedPrice) {
-        // Boost is no longer available/affordable, check for next cheapest boost
+    if (isMax || gameState.money < expectedPrice) {
+        // Find next affordable item if this one fails
         const alt = findAffordableBoost();
         if (alt) { showAutoOffer(alt); return; }
-        // If no alternative boost, check for affordable recipe
         const recipeAlt = findAffordableRecipe();
         if (recipeAlt) { showAutoOffer(recipeAlt); return; }
         startNewOrder();
         return;
     }
 
-    pendingOffer = boost; // Store the affordable boost info
+    pendingOffer = purchasable; 
 
-    const levelText = boost.maxLevel > 1 ? `Nível ${currentLevel} -> ${currentLevel + 1}` : 'Nível Máximo';
-
-    offerTitle.textContent = `Nova Vantagem Disponível!`;
+    const levelText = purchasable.maxLevel > 1 ? `Nível ${currentLevel} -> ${currentLevel + 1}` : 'Nível Máximo';
+    
+    const lang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    const typeLabel = lang.startsWith('pt') ? (purchasable.type === 'employee' ? 'Funcionário' : 'Vantagem') : (purchasable.type === 'employee' ? 'Employee' : 'Boost');
+    
+    offerTitle.textContent = `Novo ${typeLabel} Disponível!`;
     offerDesc.innerHTML = `<div style="display:flex;align-items:center;gap:.6rem;justify-content:center">
-        <span style="font-size:2.2rem">${boost.icon}</span>
+        <span style="font-size:2.2rem">${purchasable.icon}</span>
         <div style="text-align:left">
-          <div style="font-weight:800;font-size:1.05rem">${boost.name} (${levelText})</div>
-          <div style="opacity:.85">${boost.desc}</div>
-          <div style="opacity:.85; margin-top: .5rem">Custo: <span style="font-weight:700">$${boost.price}</span></div>
+          <div style="font-weight:800;font-size:1.05rem">${purchasable.name} (${levelText})</div>
+          <div style="opacity:.85">${purchasable.desc}</div>
+          <div style="opacity:.85; margin-top: .5rem">Custo: <span style="font-weight:700">$${purchasable.price}</span></div>
         </div>
       </div>`;
-    offerBuy.textContent = `Comprar Vantagem ($${boost.price})`;
+    offerBuy.textContent = `Comprar ${typeLabel} ($${purchasable.price})`;
   }
 
   // Show modal
@@ -1959,6 +2158,22 @@ offerBuy?.addEventListener('click', ()=>{
     // Buying Recipe
     const recipe = item;
     
+    // Crucial: check required stars again before buying rank goal recipe
+    const ranks = getActiveRanks();
+    let currIdx = active.rank || 0;
+    const nextDef = ranks[currIdx + 1] || null;
+    const nextGoalName = nextDef ? (getRankUnlockRecipeName(currIdx, active.cuisine || profile.cuisine) || nextDef.recipeToUnlock) : null;
+    const isRankGoal = nextGoalName && nextGoalName === item.name;
+    const requiredStars = isRankGoal ? (Number(nextDef?.requiredStars || 0)) : 0;
+
+    if (isRankGoal && Number(active.stars || 0) < requiredStars) {
+         // Should have been caught by showAutoOffer logic, but double check
+        autoOfferModal.classList.add('hidden'); 
+        showMarketMessage("Estrelas Insuficientes", `Você precisa de ★${requiredStars.toFixed(1)} para subir de ranque.`, false);
+        pendingOffer = null;
+        return; 
+    }
+    
     rankUpContext = 'auto_offer';
     const result = buyRecipe(recipe.name); 
     rankUpContext = null; 
@@ -1978,27 +2193,30 @@ offerBuy?.addEventListener('click', ()=>{
         return; 
     }
     
-    // After buying recipe, check for affordable boost before starting new order
-    const boostAlt = findAffordableBoost();
-    if (boostAlt) { 
+    // After buying recipe, check for affordable boost/employee before starting new order
+    const purchasableAlt = findAffordableBoost();
+    if (purchasableAlt) { 
         autoOfferModal.classList.add('hidden'); 
         pendingOffer = null; 
-        showAutoOffer(boostAlt); 
+        showAutoOffer(purchasableAlt); 
         return; 
     }
 
   } else {
-    // Buying Boost
-    const boost = item;
-    // Check price again for safety
-    if (gameState.money >= boost.price){
-        // buyBoost handles state updates and message popups
-        buyBoost(boost.id); 
+    // Buying Boost or Employee
+    const purchasable = item;
+    
+    if (gameState.money >= purchasable.price){
+        if (purchasable.type === 'improvement') {
+            buyImprovement(purchasable.id);
+        } else if (purchasable.type === 'employee') {
+            buyEmployee(purchasable.id);
+        }
     } else {
-        showMarketMessage("Dinheiro Insuficiente!", `Você precisa de $${boost.price}.`, false);
+        showMarketMessage("Dinheiro Insuficiente!", `Você precisa de $${purchasable.price}.`, false);
     }
     
-    // After buying boost, check for affordable recipe or another affordable boost
+    // After buying, check for next offer
     const recipeAlt = findAffordableRecipe();
     if (recipeAlt) { 
         autoOfferModal.classList.add('hidden'); 
@@ -2006,11 +2224,11 @@ offerBuy?.addEventListener('click', ()=>{
         showAutoOffer(recipeAlt); 
         return; 
     }
-    const boostAlt = findAffordableBoost();
-    if (boostAlt) {
+    const purchasableAlt = findAffordableBoost();
+    if (purchasableAlt) {
         autoOfferModal.classList.add('hidden');
         pendingOffer = null;
-        showAutoOffer(boostAlt);
+        showAutoOffer(purchasableAlt);
         return;
     }
   }
@@ -2233,6 +2451,24 @@ document.addEventListener('DOMContentLoaded', () => {
             rankUpContext = 'market_purchase';
             buyRecipe(recipeName);
             rankUpContext = null;
+        }
+    });
+
+    // NEW: Delegated listener for Boost item purchases (Improvements tab)
+    boostsImprovementsList?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-buy-boost');
+        if (btn && !btn.disabled) {
+            const boostId = btn.dataset.boostId;
+            buyImprovement(boostId);
+        }
+    });
+
+    // NEW: Delegated listener for Employee item purchases (Employees tab)
+    boostsEmployeesList?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-hire-employee');
+        if (btn && !btn.disabled) {
+            const employeeId = btn.dataset.employeeId;
+            buyEmployee(employeeId);
         }
     });
 
