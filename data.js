@@ -128,7 +128,15 @@ export const ALL_INGREDIENTS = {
   'palmito': { type: 'image', value: 'https://pbs.twimg.com/media/G4mnmouXsAAgRv6?format=png&name=small' },
   'gelatina': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/1398/1398525.png' },
   'mora': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/9138/9138332.png' },
-  'iogurte': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2592/2592587.png' } // reutilizável para molhos/sobremesas
+  'iogurte': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/2592/2592587.png' }, // reutilizável para molhos/sobremesas
+  // NEW NATAL INGREDIENTS
+  'noz': { type: 'emoji', value: '🌰' },
+  'gengibre': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/869/869389.png' },
+  'vinho_quente': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/7762/7762699.png' },
+  'peru': { type: 'image', value: 'https://cdn-icons-png.flaticon.com/512/575/575231.png' },
+  'cranberry': { type: 'emoji', value: '🍒' },
+  'hortela': { type: 'emoji', value: '🍃' },
+  'batata_doce': { type: 'emoji', value: '🍠' }
 };
 
 export const ALL_RECIPES = [
@@ -351,6 +359,18 @@ export const ALL_RECIPES = [
   { name: "Pé de Feiticeiro (doce)", emoji: "🍪", price: 140, minRank: 0, baseRecipe:["cookie_massa","amêndoa"], optionalIngredients:[], cuisine:["Halloween"] },
   { name: "Torta de Meia-Noite", image: "https://pbs.twimg.com/media/G4m0rs-XgAAOVgz?format=png&name=small", price: 320, minRank: 3, baseRecipe:["bolo_massa","trufa","abobora"], optionalIngredients:[], cuisine:["Halloween"] },
   
+  // ======= 10 NATAL =======
+  { name: "Chocolate Quente", emoji: "☕", price: 150, minRank: 0, baseRecipe:["leite","chocolate","canela"], optionalIngredients:[], cuisine:["Natal"] },
+  { name: "Biscoito de Gengibre", emoji: "🍪", price: 120, minRank: 0, baseRecipe:["farinha","gengibre","acucar"], optionalIngredients:[], cuisine:["Natal"] },
+  { name: "Rabanada (mini)", emoji: "🍞", price: 180, minRank: 1, baseRecipe:["pao","ovo","canela"], optionalIngredients:["mel"], cuisine:["Natal"] },
+  { name: "Salada Festiva", emoji: "🥗", price: 250, minRank: 1, baseRecipe:["alface","noz","cranberry"], optionalIngredients:["queijo"], cuisine:["Natal"] },
+  { name: "Peru Recheado (mini)", emoji: "🍗", price: 450, minRank: 2, baseRecipe:["peru","ervas","cebola"], optionalIngredients:["manteiga"], cuisine:["Natal"] },
+  { name: "Purê de Batata Doce", emoji: "🍠", price: 300, minRank: 2, baseRecipe:["batata_doce","manteiga","acucar"], optionalIngredients:["noz"], cuisine:["Natal"] },
+  { name: "Vinho Quente (mini)", emoji: "🍷", price: 200, minRank: 1, baseRecipe:["vinho_quente","canela"], optionalIngredients:["laranja"], cuisine:["Natal"] },
+  { name: "Stollen (mini)", emoji: "🥖", price: 280, minRank: 2, baseRecipe:["farinha","frutas_secas","acucar"], optionalIngredients:["manteiga"], cuisine:["Natal"] },
+  { name: "Bolo de Natal", emoji: "🎂", price: 380, minRank: 3, baseRecipe:["bolo_massa","chocolate","noz"], optionalIngredients:["cereja"], cuisine:["Natal"] },
+  { name: "Tronco de Natal (mini)", emoji: "🪵", price: 420, minRank: 3, baseRecipe:["bolo_massa","chocolate","creme"], optionalIngredients:["morango"], cuisine:["Natal"] },
+  
   // Fusion / bonus global dishes
   { name: "Surf & Turf Mini", emoji: "🍽️", price: 520, minRank: 3, baseRecipe: ["bife","camarao"], optionalIngredients:["ervas"], cuisine:["Brasileiro","Francês"] },
   { name: "Risoto de Frutos do Mar", emoji: "🍚", price: 460, minRank: 3, baseRecipe: ["arroz","mexilhão","camarao"], optionalIngredients:["ervas"], cuisine:["Italiano","Francês"] },
@@ -397,6 +417,12 @@ export const CUISINE_DEFS = {
     { name: "Cozinheiro Sombrio", icon:"🕯️", recipeToUnlock:"Onigiri Fantasma", baseReward: 20, requiredStars: 0.5 },
     { name: "Mestre das Sombras", icon:"👻", recipeToUnlock:"Takoyaki Tenebroso", baseReward: 38, requiredStars: 1.6 },
     { name: "Lenda Assombrada", icon:"🦇", recipeToUnlock:"Poção Efervescente", baseReward: 65, requiredStars: 3.0 } // preenchido (antes null)
+  ],
+  "Natal": [
+    { name: "Duende Aprendiz", icon:"🧝", recipeToUnlock:"Rabanada (mini)", baseReward: 10, requiredStars: 0.0 },
+    { name: "Ajudante do Papai Noel", icon:"🎅", recipeToUnlock:"Peru Recheado (mini)", baseReward: 20, requiredStars: 0.6 },
+    { name: "Mestre Confeiteiro", icon:"🎁", recipeToUnlock:"Bolo de Natal", baseReward: 40, requiredStars: 1.8 },
+    { name: "Chef de Festas", icon:"🎄", recipeToUnlock:"Tronco de Natal (mini)", baseReward: 60, requiredStars: 3.2 }
   ]
 };
 
