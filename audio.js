@@ -4,11 +4,11 @@ let hasAudioStarted = false;
 
 // Map logical sound names to asset paths
 const SOUND_ASSETS = {
-  click: 'https://yelping-blush-iwjnbbvvy0.edgeone.app/click.mp3',
+  click: 'https://dl.dropboxusercontent.com/scl/fi/ht1bzqpt92qy0i0224lzz/click.mp3?rlkey=dydpgaqqsr18lc33pxw24od36&st=evjjzzt7',
   success: '/usr/share/sounds/success.mp3',
-  error: '/usr/share/sounds/error.mp3',
-  buy: '/usr/share/sounds/buy.mp3',
-  rank_up: '/usr/share/sounds/rank_up.mp3',
+  error: 'https://dl.dropboxusercontent.com/scl/fi/z5223ergejeboa4axac37/error-2.mp3?rlkey=7fr00gcdcjbylknqk3gat3jbu&st=3xdzzwc7',
+  buy: 'https://dl.dropboxusercontent.com/scl/fi/8bncyqgy8gjfw0pm00fxs/buy_1.mp3?rlkey=trk2nrf8nljhzd43gq3ybzk3c&st=mddu9aki',
+  rank_up: 'https://dl.dropboxusercontent.com/scl/fi/fs2e8489l01sn6w7zoydu/RankUP.mp3?rlkey=r4k0b2iwtcbb3ur28rkjxet3x&st=atyzwcg2',
   timer_warning: '/usr/share/sounds/timer_warning.mp3',
   rush_hour: '/usr/share/sounds/rush_hour.mp3',
   
@@ -86,6 +86,15 @@ export function playSound(name, volume = 1.0) {
   const gainNode = audioContext.createGain();
   
   source.buffer = buffer;
+
+  // Make most sounds louder by default except background music (BG handled separately as BGmusic.mp3)
+  // We increase non-click sounds to be louder while keeping click audible but not overpowering.
+  // 'click' -> small boost, others -> larger boost. Background music (BGmusic.mp3) is not routed here.
+  if (name === 'click') {
+    finalVolume = finalVolume * 1.4;
+  } else {
+    finalVolume = finalVolume * 1.8;
+  }
   gainNode.gain.value = finalVolume;
   
   source.connect(gainNode);
