@@ -1774,12 +1774,22 @@ function initBackgroundMusic() {
     // will attempt to play on user interaction (see setupConfirm and welcomePlay)
   } catch (e) { bgAudio = null; console.warn('BG music init failed', e); }
 }
-function tryPlayBgMusic() {
-  if (!bgAudio) return;
-  const muted = localStorage.getItem(BGM_KEY) === '1';
-  if (muted) { bgAudio.pause(); return; }
-  bgAudio.play().catch(()=>{ /* autoplay blocked; will play on next user gesture */ });
+/* ...existing code... */
+
+// NEW: ensure background music is paused when page is hidden/unloaded to prevent background playback
+function stopBackgroundMusic() {
+  try {
+    if (bgAudio && !bgAudio.paused) {
+      try { bgAudio.pause(); } catch(e){}
+      try { bgAudio.currentTime = 0; } catch(e){}
+    }
+  } catch(e){ /* ignore */ }
 }
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopBackgroundMusic();
+}, { passive: true });
+window.addEventListener('pagehide', () => stopBackgroundMusic(), { passive: true });
+window.addEventListener('beforeunload', () => stopBackgroundMusic(), { passive: true });
 
 function setBgmIcon(){
   const muted = localStorage.getItem(BGM_KEY) === '1';
@@ -3113,19 +3123,22 @@ window.addEventListener('unhandledrejection', (event) => {
 // if (typeof buyBoost === 'function') {
 //   const _buyBoost = buyBoost;
 //   window.buyBoost = function wrappedBuyBoost(id){
-//     try { clearModalWatchdog(); const r = _buyBoost(id); clearModalWatchdog(); return r; } catch(e){ console.error('buyBoost crashed', e); safeResetToMenu('buyBoost crash'); }
+//     try { clearModalWatchdog(); const r = _buyBoost(id); clearModalWatchdog(); return r; }
+//     catch (e) { console.error('buyBoost crashed', e); safeResetToMenu('buyBoost crash'); }
 //   };
 // }
 // if (typeof buyImprovement === 'function') {
 //   const _buyImprovement = buyImprovement;
 //   window.buyImprovement = function wrappedBuyImprovement(id){
-//     try { clearModalWatchdog(); const r = _buyImprovement(id); clearModalWatchdog(); return r; } catch(e){ console.error('buyImprovement crashed', e); safeResetToMenu('buyImprovement crash'); }
+//     try { clearModalWatchdog(); const r = _buyImprovement(id); clearModalWatchdog(); return r; }
+//     catch (e) { console.error('buyImprovement crashed', e); safeResetToMenu('buyImprovement crash'); }
 //   };
 // }
 // if (typeof buyEmployee === 'function') {
 //   const _buyEmployee = buyEmployee;
 //   window.buyEmployee = function wrappedBuyEmployee(id){
-//     try { clearModalWatchdog(); const r = _buyEmployee(id); clearModalWatchdog(); return r; } catch(e){ console.error('buyEmployee crashed', e); safeResetToMenu('buyEmployee crash'); }
+//     try { clearModalWatchdog(); const r = _buyEmployee(id); clearModalWatchdog(); return r; }
+//     catch (e) { console.error('buyEmployee crashed', e); safeResetToMenu('buyEmployee crash'); }
 //   };
 // }
 
