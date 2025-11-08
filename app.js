@@ -2496,16 +2496,21 @@ function hideModalById(id){
   // clear watchdog on modal close and resume safe state
   clearModalWatchdog();
   try {
-    // if there is no ongoing game, safely start a new order; otherwise resume timer if it was paused
-    if (!session.gameActive) {
-      // do not auto-start gameplay after closing settings/stats; only resume if previously active
-      // safe default: go to menu
-      showScreen('menu-screen');
-    } else if (session.isPaused === true) {
-      // resumeTimer will only run if there's remaining time
-      try { resumeTimer(); } catch(e){ session.isPaused = false; }
-    }
-  } catch(e){}
+    // STOP any active timers to guarantee no orders continue when modal is closed.
+    try {
+      if (session && session.timerId) {
+        clearInterval(session.timerId);
+        session.timerId = null;
+      }
+    } catch(e){ /* ignore */ }
+    // Ensure gameplay flags are reset so money/penalties won't apply while player is on menu or other screens.
+    try { session.gameActive = false; session.isPaused = false; session.playerSelection = []; } catch(e){}
+
+    // Return to menu as a safe default when modals are dismissed during gameplay flows.
+    showScreen('menu-screen');
+  } catch(e){
+    console.warn('Error while hiding modal and enforcing safe state', e);
+  }
 }
 
 // TUTORIAL LOGIC START
