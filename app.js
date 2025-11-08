@@ -397,6 +397,20 @@ function buildLayout() {
       </div>
     </div>
 
+    <div id="insufficient-stars-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center p-6">
+      <div class="card p-5 rounded-2xl w-full max-w-sm text-center">
+        <i class="fas fa-star text-6xl text-yellow-400 mb-3"></i>
+        <h3 class="text-xl font-bold mb-1">Estrelas insuficientes para esta compra</h3>
+        <p class="mb-4 text-sm">
+          Para comprar <strong id="ins-stars-recipe-name">esta receita</strong> (necessária para subir de ranque) você precisa de <strong id="ins-stars-required">★0.0</strong>. Você tem <strong id="ins-stars-have">★0.0</strong>.
+        </p>
+        <div class="flex gap-2">
+          <button id="ins-stars-cancel" class="btn-main w-full bg-gray-400 text-white font-bold py-3 rounded-lg text-lg">Voltar</button>
+          <button id="ins-stars-attempt" class="btn-main w-full bg-purple-600 text-white font-bold py-3 rounded-lg text-lg">Tentar Comprar</button>
+        </div>
+      </div>
+    </div>
+
     <div id="tutorial-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center p-6">
       <div class="card p-5 rounded-2xl w-full max-w-md text-center">
         <h3 class="text-2xl font-bold mb-2">Tutorial</h3>
@@ -697,7 +711,7 @@ function showInsufficientFundsModal(neededPrice){
     void icon.offsetWidth; 
     icon.classList.add('shake-animation');
   }
-  
+  // show as regular modal (non-blocking) — buttons wired to close/attempt purchase
   showModalById('insufficient-funds-modal');
 }
 fundsClose?.addEventListener('click', ()=>{ hideModalById('insufficient-funds-modal'); playSound('click'); });
@@ -1085,7 +1099,15 @@ function renderMarket(){
       if (btn){
         // enable/disable based on effective price (prevents greyed out when affordable)
         const effective = getEffectivePrice(recipe);
-        btn.disabled = gameState.money < effective;
+        // Additionally block purchase of the next-rank (rank-up) recipe until required stars are met
+        const ranksForMarket = getActiveRanks();
+        const activeIdxForMarket = (getActiveRestaurant() && typeof getActiveRestaurant().rank === 'number') ? getActiveRestaurant().rank : 0;
+        const nextRankDef = ranksForMarket[activeIdxForMarket + 1] || null;
+        const nextGoalName = nextRankDef ? (getRankUnlockRecipeName(activeIdxForMarket, getActiveRestaurant().cuisine || profile.cuisine) || nextRankDef.recipeToUnlock) : null;
+        const requiredStarsForThis = (isRankUpCard && nextRankDef) ? Number(nextRankDef.requiredStars || 0) : 0;
+        const activeStarsNow = Number(getActiveRestaurant().stars || 0);
+        // disable if not enough money OR (it's the rank-up card and stars insufficient)
+        btn.disabled = (gameState.money < effective) || (isRankUpCard && activeStarsNow < requiredStarsForThis);
         // btn.addEventListener('click', ()=> buyRecipe(recipe.name)); // REMOVED: using delegated listener
       }
     }
@@ -1353,7 +1375,83 @@ function buyRecipe(recipeName){
   if (!recipe) return { success: false, advanced: false };
   const active = getActiveRestaurant();
   const effective = getEffectivePrice(recipe);
+
+  // VALIDATION: Prevent purchasing a rank-up recipe if the restaurant lacks required stars
+  const ranks = getActiveRanks();
+  const currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+  const nextDef = ranks[currIdx + 1] || null;
+  const requiredRankGoalName = getRankUnlockRecipeName(currIdx, active.cuisine || profile.cuisine);
+  const isRankGoal = recipe.name === requiredRankGoalName;
+  const requiredStars = isRankGoal ? Number(nextDef?.requiredStars || 0) : 0;
+  const activeStars = Number(active.stars || 0);
+  if (isRankGoal && activeStars < requiredStars) {
+    // show a dedicated modal with clear instruction instead of a plain market message
+    try {
+      const modalId = 'insufficient-stars-modal';
+      // create modal if missing (safe to call multiple times)
+      if (!document.getElementById(modalId)){
+        const wrapper = document.createElement('div');
+        wrapper.id = modalId;
+        wrapper.className = 'hidden absolute inset-0 z-50 flex items-center justify-center p-6';
+        wrapper.innerHTML = `<div class="card p-5 rounded-2xl w-full max-w-sm text-center">
+          <i class="fas fa-star text-6xl text-yellow-400 mb-3"></i>
+          <h3 class="text-xl font-bold mb-1">Estrelas insuficientes para esta compra</h3>
+          <p class="mb-4 text-sm">
+            Para comprar <strong id="ins-stars-recipe-name">esta receita</strong> (necessária para subir de ranque) você precisa de <strong id="ins-stars-required">★0.0</strong>. Você tem <strong id="ins-stars-have">★0.0</strong>.
+          </p>
+          <div class="flex gap-2">
+            <button id="ins-stars-cancel" class="btn-main w-full bg-gray-400 text-white font-bold py-3 rounded-lg text-lg">Voltar</button>
+            <button id="ins-stars-attempt" class="btn-main w-full bg-purple-600 text-white font-bold py-3 rounded-lg text-lg">Tentar Comprar</button>
+          </div>
+        </div>`;
+        document.body.appendChild(wrapper);
+      }
+      // open modal
+      showModalById('insufficient-stars-modal');
+      // attach handlers (idempotent) - use addEventListener and async-safe flow to avoid freezing UI
+      const cancelBtn = document.getElementById('ins-stars-cancel');
+      const attemptBtn = document.getElementById('ins-stars-attempt');
+      if (cancelBtn) {
+        cancelBtn.removeEventListener('click', window.__insStarsCancelHandler);
+        window.__insStarsCancelHandler = () => { hideModalById('insufficient-stars-modal'); playSound('click'); clearModalWatchdog(); };
+        cancelBtn.addEventListener('click', window.__insStarsCancelHandler);
+      }
+      if (attemptBtn) {
+        attemptBtn.removeEventListener('click', window.__insStarsAttemptHandler);
+        window.__insStarsAttemptHandler = () => {
+          playSound('click');
+          // hide modal immediately and clear any modal watchdog so UI can update
+          hideModalById('insufficient-stars-modal');
+          clearModalWatchdog();
+          // small delay lets the DOM update and prevents re-entrancy freezing
+          setTimeout(() => {
+            // if still short on money, show insufficient funds flow
+            if (gameState.money < effective) {
+              showInsufficientFundsModal(effective);
+              return;
+            }
+            try {
+              // attempt purchase (buyRecipe re-validates stars/money). Wrap in try/catch to avoid uncaught errors freezing UI.
+              const res = buyRecipe(recipeName);
+              // if buyRecipe returned a promise (rare), handle it safely
+              if (res && typeof res.then === 'function') res.catch(err=>{ console.error(err); safeResetToMenu('buyRecipe async crash'); });
+            } catch (err) {
+              console.error('Error while attempting rank purchase', err);
+              safeResetToMenu('ins-stars-attempt crash');
+            }
+          }, 40);
+        };
+        attemptBtn.addEventListener('click', window.__insStarsAttemptHandler);
+      }
+    } catch(e){
+      // fallback to older behavior if modal creation fails
+      showMarketMessage("Estrelas Insuficientes", `Você precisa de ★${requiredStars.toFixed(1)} para desbloquear o ranque ${nextDef?.name || 'próximo ranque'} antes de comprar esta receita.`, false);
+    }
+    return { success: false, advanced: false };
+  }
+
   if (gameState.money >= effective){
+    // Proceed with purchase now that validations passed
     playSound('buy');
     gameState.money -= effective;
     active.unlockedRecipeNames = Array.from(new Set([...(active.unlockedRecipeNames||[]), recipe.name]));
@@ -1361,32 +1459,17 @@ function buyRecipe(recipeName){
     [...recipe.baseRecipe, ...recipe.optionalIngredients].forEach(id=>s.add(id));
     active.unlockedIngredientIds = Array.from(s);
     
-    // Check if the recipe is the rank goal and prevent purchase if stars are insufficient
-    const ranks = getActiveRanks();
-    let currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
-    const nextDef = ranks[currIdx + 1] || null;
-    const requiredRankGoalName = getRankUnlockRecipeName(currIdx, active.cuisine || profile.cuisine);
-    const isRankGoal = recipe.name === requiredRankGoalName;
-    const requiredStars = isRankGoal ? (Number(nextDef?.requiredStars || 0)) : 0;
-    const activeStars = Number(active.stars || 0);
-
-    // FIX 1: Prevent purchasing the rank-up recipe if Star requirement is not met
-    if (isRankGoal && activeStars < requiredStars){
-      playSound('error');
-      showMarketMessage("Estrelas Insuficientes", `Você precisa de ★${requiredStars.toFixed(1)} para desbloquear o ranque ${nextDef.name} antes de comprar esta receita.`, false);
-      return { success: false, advanced: false };
-    }
-
     // After purchase check if this purchase satisfies any rank-up(s).
     const cuisine = active.cuisine || profile.cuisine || null;
     // Only advance a single rank if the purchased recipe exactly matches the next rank goal AND stars requirement is met.
     let advanced = false;
+    let currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
     if (currIdx < ranks.length - 1){
       const nextIdx = currIdx + 1;
       const nextDef = ranks[nextIdx] || null;
       const nextGoalName = nextDef ? (getRankUnlockRecipeName(currIdx, cuisine) || nextDef.recipeToUnlock) : null;
       // Use the configured requiredStars from the rank definition (no additional +1.0)
-      const requiredStars = ALL_RECIPES.find(r => r.name === nextGoalName)?.requiredStars || 0.0;
+      const requiredStars = Number(nextDef?.requiredStars || 0);
       const activeStars = Number(active.stars || 0);
       if (nextGoalName && nextGoalName === recipe.name){
         if (activeStars >= requiredStars){
@@ -1953,6 +2036,69 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// NEW: Robust delegated listener for market purchase buttons.
+// This validates again server-side-style (money, rank and stars) before delegating to buyRecipe
+// and prevents UI freeze by wrapping in try/catch and using safe wrappers.
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn-buy');
+  if (!btn) return;
+  // find recipe name from button dataset
+  const recipeName = btn.dataset && btn.dataset.recipe;
+  if (!recipeName) return;
+
+  try {
+    // Basic guard: button disabled should not trigger purchase
+    if (btn.disabled) return;
+
+    const recipe = ALL_RECIPES.find(r => r.name === recipeName);
+    if (!recipe) return;
+
+    const active = getActiveRestaurant();
+    const ranks = getActiveRanks();
+    const currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+
+    // Check money
+    const effective = getEffectivePrice(recipe);
+    if (gameState.money < effective) {
+      playSound('error');
+      showInsufficientFundsModal(effective);
+      return;
+    }
+
+    // Check rank requirement (must be at least recipe.minRank)
+    if ((active.rank || 0) < recipe.minRank) {
+      playSound('error');
+      showMarketMessage("Receita bloqueada", `Você precisa estar no ranque mínimo para comprar ${recipe.name}.`, false);
+      return;
+    }
+
+    // If recipe is a rank-up goal, ensure stars are sufficient before allowing purchase
+    const nextDef = ranks[currIdx + 1] || null;
+    const nextGoalName = nextDef ? (getRankUnlockRecipeName(currIdx, active.cuisine || profile.cuisine) || nextDef.recipeToUnlock) : null;
+    const isRankGoal = nextGoalName && nextGoalName === recipe.name;
+    if (isRankGoal) {
+      const requiredStars = Number(nextDef?.requiredStars || 0);
+      const haveStars = Number(active.stars || 0);
+      if (haveStars < requiredStars) {
+        playSound('error');
+        // Use the dedicated insufficient-stars modal flow if available
+        showMarketMessage("Estrelas Insuficientes", `Você precisa de ★${requiredStars.toFixed(1)} para comprar ${recipe.name} e subir de ranque.`, false);
+        return;
+      }
+    }
+
+    // All checks passed — attempt purchase via safe wrapper if present, else direct call
+    rankUpContext = 'market_purchase';
+    if (typeof window.__safe_buyRecipe__ === 'function') window.__safe_buyRecipe__(recipeName);
+    else buyRecipe(recipeName);
+    rankUpContext = null;
+
+  } catch (err) {
+    console.error('Purchase delegation failed safely', err);
+    safeResetToMenu('purchase-delegation-exception');
+  }
+});
+
 /* ---------- Init ---------- */
 function init(){
   // migrate legacy top-level fields into restaurants if needed
@@ -1976,6 +2122,10 @@ function init(){
   renderUnlockedIngredientBin();
   renderMarket();
   renderRestaurantsButtonIfEligible();
+
+  // ensure UI scale is computed on init and on resize to guarantee everything fits
+  adjustUIScale();
+  window.addEventListener('resize', () => { adjustUIScale(); });
 
   if (!profile.restoName || !profile.cuisine){
     showScreen('setup-screen');
@@ -2023,17 +2173,24 @@ function findAffordableRecipe() {
   const active = getActiveRestaurant();
   const ranks = getActiveRanks();
   const activeIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
-  const currentRank = ranks[activeIdx];
 
   // Consider all not-yet-unlocked recipes of the active cuisine
   let notUnlockedAll = filterRecipesByCuisine(ALL_RECIPES)
     .filter(r => !(active.unlockedRecipeNames||[]).includes(r.name));
 
-  // If the mandatory recipe for the next rank exists but has been already purchased, treat as not available.
-  if (currentRank?.recipeToUnlock) {
-    const mandatory = notUnlockedAll.find(r => r.name === currentRank.recipeToUnlock);
-    // Only return mandatory if it's truly not yet unlocked and affordable (use effective price)
-    if (mandatory && gameState.money >= getEffectivePrice(mandatory)) return mandatory;
+  // If the mandatory recipe for the next rank exists but the restaurant lacks the required stars, exclude it
+  const nextDef = ranks[activeIdx + 1] || null;
+  const nextGoalName = nextDef ? (getRankUnlockRecipeName(activeIdx, active.cuisine || profile.cuisine) || nextDef.recipeToUnlock) : null;
+  if (nextGoalName) {
+    const requiredStars = Number(nextDef.requiredStars || 0);
+    const haveStars = Number(active.stars || 0);
+    if (haveStars < requiredStars) {
+      notUnlockedAll = notUnlockedAll.filter(r => r.name !== nextGoalName);
+    } else {
+      // if it's available and affordable prefer returning it immediately
+      const mandatory = notUnlockedAll.find(r => r.name === nextGoalName);
+      if (mandatory && gameState.money >= getEffectivePrice(mandatory)) return mandatory;
+    }
   }
 
   // Otherwise pick the cheapest allowed by current rank but ensure it's not already unlocked and within cuisine
@@ -2317,12 +2474,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
 function showModalById(id){
   const el = document.getElementById(id);
   if (!el) return;
+  // pause any active order to avoid conflicts and ensure timers are halted
+  try { if (session.gameActive) { session.isPaused = true; stopTimer(); } } catch(e){}
   el.classList.remove('hidden');
   el.classList.add('modal-wrap','show','modal-scrim-pane');
   const inner = el.querySelector('.p-5, .card, .modal-card');
   if (inner) inner.classList.add('modal-card','fade');
   // focus first button
   setTimeout(()=>{ const b = el.querySelector('button, [role="button"]'); if(b) b.focus(); }, 160);
+  // start a watchdog in case modal flow freezes
+  startModalWatchdog(9000);
 }
 function hideModalById(id){
   const el = document.getElementById(id);
@@ -2332,6 +2493,19 @@ function hideModalById(id){
   if (inner) inner.classList.remove('modal-card','fade');
   // wait transition then hide
   setTimeout(()=>{ el.classList.add('hidden'); el.classList.remove('modal-scrim-pane'); }, 300);
+  // clear watchdog on modal close and resume safe state
+  clearModalWatchdog();
+  try {
+    // if there is no ongoing game, safely start a new order; otherwise resume timer if it was paused
+    if (!session.gameActive) {
+      // do not auto-start gameplay after closing settings/stats; only resume if previously active
+      // safe default: go to menu
+      showScreen('menu-screen');
+    } else if (session.isPaused === true) {
+      // resumeTimer will only run if there's remaining time
+      try { resumeTimer(); } catch(e){ session.isPaused = false; }
+    }
+  } catch(e){}
 }
 
 // TUTORIAL LOGIC START
@@ -2696,14 +2870,36 @@ function renderRestaurantsModal(){
   }));
 }
 
-// Global helper: ensure audio starts on first user interaction and play a tactile click for buttons
-document.addEventListener('click', (e) => {
-    const el = e.target.closest('button, .btn-main, .ingredient-btn, .btn-buy, .btn-buy-boost, [role="button"]');
-    if (!el) return;
-    try { ensureAudioStarted(); playSound('click', 0.9); } catch (err) { console.warn('Click sound failed', err); }
-});
+// NEW: dynamic UI scaler to ensure all elements fit small viewports without overflow
+function adjustUIScale(){
+    try{
+        const vh = Math.max(window.innerHeight, document.documentElement.clientHeight);
+        const vw = Math.max(window.innerWidth, document.documentElement.clientWidth);
+        // compute scale based on a target design size (420x920) while preserving readability
+        const scaleW = vw / 420;
+        const scaleH = vh / 920;
+        // choose the smaller scale but clamp between 0.6 and 1
+        const s = Math.max(0.6, Math.min(1, Math.min(scaleW, scaleH)));
+        document.documentElement.style.setProperty('--ui-scale', String(s));
+        // adjust ingredient grid columns for very small widths
+        const bin = document.getElementById('ingredient-bin');
+        if (bin){
+          if (vw < 360) bin.style.gridTemplateColumns = 'repeat(4, 1fr)';
+          else if (vw < 420) bin.style.gridTemplateColumns = 'repeat(5, 1fr)';
+          else bin.style.gridTemplateColumns = '';
+        }
+        // ensure game container max-height never exceeds viewport
+        const container = document.getElementById('game-container');
+        if (container) container.style.maxHeight = `calc(${vh}px - 12px)`;
+    }catch(e){ /* non-critical */ }
+}
 
-// New: showStatsModal & showSettingsModal functions and handlers
+// helper to show the update modal (only shown when stored seen text differs)
+// NOTE: This helper was previously defined twice — the duplicate earlier definition has been removed to avoid a naming conflict.
+// The canonical showUpdateModalIfNeeded implementation remains later in the file.
+// ... existing code ...
+
+// NEW: showStatsModal & showSettingsModal functions and handlers
 function showStatsModal(){
   const active = getActiveRestaurant();
   document.getElementById('stat-money').textContent = `$${gameState.money}`;
@@ -2772,4 +2968,278 @@ updateModalClose?.addEventListener('click', ()=>{
     setTimeout(()=> updateModal.classList.add('hidden'), 220);
   }
   playSound('click');
+});
+
+// Ensure insufficient-funds modal buttons don't leave the game frozen and provide a clear non-blocking flow
+// Add handlers once during init phase (idempotent and safe)
+document.addEventListener('DOMContentLoaded', ()=> {
+  // funds-skip: simply close the modal and resume play
+  const fundsSkipBtn = document.getElementById('funds-skip');
+  if (fundsSkipBtn) fundsSkipBtn.addEventListener('click', () => {
+    hideModalById('insufficient-funds-modal');
+    playSound('click');
+    // do not block; safely return to prior flow
+    pendingOffer = null;
+    // resume normal flow: start new order if nothing active
+    if (!session.gameActive) startNewOrder();
+  });
+
+  // funds-buy: attempt to purchase the pendingOffer when player confirms from insufficient-funds modal
+  const fundsBuyBtn = document.getElementById('funds-buy');
+  if (fundsBuyBtn) fundsBuyBtn.addEventListener('click', () => {
+    hideModalById('insufficient-funds-modal');
+    playSound('click');
+
+    // If we have a pendingOffer and it's a recipe, attempt buy; if boost/employee attempt respective buy
+    if (pendingOffer){
+      if (pendingOffer.baseRecipe){ // recipe
+        // attempt purchase; buyRecipe will re-check funds and stars safely
+        const res = buyRecipe(pendingOffer.name);
+        // clear pendingOffer only if purchase succeeded or failed (prevents stale offers)
+        if (res.success) pendingOffer = null;
+        // if failed due to funds/stars, respective modal will appear but won't freeze
+        return;
+      } else {
+        // purchasable (improvement/employee)
+        if (pendingOffer.type === 'improvement') buyImprovement(pendingOffer.id);
+        else if (pendingOffer.type === 'employee') buyEmployee(pendingOffer.id);
+        pendingOffer = null;
+        return;
+      }
+    }
+
+    // If there's no pendingOffer, fallback: close and return to menu/order
+    if (!session.gameActive) startNewOrder();
+  });
+});
+
+// small safety: when insufficient-funds modal is shown via showInsufficientFundsModal ensure pendingOffer remains and modal is non-blocking
+// (Duplicate definition removed here to avoid function shadowing / SyntaxError)
+ /* duplicate showInsufficientFundsModal removed - canonical implementation (earlier in file) is kept */
+
+// New global safety helpers to avoid freezing during modals/orders
+let __modalWatchdogId = null;
+function safeResetToMenu(reason){
+  try {
+    console.warn('Safe reset to menu triggered:', reason);
+    // stop any running timers and game activity
+    try { clearInterval(session.timerId); session.timerId = null; } catch(e){}
+    session.gameActive = false;
+    session.isPaused = false;
+    session.playerSelection = [];
+    // hide transient modals that might block
+    ['auto-offer-modal','insufficient-funds-modal','market-message-modal','rank-up-modal','pause-modal','upcoming-ranks-modal','tutorial-modal','stats-modal','settings-modal','restaurants-modal','update-modal'].forEach(id=>{
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('show');
+        el.classList.add('hidden');
+      }
+    });
+    // hide success/failure popups
+    try { document.getElementById('success-modal')?.classList.add('hidden'); document.getElementById('failure-modal')?.classList.add('hidden'); } catch(e){}
+    // ensure UI returns to menu in a safe state
+    showScreen('menu-screen');
+    // re-render UI so things aren't stale
+    try { renderMarket(); renderUnlockedIngredientBin(); updateAllMoneyDisplays(); updateRankDisplay(); } catch(e){}
+  } catch(e){
+    console.error('safeResetToMenu failed', e);
+  }
+}
+function startModalWatchdog(timeoutMs = 8000){
+  clearModalWatchdog();
+  __modalWatchdogId = setTimeout(()=>{
+    // If there's still an active order or a modal stuck open, perform safe reset
+    // Additional heuristics: if session.gameActive true but there's no interval, treat as frozen
+    const timerMissing = !session.timerId && session.gameActive;
+    const anyModalShown = !!document.querySelector('.modal-wrap.show, .modal-wrap:not(.hidden), .card.modal-card:not(.hidden)');
+    if (timerMissing || anyModalShown || session.isPaused) {
+      safeResetToMenu('watchdog timeout');
+    }
+  }, timeoutMs);
+}
+function clearModalWatchdog(){
+  if (__modalWatchdogId){ clearTimeout(__modalWatchdogId); __modalWatchdogId = null; }
+}
+
+// Attach global handlers for uncaught errors to recover UI
+window.addEventListener('error', (ev) => {
+  console.error('Global error caught:', ev.error || ev.message);
+  // attempt to recover gracefully
+  try { safeResetToMenu('window.error'); } catch(e){}
+});
+window.addEventListener('unhandledrejection', (event) => {
+  try {
+    console.warn('Unhandled promise rejection caught (global):', event.reason);
+    // attempt recovery path
+    safeResetToMenu('unhandledrejection');
+    // keep existing logic that tried to prevent default for audio errors
+    if (event.reason && typeof event.reason === 'object' &&
+        /audio|device|start/i.test(String(event.reason.message || event.reason))) {
+      event.preventDefault?.();
+    }
+  } catch (e) {
+    console.warn('Error in global unhandledrejection handler', e);
+  }
+});
+
+// Ensure modal-based flows that call showModalById also clear watchdog appropriately when action completes
+// For autoOffer modal show path, call startModalWatchdog there as well (already handled by showModalById).
+// For explicit programmatic modal openings elsewhere, ensure they use showModalById/hideModalById so watchdog runs.
+
+// Wrap risky purchase paths in try/catch to avoid uncaught errors freezing the app
+// const originalBuyRecipe = typeof buyRecipe === 'function' ? buyRecipe : null;
+// if (typeof buyRecipe === 'function') {
+//   window.buyRecipe = function wrappedBuyRecipe(recipeName){
+//     try {
+//       clearModalWatchdog();
+//       const res = originalBuyRecipe(recipeName);
+//       // clear watchdog after attempt
+//       clearModalWatchdog();
+//       return res;
+//     } catch (e) {
+//       console.error('buyRecipe crashed', e);
+//       safeResetToMenu('buyRecipe crash');
+//       return { success: false, advanced: false };
+//     }
+//   };
+// }
+
+// Similarly wrap buyBoost / buyImprovement / buyEmployee if present
+// if (typeof buyBoost === 'function') {
+//   const _buyBoost = buyBoost;
+//   window.buyBoost = function wrappedBuyBoost(id){
+//     try { clearModalWatchdog(); const r = _buyBoost(id); clearModalWatchdog(); return r; } catch(e){ console.error('buyBoost crashed', e); safeResetToMenu('buyBoost crash'); }
+//   };
+// }
+// if (typeof buyImprovement === 'function') {
+//   const _buyImprovement = buyImprovement;
+//   window.buyImprovement = function wrappedBuyImprovement(id){
+//     try { clearModalWatchdog(); const r = _buyImprovement(id); clearModalWatchdog(); return r; } catch(e){ console.error('buyImprovement crashed', e); safeResetToMenu('buyImprovement crash'); }
+//   };
+// }
+// if (typeof buyEmployee === 'function') {
+//   const _buyEmployee = buyEmployee;
+//   window.buyEmployee = function wrappedBuyEmployee(id){
+//     try { clearModalWatchdog(); const r = _buyEmployee(id); clearModalWatchdog(); return r; } catch(e){ console.error('buyEmployee crashed', e); safeResetToMenu('buyEmployee crash'); }
+//   };
+// }
+
+// Instead, create safe wrappers under unique names and only define them if originals exist, without reassigning existing identifiers.
+(function createSafeWrappers(){
+  try {
+    if (typeof buyRecipe === 'function' && typeof window.__safe_buyRecipe__ !== 'function') {
+      const _orig = buyRecipe;
+      window.__safe_buyRecipe__ = function(recipeName){
+        try { clearModalWatchdog(); const res = _orig(recipeName); clearModalWatchdog(); return res; }
+        catch (e) { console.error('buyRecipe crashed', e); safeResetToMenu('buyRecipe crash'); return { success:false, advanced:false }; }
+      };
+      // expose non-destructive alias for other code to call if desired
+      if (typeof window.buyRecipe !== 'function') window.buyRecipe = window.__safe_buyRecipe__;
+    }
+  } catch(e){}
+  try {
+    // buyBoost may not exist in all builds; wrap if present
+    if (typeof buyBoost === 'function' && typeof window.__safe_buyBoost__ !== 'function') {
+      const _orig = buyBoost;
+      window.__safe_buyBoost__ = function(id){
+        try { clearModalWatchdog(); const r = _orig(id); clearModalWatchdog(); return r; }
+        catch (e) { console.error('buyBoost crashed', e); safeResetToMenu('buyBoost crash'); }
+      };
+      if (typeof window.buyBoost !== 'function') window.buyBoost = window.__safe_buyBoost__;
+    }
+  } catch(e){}
+  try {
+    if (typeof buyImprovement === 'function' && typeof window.__safe_buyImprovement__ !== 'function') {
+      const _orig = buyImprovement;
+      window.__safe_buyImprovement__ = function(id){
+        try { clearModalWatchdog(); const r = _orig(id); clearModalWatchdog(); return r; }
+        catch (e) { console.error('buyImprovement crashed', e); safeResetToMenu('buyImprovement crash'); }
+      };
+      if (typeof window.buyImprovement !== 'function') window.buyImprovement = window.__safe_buyImprovement__;
+    }
+  } catch(e){}
+  try {
+    if (typeof buyEmployee === 'function' && typeof window.__safe_buyEmployee__ !== 'function') {
+      const _orig = buyEmployee;
+      window.__safe_buyEmployee__ = function(id){
+        try { clearModalWatchdog(); const r = _orig(id); clearModalWatchdog(); return r; }
+        catch (e) { console.error('buyEmployee crashed', e); safeResetToMenu('buyEmployee crash'); }
+      };
+      if (typeof window.buyEmployee !== 'function') window.buyEmployee = window.__safe_buyEmployee__;
+    }
+  } catch(e){}
+})();
+// ... existing code ...
+
+// Ensure modal-related click handlers dismiss watchdog appropriately
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  // any primary modal close or confirm should clear watchdog
+  if (btn.id && /^(market-message-close|confirm-reset-cancel|confirm-reset-confirm|rank-up-close|pause-resume|pause-return-menu|funds-skip|funds-buy|offer-skip|offer-buy|ins-stars-cancel|ins-stars-attempt|tutorial-start|tutorial-close-btn|close-stats|close-settings|update-modal-close)$/i.test(btn.id)){
+    clearModalWatchdog();
+  }
+});
+
+// Robust delegated listener for market purchase buttons.
+// This validates again server-side-style (money, rank and stars) before delegating to buyRecipe
+// and prevents UI freeze by wrapping in try/catch and using safe wrappers.
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn-buy');
+  if (!btn) return;
+  // find recipe name from button dataset
+  const recipeName = btn.dataset && btn.dataset.recipe;
+  if (!recipeName) return;
+
+  try {
+    // Basic guard: button disabled should not trigger purchase
+    if (btn.disabled) return;
+
+    const recipe = ALL_RECIPES.find(r => r.name === recipeName);
+    if (!recipe) return;
+
+    const active = getActiveRestaurant();
+    const ranks = getActiveRanks();
+    const currIdx = (active && typeof active.rank === 'number') ? active.rank : 0;
+
+    // Check money
+    const effective = getEffectivePrice(recipe);
+    if (gameState.money < effective) {
+      playSound('error');
+      showInsufficientFundsModal(effective);
+      return;
+    }
+
+    // Check rank requirement (must be at least recipe.minRank)
+    if ((active.rank || 0) < recipe.minRank) {
+      playSound('error');
+      showMarketMessage("Receita bloqueada", `Você precisa estar no ranque mínimo para comprar ${recipe.name}.`, false);
+      return;
+    }
+
+    // If recipe is a rank-up goal, ensure stars are sufficient before allowing purchase
+    const nextDef = ranks[currIdx + 1] || null;
+    const nextGoalName = nextDef ? (getRankUnlockRecipeName(currIdx, active.cuisine || profile.cuisine) || nextDef.recipeToUnlock) : null;
+    const isRankGoal = nextGoalName && nextGoalName === recipe.name;
+    if (isRankGoal) {
+      const requiredStars = Number(nextDef?.requiredStars || 0);
+      const haveStars = Number(active.stars || 0);
+      if (haveStars < requiredStars) {
+        playSound('error');
+        // Use the dedicated insufficient-stars modal flow if available
+        showMarketMessage("Estrelas Insuficientes", `Você precisa de ★${requiredStars.toFixed(1)} para comprar ${recipe.name} e subir de ranque.`, false);
+        return;
+      }
+    }
+
+    // All checks passed — attempt purchase via safe wrapper if present, else direct call
+    rankUpContext = 'market_purchase';
+    if (typeof window.__safe_buyRecipe__ === 'function') window.__safe_buyRecipe__(recipeName);
+    else buyRecipe(recipeName);
+    rankUpContext = null;
+
+  } catch (err) {
+    console.error('Purchase delegation failed safely', err);
+    safeResetToMenu('purchase-delegation-exception');
+  }
 });
