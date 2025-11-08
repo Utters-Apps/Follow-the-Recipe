@@ -1,37 +1,36 @@
 <!DOCTYPE html>
 <!-- O idioma da tag <html> será definido dinamicamente pelo JS -->
-<html lang="en">
+<html lang="en" class="dark"> <!-- Inicia em 'dark' por padrão, o JS corrige se necessário -->
 <head>
-      <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#6A0DAD">
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Follow the Recipe!</title>
+    
     <!-- Carrega o Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-      <!-- Manifest PWA -->
-  <link rel="manifest" href="/manifest.webmanifest">
-
-  <!-- Ícones PWA -->
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
-
-<!-- PWA Manifest - Updated with provided icon. For production, convert to Data URL with multiple sizes. -->
-<link rel="manifest" href="data:application/json;base64,eyJpY29ucyI6W3sic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyIsInNyYyI6Imh0dHBzOi8vcGJzLnR3aW1nLmNvbS9tZWRpYS9HekZkbXhEVzBBQVdxeTFKP2Zvcm1hdD1wbmcmdmFzZT0xOTJ4MTkyIiwicHVycG9zZXMiOiJhbnlfdXNlIn0seyJzaXplcyI6IjUxMnU1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIiwic3JjIjoiaHR0cHM6Ly9wYnMudHdpbWc comorbidities/GzZdmXDW0AAWq1J?format=png&name=512x512IiwicHVycG9zZXMiOiJhbnlfdXNlIn1dLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImNsaXByZWZpeCI6ImxvdmUtdGVzdGVyIiwic3RhcnRfdXJsIjoiLiIsIm5hbWUiOiJMb3ZlIFRlc3RlciIsInNob3J0X25hbWUiOiJMb3ZlIFRlc3RlciIsImRlc2NyaXB0aW9uIjoiQ2FsY3VsZSBhIGNvbXBhdGliaWxpZGFkZSBlbnRyZSBub21lcyBlIHBlcnNvbmFsaWRhZGVzIiwiY2xpcHJlZml4IjoibG92ZS10ZXN0ZXIiLCJzdGFydF91cmwiOiIuIiwibmFtZSI6IkxvdmUgVGVzdGVyIiwic2hvcnRfbmFtZSI6IkxvdmUgVGVzdGVyIiwiZGVzY3JpcHRpb24iOiJDYWxjdWxlIGEgY29tcGF0aWJpbGlkYWRlIGVudHJlIG5vbWVzIGUgcGVyc29uYWxpZGFkZXMiLCJ0aGVtZV9jb2xvciI6IiNmZjRkOGQiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzBmMDQxMiJ9">
-
-
-  <!-- Cor do tema (roxo) -->
-  <meta name="theme-color" content="#6A0DAD">
-
-  <!-- Suporte para instalação no iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="mobile-web-app-capable" content="yes">
     
+    <!-- Fontes (Google Fonts - Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Configuração PWA (Limpa e Corrigida) -->
+    <!-- Assumindo que 'manifest.json' e os ícones estão na mesma pasta -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    
+    <!-- Cor do tema (Roxo "primary" do config) -->
+    <meta name="theme-color" content="#7c3aed"> <!-- Corrigido para um roxo da paleta -->
+
+    <!-- Suporte para instalação no iOS/Mobile -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+        
     <style>
-        /* Define a fonte Inter como padrão (similar ao Inter) */
+        /* Define a fonte Inter como padrão */
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -39,11 +38,17 @@
         body, .bg-white, .bg-gray-800 {
             transition: background-color 0.3s ease, color 0.3s ease;
         }
-        /* Fallback para a fonte Inter */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        /* Esconde a barra de rolagem (opcional, mas limpo) */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+        body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
     <script>
-        // Configuração do Tailwind para modo escuro
+        // Configuração do Tailwind (Modo Escuro e Paleta Roxa Aprimorada)
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -52,23 +57,35 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        // Paleta primária roxa aprimorada
-                        'primary-purple': {
-                            500: '#9b59b6',
-                            600: '#8e44ad',
-                        }
+                        // Paleta roxa "primary" completa
+                        primary: {
+                            '50': '#f5f3ff',
+                            '100': '#ede9fe',
+                            '200': '#ddd6fe',
+                            '300': '#c4b5fd',
+                            '400': '#a78bfa',
+                            '500': '#8b5cf6', // Roxo principal
+                            '600': '#7c3aed', // Roxo mais vibrante
+                            '700': '#6d28d9',
+                            '800': '#5b21b6',
+                            '900': '#4c1d95',
+                            '950': '#2e1065', // Roxo bem escuro
+                        },
                     }
                 },
             },
         }
     </script>
 </head>
-<!-- O oncontextmenu previne o menu de contexto padrão do navegador -->
-<body class="bg-gradient-to-br from-indigo-200 to-purple-300 dark:from-gray-900 dark:to-indigo-900" oncontextmenu="return false;">
+<!-- 
+  - Gradiente de fundo roxo aprimorado
+  - oncontextmenu previne o menu de clique direito
+-->
+<body class="bg-gradient-to-br from-primary-100 to-violet-200 dark:from-gray-900 dark:via-primary-950 dark:to-gray-900" oncontextmenu="return false;">
 
     <!--
       LÓGICA DE REDIRECIONAMENTO AUTOMÁTICO
-      Isso precisa ser verificado antes de renderizar a página.
+      (Mantido como estava, pois é a lógica correta para evitar piscar a tela)
     -->
     <script>
         const LANG_KEY = 'preferredLanguage';
@@ -77,34 +94,51 @@
         // Mapeamento de idioma para o arquivo de destino
         const langToFileMap = {
             'pt-br': 'https://utters-apps.github.io/Follow-the-Recipe/index-portuguese.html',
-            'en': 'index-english.html',
-            'es': 'index-spanish.html',
-            'fr': 'index-french.html',
-            'de': 'index-german.html',
-            'ru': 'index-russian.html'
+            'en': 'https://utters-apps.github.io/Follow-the-Recipe/index-english.html',
+            'es': 'https://utters-apps.github.io/Follow-the-Recipe/index-spanish.html',
+            'fr': 'https://utters-apps.github.io/Follow-the-Recipe/index-french.html',
+            'de': 'https://utters-apps.github.io/Follow-the-Recipe/index-german.html',
+            'ru': 'https://utters-apps.github.io/Follow-the-Recipe/index-russian.html'
         };
 
-        // Se um idioma já foi salvo, redireciona automaticamente para o arquivo específico
+        // Se um idioma já foi salvo, redireciona IMEDIATAMENTE
         if (savedLang) {
             const targetFile = langToFileMap[savedLang] || 'index-english.html';
-            // Usamos 'replace' para que o usuário não possa "voltar" para a tela de seleção
             window.location.replace(targetFile);
         }
     </script>
 
-    <!-- TRANSITION OVERLAY: Aparece para dar o efeito de transição no redirecionamento -->
-    <div id="transition-overlay" class="fixed inset-0 bg-gray-900/90 dark:bg-black/90 opacity-0 transition-opacity duration-500 pointer-events-none z-50 flex flex-col items-center justify-center text-white text-2xl font-semibold">
+    <!-- 
+      TELA DE TRANSIÇÃO INICIAL (SPLASH SCREEN) - NOVO 
+      Visível por padrão, será escondida via JS após 2s 
+    -->
+    <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-primary-700 to-primary-950 transition-opacity duration-1000 ease-in-out">
+        <!-- Ícone de Chef com Animação de Pulso -->
+        <span class="text-8xl animate-pulse">🧑‍🍳</span>
+        <h1 class="text-4xl font-bold text-white mt-4">Follow the Recipe!</h1>
+        <span class="text-2xl font-medium text-white/80 mt-2" data-translate-key="loading">Loading...</span>
+    </div>
+
+    <!-- 
+      OVERLAY DE TRANSIÇÃO (REDIRECIONAMENTO) - EXISTENTE 
+      Escondido por padrão, aparece ao clicar no idioma 
+    -->
+    <div id="transition-overlay" class="fixed inset-0 bg-gray-900/90 dark:bg-black/90 opacity-0 transition-opacity duration-500 pointer-events-none z-40 flex flex-col items-center justify-center text-white text-2xl font-semibold">
         <div class="animate-pulse flex items-center space-x-3">
             <span class="text-4xl">✨</span>
             <span data-translate-key="redirecting">Starting the Game</span>
         </div>
     </div>
 
-    <!-- Container Principal -->
-    <div id="main-content" class="flex flex-col items-center justify-center min-h-screen p-4 transition-opacity duration-500">
+    <!-- 
+      Container Principal 
+      Escondido por padrão (opacity-0), aparece após o splash 
+      Adicionada animação de "float up" (translate-y-4)
+    -->
+    <div id="main-content" class="flex flex-col items-center justify-center min-h-screen p-4 opacity-0 translate-y-4 transform transition-all ease-out duration-1000 delay-500">
         
-        <!-- Botão de Modo Claro/Escuro -->
-        <button id="theme-toggle" type="button" class="absolute top-5 right-5 text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 backdrop-blur-sm rounded-full p-3 shadow-lg transition-colors duration-300">
+        <!-- Botão de Modo Claro/Escuro (Estilo Aprimorado) -->
+        <button id="theme-toggle" type="button" class="absolute top-5 right-5 text-primary-700 dark:text-primary-200 bg-white/40 dark:bg-primary-950/40 backdrop-blur-sm rounded-full p-3 shadow-lg transition-all duration-300 hover:bg-white/70 dark:hover:bg-primary-950/70 hover:scale-110">
             <!-- Ícone de Lua (Modo Escuro) -->
             <svg id="theme-toggle-dark-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
             <!-- Ícone de Sol (Modo Claro) -->
@@ -113,101 +147,93 @@
             </svg>
         </button>
 
-        <!-- Card de Seleção (Glassmorphism Aprimorado) -->
-        <div class="w-full max-w-md bg-white/30 dark:bg-gray-800/50 backdrop-blur-xl border border-white/10 dark:border-gray-700 shadow-2xl rounded-2xl p-8">
+        <!-- Card de Seleção (Glassmorphism Roxo Aprimorado) -->
+        <div class="w-full max-w-md bg-white/40 dark:bg-gray-900/40 backdrop-blur-2xl border border-white/20 dark:border-primary-700/50 shadow-2xl rounded-3xl p-8">
             <!-- Ícone de Chef (Emoji) -->
             <div class="flex justify-center mb-4">
                 <span class="text-6xl">🧑‍🍳</span> 
             </div>
-            <!-- CONTEÚDO PADRÃO ALTERADO PARA INGLÊS -->
-            <h1 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4" data-translate-key="title">
+            <!-- Conteúdo de Texto -->
+            <h1 class="text-3xl font-bold text-center text-primary-900 dark:text-white mb-4" data-translate-key="title">
                 Choose Your Language
             </h1>
-            <p class="text-center text-gray-700 dark:text-gray-300 mb-8 font-light" data-translate-key="subtitle">
+            <p class="text-center text-primary-800 dark:text-primary-200 mb-8 font-light" data-translate-key="subtitle">
                 Your choice will be saved for your next visit.
             </p>
 
-            <!-- Lista de Idiomas -->
+            <!-- Lista de Idiomas (Botões com Estilo Aprimorado) -->
             <div class="space-y-4">
-                <!-- Alterado onclick para passar o evento (event) -->
+                
                 <a href="index-portuguese.html" class="block w-full" onclick="handleLanguageClick(event, 'pt-br')">
-                    <div class="flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-800 dark:text-gray-200 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-purple-500 hover:text-white dark:hover:bg-primary-purple-600 hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-purple-500/50 dark:focus:ring-primary-purple-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-pt-br">
+                    <div class="flex items-center justify-center space-x-3 p-4 bg-white/60 dark:bg-primary-900/50 border border-white/30 dark:border-primary-800/60 rounded-xl text-primary-800 dark:text-primary-100 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-600 hover:text-white dark:hover:bg-primary-500 dark:hover:text-white hover:shadow-primary-500/30 hover:shadow-lg hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-primary-500/50 dark:focus:ring-primary-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-pt-br">
                         <span>🇧🇷</span> <span>Português (Brasil)</span>
                     </div>
                 </a>
                 
                 <a href="index-english.html" class="block w-full" onclick="handleLanguageClick(event, 'en')">
-                    <div class="flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-800 dark:text-gray-200 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-purple-500 hover:text-white dark:hover:bg-primary-purple-600 hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-purple-500/50 dark:focus:ring-primary-purple-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-en">
+                    <div class="flex items-center justify-center space-x-3 p-4 bg-white/60 dark:bg-primary-900/50 border border-white/30 dark:border-primary-800/60 rounded-xl text-primary-800 dark:text-primary-100 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-600 hover:text-white dark:hover:bg-primary-500 dark:hover:text-white hover:shadow-primary-500/30 hover:shadow-lg hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-primary-500/50 dark:focus:ring-primary-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-en">
                         <span>🇬🇧</span> <span>English</span>
                     </div>
                 </a>
 
                 <a href="index-spanish.html" class="block w-full" onclick="handleLanguageClick(event, 'es')">
-                    <div class="flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-800 dark:text-gray-200 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-purple-500 hover:text-white dark:hover:bg-primary-purple-600 hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-purple-500/50 dark:focus:ring-primary-purple-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-es">
+                    <div class="flex items-center justify-center space-x-3 p-4 bg-white/60 dark:bg-primary-900/50 border border-white/30 dark:border-primary-800/60 rounded-xl text-primary-800 dark:text-primary-100 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-600 hover:text-white dark:hover:bg-primary-500 dark:hover:text-white hover:shadow-primary-500/30 hover:shadow-lg hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-primary-500/50 dark:focus:ring-primary-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-es">
                         <span>🇪🇸</span> <span>Español</span>
                     </div>
                 </a>
 
                 <a href="index-french.html" class="block w-full" onclick="handleLanguageClick(event, 'fr')">
-                    <div class="flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-800 dark:text-gray-200 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-purple-500 hover:text-white dark:hover:bg-primary-purple-600 hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-purple-500/50 dark:focus:ring-primary-purple-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-fr">
+                    <div class="flex items-center justify-center space-x-3 p-4 bg-white/60 dark:bg-primary-900/50 border border-white/30 dark:border-primary-800/60 rounded-xl text-primary-800 dark:text-primary-100 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-600 hover:text-white dark:hover:bg-primary-500 dark:hover:text-white hover:shadow-primary-500/30 hover:shadow-lg hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-primary-500/50 dark:focus:ring-primary-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-fr">
                         <span>🇫🇷</span> <span>Français</span>
                     </div>
                 </a>
 
                 <a href="index-german.html" class="block w-full" onclick="handleLanguageClick(event, 'de')">
-                    <div class="flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-800 dark:text-gray-200 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-purple-500 hover:text-white dark:hover:bg-primary-purple-600 hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-purple-500/50 dark:focus:ring-primary-purple-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-de">
+                    <div class="flex items-center justify-center space-x-3 p-4 bg-white/60 dark:bg-primary-900/50 border border-white/30 dark:border-primary-800/60 rounded-xl text-primary-800 dark:text-primary-100 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-600 hover:text-white dark:hover:bg-primary-500 dark:hover:text-white hover:shadow-primary-500/30 hover:shadow-lg hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-primary-500/50 dark:focus:ring-primary-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-de">
                         <span>🇩🇪</span> <span>Deutsch</span>
                     </div>
                 </a>
 
                 <a href="index-russian.html" class="block w-full" onclick="handleLanguageClick(event, 'ru')">
-                    <div class="flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-800 dark:text-gray-200 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-purple-500 hover:text-white dark:hover:bg-primary-purple-600 hover:shadow-xl hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-purple-500/50 dark:focus:ring-primary-purple-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-ru">
+                    <!-- BUG CORRIGIDO: Alterado dark:bg-primary-900/5C para dark:bg-primary-900/50 -->
+                    <div class="flex items-center justify-center space-x-3 p-4 bg-white/60 dark:bg-primary-900/50 border border-white/30 dark:border-primary-800/60 rounded-xl text-primary-800 dark:text-primary-100 font-medium text-lg transition-all duration-300 shadow-md hover:bg-primary-600 hover:text-white dark:hover:bg-primary-500 dark:hover:text-white hover:shadow-primary-500/30 hover:shadow-lg hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-primary-500/50 dark:focus:ring-primary-600/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900" data-translate-key="lang-ru">
                         <span>🇷🇺</span> <span>Русский</span>
                     </div>
                 </a>
             </div>
         </div>
     </div>
-  <script>
-    const audioPath = "/click.mp3"; // 🔊 Som na raiz do site
 
-    // Função que toca o som
-    async function playClickSound() {
-      try {
-        const response = await fetch(audioPath);
-        if (!response.ok) {
-          console.warn("O arquivo '/click.mp3' não foi encontrado!");
-          return;
-        }
-        const audio = new Audio(audioPath);
-        audio.play();
-      } catch (error) {
-        console.error("Erro ao tentar tocar o som:", error);
-      }
-    }
-
-    // Seleciona todos os botões da página
-    const buttons = document.querySelectorAll("button");
-
-    buttons.forEach((btn, index) => {
-      // Se o botão não tiver id, aplica id automaticamente
-      if (!btn.id) {
-        btn.id = `playSound_${index + 1}`;
-      }
-
-      // Adiciona o evento de clique
-      btn.addEventListener("click", playClickSound);
-    });
-  </script>
     <script>
+        // --- GERENCIAMENTO DE SOM ---
+        // 🔊 Assume que o som 'click.mp3' está na raiz do site.
+        const audioPath = "/click.mp3"; 
+
+        /**
+         * Função que toca o som (Simplificada)
+         */
+        function playClickSound() {
+            // Não precisa de fetch, apenas toca.
+            // Se o arquivo não existir, o console registrará um erro 404, o que é aceitável.
+            try {
+                const audio = new Audio(audioPath);
+                // Define um volume mais baixo para não ser irritante
+                audio.volume = 0.3; 
+                audio.play().catch(e => console.warn("Audio play failed, possibly requires user interaction.", e));
+            } catch (error) {
+                console.error("Erro ao tentar tocar o som:", error);
+            }
+        }
+
         // --- GERENCIAMENTO DE IDIOMA E TRADUÇÃO ---
 
-        // Dicionário de traduções para a página de seleção
+        // Dicionário de traduções (Adicionada a chave 'loading')
         const translations = {
             'en': {
                 'title': 'Choose Your Language',
                 'subtitle': 'Your choice will be saved for your next visit.',
-                'redirecting': 'Starting the Game', // Alterado para Starting the Game
+                'redirecting': 'Starting the Game',
+                'loading': 'Loading...',
                 'lang-pt-br': 'Português (Brasil)',
                 'lang-en': 'English',
                 'lang-es': 'Español',
@@ -218,7 +244,8 @@
             'pt-br': {
                 'title': 'Escolha Seu Idioma',
                 'subtitle': 'Sua escolha será salva para a próxima visita.',
-                'redirecting': 'Iniciando o Jogo', // Tradução para Português
+                'redirecting': 'Iniciando o Jogo',
+                'loading': 'Carregando...',
                 'lang-pt-br': 'Português (Brasil)',
                 'lang-en': 'Inglês',
                 'lang-es': 'Espanhol',
@@ -229,7 +256,8 @@
             'es': {
                 'title': 'Elige Tu Idioma',
                 'subtitle': 'Tu elección se guardará para tu próxima visita.',
-                'redirecting': 'Iniciando el Juego', // Tradução para Espanhol
+                'redirecting': 'Iniciando el Juego',
+                'loading': 'Cargando...',
                 'lang-pt-br': 'Português (Brasil)',
                 'lang-en': 'Inglés',
                 'lang-es': 'Español',
@@ -240,7 +268,8 @@
             'fr': {
                 'title': 'Choisissez Votre Langue',
                 'subtitle': 'Votre choix sera sauvegardé pour votre prochaine visite.',
-                'redirecting': 'Démarrage du Jeu', // Tradução para Francês
+                'redirecting': 'Démarrage du Jeu',
+                'loading': 'Chargement...',
                 'lang-pt-br': 'Português (Brésil)',
                 'lang-en': 'Anglais',
                 'lang-es': 'Espagnol',
@@ -251,7 +280,8 @@
             'de': {
                 'title': 'Wähle deine Sprache',
                 'subtitle': 'Ihre Auswahl wird für Ihren nächsten Besuch gespeichert.',
-                'redirecting': 'Starte das Spiel', // Tradução para Alemão
+                'redirecting': 'Starte das Spiel',
+                'loading': 'Laden...',
                 'lang-pt-br': 'Portugiesisch (Brasilien)',
                 'lang-en': 'Englisch',
                 'lang-es': 'Spanisch',
@@ -262,7 +292,8 @@
             'ru': {
                 'title': 'Выберите ваш язык',
                 'subtitle': 'Ваш выбор будет сохранен для следующего визита.',
-                'redirecting': 'Запуск игры', // Tradução para Russo
+                'redirecting': 'Запуск игры',
+                'loading': 'Загрузка...',
                 'lang-pt-br': 'Португальский (Бразилия)',
                 'lang-en': 'Английский',
                 'lang-es': 'Испанский',
@@ -274,16 +305,13 @@
 
         /**
          * Função chamada ao clicar em um idioma.
-         * Agora ela usa o 'href' do elemento clicado para o redirecionamento.
          * @param {Event} event O evento de clique.
          * @param {string} lang O código do idioma.
          */
         function handleLanguageClick(event, lang) {
             event.preventDefault(); // Previne o redirecionamento imediato
 
-            // Obtém o URL de destino do atributo href do link
             const targetUrl = event.currentTarget.getAttribute('href');
-
             const overlay = document.getElementById('transition-overlay');
             const mainContent = document.getElementById('main-content');
 
@@ -292,41 +320,34 @@
             overlay.style.opacity = '1';
             overlay.classList.remove('pointer-events-none');
             
-            // Traduz a mensagem de redirecionamento no overlay antes de mostrar
+            // Traduz a mensagem de redirecionamento no overlay
             const currentLang = document.documentElement.lang;
             const redirectMessageEl = overlay.querySelector('[data-translate-key="redirecting"]');
             if (redirectMessageEl) {
-                // Certifica-se de que a mensagem é traduzida corretamente
                 redirectMessageEl.textContent = translations[currentLang]?.redirecting || translations['en'].redirecting;
             }
 
-
-            // 2. Salva a escolha e redireciona após a duração da transição
+            // 2. Salva a escolha e redireciona após a transição
             setTimeout(() => {
                 localStorage.setItem(LANG_KEY, lang);
-                // Redireciona para o arquivo de destino específico
                 window.location.href = targetUrl;
-            }, 500); // Espera 500ms (a duração do transition-opacity)
+            }, 500); // Espera 500ms (duração do transition-opacity)
         }
 
         // Função para traduzir a página com base no idioma
         function translatePage(lang) {
-            // Pega as strings do idioma, ou usa 'en' como padrão
             const langStrings = translations[lang] || translations['en'];
             
-            // Atualiza o atributo 'lang' da tag <html>
-            document.documentElement.lang = lang;
+            document.documentElement.lang = lang; // Define o lang da página
 
-            // Encontra todos os elementos com a chave de tradução
             document.querySelectorAll('[data-translate-key]').forEach(el => {
                 const key = el.dataset.translateKey;
                 if (langStrings[key]) {
-                    // Mantém os emojis no lugar, alterando apenas o texto
+                    // Para os botões de idioma (mantém o emoji)
                     if (el.children.length > 0 && el.children[0].tagName === 'SPAN') {
-                        // Isso é para os botões de idioma
                         el.children[1].textContent = langStrings[key];
                     } else {
-                        // Isso é para o título e subtítulo
+                        // Para outros textos (título, subtítulo, loading)
                         el.textContent = langStrings[key];
                     }
                 }
@@ -335,25 +356,15 @@
 
         // Função para detectar o idioma do navegador e aplicar a tradução
         function detectAndSetLanguage() {
-            // Pega o idioma do navegador (ex: "en-US", "pt-BR", "es-ES")
             const browserLang = (navigator.language || 'en').toLowerCase();
             let lang = 'en'; // Padrão
 
-            // Mapeamento de idiomas suportados
-            if (browserLang.startsWith('pt')) {
-                lang = 'pt-br';
-            } else if (browserLang.startsWith('es')) {
-                lang = 'es';
-            } else if (browserLang.startsWith('fr')) {
-                lang = 'fr';
-            } else if (browserLang.startsWith('de')) {
-                lang = 'de';
-            } else if (browserLang.startsWith('ru')) {
-                lang = 'ru';
-            } else if (browserLang.startsWith('en')) {
-                lang = 'en';
-            }
-            // Se não for nenhum desses, o padrão 'en' será usado
+            if (browserLang.startsWith('pt')) lang = 'pt-br';
+            else if (browserLang.startsWith('es')) lang = 'es';
+            else if (browserLang.startsWith('fr')) lang = 'fr';
+            else if (browserLang.startsWith('de')) lang = 'de';
+            else if (browserLang.startsWith('ru')) lang = 'ru';
+            else if (browserLang.startsWith('en')) lang = 'en';
 
             translatePage(lang);
         }
@@ -367,7 +378,6 @@
         // Função para inicializar o modo escuro
         function initDarkMode() {
             const theme = localStorage.getItem('theme');
-            // Prioriza a escolha do usuário, se não houver, usa a preferência do dispositivo
             if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
                 darkIcon.classList.remove('hidden');
@@ -394,15 +404,43 @@
         
         // Espera o DOM carregar para rodar os scripts de inicialização
         document.addEventListener('DOMContentLoaded', () => {
-            // (A lógica de redirecionamento já rodou lá em cima)
+            // (A lógica de redirecionamento principal já rodou lá em cima)
             
-            // Se não fomos redirecionados, inicializa a página de seleção:
+            // Configura o tema e idioma o mais rápido possível
             initDarkMode();
-            detectAndSetLanguage();
-        });
+            detectAndSetLanguage(); // Isso também traduzirá a tela de "Loading..."
 
-        // Adiciona um listener extra para desabilitar o clique direito em todo o documento
-        document.addEventListener('contextmenu', event => event.preventDefault());
+            // Pega os elementos da tela
+            const splashScreen = document.getElementById('splash-screen');
+            const mainContent = document.getElementById('main-content');
+            
+            // --- LÓGICA DA TELA DE TRANSIÇÃO INICIAL (2 SEGUNDOS) ---
+            setTimeout(() => {
+                if (splashScreen) {
+                    // Inicia o fade out do splash
+                    splashScreen.classList.add('opacity-0');
+                    // Remove o splash do DOM após a transição para não bloquear cliques
+                    setTimeout(() => splashScreen.remove(), 1000); 
+                }
+                if (mainContent) {
+                    // Inicia o fade in e o "float up" do conteúdo principal
+                    mainContent.classList.remove('opacity-0', 'translate-y-4');
+                }
+            }, 2000); // 2 segundos de espera
+
+            // --- INICIALIZADOR DE SOM (Corrigido) ---
+            // Seleciona o botão de tema E os links de idioma
+            const clickableElements = document.querySelectorAll('#theme-toggle, a[onclick*="handleLanguageClick"]');
+            
+            clickableElements.forEach((el, index) => {
+                // Adiciona ID se não tiver (bom para acessibilidade)
+                if (!el.id) {
+                    el.id = `clickable_element_${index + 1}`;
+                }
+                // Adiciona o evento de clique para tocar o som
+                el.addEventListener('click', playClickSound);
+            });
+        });
 
     </script>
 </body>
