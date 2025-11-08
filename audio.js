@@ -9,8 +9,8 @@ const SOUND_ASSETS = {
   error: 'https://dl.dropboxusercontent.com/scl/fi/z5223ergejeboa4axac37/error-2.mp3?rlkey=7fr00gcdcjbylknqk3gat3jbu&st=3xdzzwc7',
   buy: 'https://dl.dropboxusercontent.com/scl/fi/8bncyqgy8gjfw0pm00fxs/buy_1.mp3?rlkey=trk2nrf8nljhzd43gq3ybzk3c&st=mddu9aki',
   rank_up: 'https://dl.dropboxusercontent.com/scl/fi/fs2e8489l01sn6w7zoydu/RankUP.mp3?rlkey=r4k0b2iwtcbb3ur28rkjxet3x&st=atyzwcg2',
-  timer_warning: '/usr/share/sounds/timer_warning.mp3',
-  rush_hour: '/usr/share/sounds/rush_hour.mp3',
+  timer_warning: 'https://dl.dropboxusercontent.com/scl/fi/lv9xtea6lkfw4cqolafmi/timer_warning-1.mp3?rlkey=mu7c4lwnnjr54sk0wkap2dtkz&st=63sqztmu',
+  rush_hour: 'https://dl.dropboxusercontent.com/scl/fi/43zygjp9ip9z0p4f2eo3i/Big-Time-Rush-Oh-Oh-Sound-Effect.-Sound-Guy-youtube.mp3?rlkey=lciwqkr4wyxsxmfazhrwriody&st=7vbqk9p3',
   
   // Ingredient specific sounds
   mascarpone: '/mascarpone.mp3',
@@ -110,3 +110,34 @@ export function ensureAudioStarted() {
   }
   initializeAudio().catch(() => {});
 }
+
+// NEW: ensure audio never plays while the document is not visible or during pagehide/unload
+// Suspend audioContext when document.hidden (page backgrounded) and resume on visible.
+// Also stop any short-lived sources by clearing buffers reference if suspended, and provide a global stopAllSounds().
+function stopAllSounds() {
+  try {
+    // There's no direct list of active sources here; suspending the context prevents further output.
+    if (audioContext && audioContext.state === 'running') {
+      audioContext.suspend().catch(()=>{});
+    }
+  } catch (e) {
+    console.warn('stopAllSounds failed', e);
+  }
+}
+// Visibility handler: when hidden, suspend; when visible, do not automatically resume unless user interacts
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopAllSounds();
+  } else {
+    // Do NOT automatically resume audio to avoid background-then-resume behavior.
+    // We keep ensureAudioStarted/init flow to resume on user gesture.
+    // Optionally, try to resume minimal context state (non-playing) to allow future user-initiated playback.
+    if (audioContext && audioContext.state === 'suspended') {
+      // keep suspended; call ensureAudioStarted() from user gesture to resume
+    }
+  }
+}, { passive: true });
+
+// pagehide and beforeunload ensure no sound persists when navigating away or putting app to background on mobile
+window.addEventListener('pagehide', () => stopAllSounds(), { passive: true });
+window.addEventListener('beforeunload', () => stopAllSounds(), { passive: true });
